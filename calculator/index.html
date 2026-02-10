@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>Crypto Risk Management Calculator</title>
+
+<style>
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #10101a, #1f1f35);
+    color: #fff;
+}
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.container {
+    background: #1f1f35;
+    border-radius: 25px;
+    width: 900px;
+    max-width: 95%;
+    padding: 30px;
+    display: flex;
+    gap: 30px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.7);
+}
+.inputs, .results {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+h2 {
+    text-align: center;
+    color: #00ffe0;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+label {
+    margin-top: 15px;
+    font-weight: bold;
+}
+input {
+    padding: 10px;
+    margin-top: 5px;
+    width: 100%;
+    border-radius: 12px;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    box-sizing: border-box;
+    background: #2c2c44;
+    color: #fff;
+    transition: 0.3s;
+}
+input:focus {
+    background: #35355c;
+    box-shadow: 0 0 10px rgba(0,255,224,0.3);
+}
+.risk-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 5px;
+}
+.risk-btn, .reset-btn {
+    flex: 1;
+    padding: 10px;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 16px;
+    border: none;
+    transition: 0.2s;
+}
+.risk-btn {
+    background: linear-gradient(135deg, #ff8c42, #ffa15c);
+    color: #fff;
+    margin-right: 5px;
+}
+.risk-btn:last-child { margin-right: 0; }
+.risk-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(255,140,66,0.4); }
+.reset-btn {
+    background: linear-gradient(135deg, #ff4c4c, #ff6a6a);
+    color: #fff;
+    margin-top: 15px;
+    width: 100%;
+}
+.reset-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(255,76,76,0.4); }
+.row { display: flex; gap: 10px; }
+.row input { flex: 1; }
+
+/* 💎 کارت نتایج مدرن با Glow */
+.result-card {
+    background: linear-gradient(145deg, #1b1b2b, #2e2e44);
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+    font-size: 18px;
+    font-weight: bold;
+    color: #e0f7ff;
+    border: 1px solid #00ffe0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.result-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    direction: rtl;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(0,255,224,0.2);
+    border-radius: 8px;
+}
+.result-row:last-child { border-bottom: none; }
+.result-label { text-align: right; font-size: 16px; }
+.result-value {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    text-align: left;
+    direction: ltr;
+    font-size: 16px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+.profit { color: #00ff7f; }
+.loss { color: #ff4c4c; }
+.result-value span.icon { font-size: 18px; }
+
+/* انیمیشن تغییر اعداد */
+@keyframes fadeChange {
+    0% {opacity: 0; transform: translateY(-5px);}
+    50% {opacity: 1; transform: translateY(0);}
+    100% {opacity: 1;}
+}
+.value-animate { animation: fadeChange 0.4s ease; }
+
+/* Glow پویا */
+.glow-profit { 
+    box-shadow: 0 0 15px #00ff7f, 0 0 30px #00ff7f50; 
+    transition: box-shadow 0.4s ease;
+}
+.glow-loss { 
+    box-shadow: 0 0 15px #ff4c4c, 0 0 30px #ff4c4c50; 
+    transition: box-shadow 0.4s ease;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+    <div class="inputs">
+        <h2>Inputs</h2>
+        <label>Balance ($):</label>
+        <input type="number" id="capital" value="2000">
+        <label>Risk ($):</label>
+        <div class="risk-buttons">
+            <button class="risk-btn" onclick="setRiskPercent(0.25)">0.25%</button>
+            <button class="risk-btn" onclick="setRiskPercent(0.5)">0.5%</button>
+            <button class="risk-btn" onclick="setRiskPercent(1)">1%</button>
+        </div>
+        <input type="number" id="risk" value="10">
+        <div class="row">
+            <div>
+                <label>Stop Loss (%):</label>
+                <input type="number" id="stop" value="0.25" step="0.01">
+            </div>
+            <div>
+                <label>Entry Price ($):</label>
+                <input type="number" id="entry" value="1000" step="0.01">
+            </div>
+        </div>
+        <label>Fee (%):</label>
+        <input type="number" id="fee" value="0.04" step="0.01">
+        <label>Risk Reward (RR):</label>
+        <input type="number" id="rr" value="3" step="0.1">
+        <label>Leverage:</label>
+        <input type="number" id="leverage" value="5" step="1" min="1">
+        <button class="reset-btn" onclick="resetAll()"> Clear </button>
+    </div>
+
+    <div class="results">
+        <h2>Results</h2>
+        <div class="result-card">
+            <div class="result-row">
+                <span class="result-label">Margin</span>
+                <span class="result-value" id="margin-value"></span>
+            </div>
+            <div class="result-row">
+                <span class="result-label">Quantity</span>
+                <span class="result-value" id="quantity-value"></span>
+            </div>
+            <div class="result-row">
+                <span class="result-label">Real Loss</span>
+                <span class="result-value loss" id="loss-value"><span class="icon">❌</span></span>
+            </div>
+            <div class="result-row">
+                <span class="result-label">Real Profit</span>
+                <span class="result-value profit" id="profit-value"><span class="icon">✅</span></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+window.addEventListener('DOMContentLoaded', () => {
+    const fields = ['capital','risk','fee'];
+    fields.forEach(id => {
+        const saved = localStorage.getItem(id);
+        if(saved !== null) document.getElementById(id).value = saved;
+        document.getElementById(id).addEventListener('input', e => {
+            localStorage.setItem(id, e.target.value);
+            calculate();
+        });
+    });
+    ['stop','entry','rr','leverage'].forEach(id => {
+        document.getElementById(id).addEventListener('input', calculate);
+    });
+    calculate();
+});
+
+function setRiskPercent(percent){
+    const capital = parseFloat(document.getElementById('capital').value);
+    const riskDollar = (capital*percent/100).toFixed(2);
+    document.getElementById('risk').value = riskDollar;
+    localStorage.setItem('risk', riskDollar);
+    calculate();
+}
+
+function calculate(){
+    const risk_total = parseFloat(document.getElementById('risk').value);
+    const stop = parseFloat(document.getElementById('stop').value)/100;
+    const fee = parseFloat(document.getElementById('fee').value)/100;
+    const rr = parseFloat(document.getElementById('rr').value);
+    const leverage = parseFloat(document.getElementById('leverage').value);
+    const entry = parseFloat(document.getElementById('entry').value);
+    if(isNaN(risk_total)||isNaN(stop)||isNaN(fee)||isNaN(rr)||isNaN(leverage)||isNaN(entry)) return;
+
+    const position = risk_total / (stop + fee);
+    const margin = position / leverage;
+    const loss = position*stop + position*fee;
+    const win = position*stop*rr - position*fee;
+    const quantity = position / entry;
+
+    function updateValue(id, value, glowClass){
+        const el = document.getElementById(id);
+        if(el.textContent != value){
+            el.textContent = value;
+            el.classList.add('value-animate');
+            if(glowClass){
+                el.classList.add(glowClass);
+                setTimeout(()=>el.classList.remove(glowClass),400);
+            }
+            setTimeout(()=>el.classList.remove('value-animate'),400);
+        }
+    }
+
+    updateValue('margin-value', margin.toFixed(2)+' $');
+    updateValue('quantity-value', quantity.toFixed(6));
+    updateValue('loss-value', '❌ '+loss.toFixed(2)+' $', 'glow-loss');
+    updateValue('profit-value', '✅ '+win.toFixed(2)+' $', 'glow-profit');
+}
+
+function resetAll(){
+    ['capital','risk','fee','stop','entry','rr','leverage'].forEach(id=>{
+        document.getElementById(id).value='';
+        localStorage.removeItem(id);
+    });
+    ['margin-value','quantity-value','loss-value','profit-value'].forEach(id=>{
+        document.getElementById(id).textContent='';
+    });
+}
+</script>
+
+</body>
+</html>
