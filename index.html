@@ -651,7 +651,7 @@
             font-size: 0.95rem;
         }
         
-        /* دکمه‌های سریع ریسک */
+        /* دکمه‌های سریع ریسک - فقط دو دکمه */
         .quick-risk-buttons {
             display: flex;
             gap: 8px;
@@ -757,6 +757,78 @@
             margin-top: 8px;
         }
         
+        /* استایل برای آپلود تصویر - سایز کوچکتر */
+        .screenshot-section {
+            background: rgba(15, 23, 42, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            border: 1px solid rgba(71, 85, 105, 0.3);
+            margin-top: 15px;
+        }
+        
+        .screenshot-title {
+            color: #60a5fa;
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .screenshot-upload {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px dashed #475569;
+            border-radius: 6px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            max-width: 250px;
+            margin: 0 auto;
+        }
+        
+        .screenshot-upload:hover {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.1);
+        }
+        
+        .screenshot-upload i {
+            font-size: 1.5rem;
+            color: #94a3b8;
+            margin-bottom: 5px;
+        }
+        
+        .screenshot-upload span {
+            display: block;
+            color: #94a3b8;
+            font-size: 0.8rem;
+        }
+        
+        .screenshot-preview {
+            max-width: 100%;
+            max-height: 100px;
+            border-radius: 4px;
+            margin-top: 8px;
+            display: none;
+        }
+        
+        .screenshot-preview.active {
+            display: block;
+            margin: 8px auto 0;
+        }
+        
+        .screenshot-remove {
+            color: #ef4444;
+            cursor: pointer;
+            font-size: 0.75rem;
+            margin-top: 3px;
+            display: none;
+        }
+        
+        .screenshot-remove.active {
+            display: inline-block;
+        }
+        
         /* دکمه‌های فرم */
         .form-actions {
             display: flex;
@@ -827,7 +899,7 @@
         .trades-table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 900px;
+            min-width: 1000px;
             direction: ltr;
         }
         
@@ -903,14 +975,14 @@
             color: #10b981;
         }
         
-        /* ========== دکمه‌های عملیات بزرگتر و خوانا‌تر ========== */
+        /* ========== دکمه‌های عملیات ========== */
         .actions {
             display: flex;
             gap: 8px;
             justify-content: center;
             align-items: center;
             flex-wrap: nowrap;
-            min-width: 160px; /* کاهش عرض مینیمم بعد از حذف دکمه ویرایش */
+            min-width: 120px;
         }
         
         .btn-icon {
@@ -1125,6 +1197,141 @@
             box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
         }
         
+        /* ========== داشبورد ماهانه ========== */
+        .dashboard-section {
+            background-color: rgba(15, 23, 42, 0.7);
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid #475569;
+        }
+        
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #475569;
+        }
+        
+        .dashboard-title {
+            color: #60a5fa;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .month-selector {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .month-btn {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: #60a5fa;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-width: 36px;
+        }
+        
+        .month-btn:hover {
+            background: rgba(59, 130, 246, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .month-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .month-btn:disabled:hover {
+            transform: none;
+        }
+        
+        .current-month {
+            background: linear-gradient(135deg, #3b82f6, #6366f1);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .dashboard-stat-card {
+            background: linear-gradient(145deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+            border: 1px solid #475569;
+        }
+        
+        .dashboard-stat-label {
+            color: #94a3b8;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+        }
+        
+        .dashboard-stat-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+        
+        .monthly-trades-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border-radius: 8px;
+            border: 1px solid #475569;
+        }
+        
+        .monthly-trades-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .monthly-trades-table th {
+            background: linear-gradient(135deg, #1e40af, #3730a3);
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+            position: sticky;
+            top: 0;
+        }
+        
+        .monthly-trades-table td {
+            padding: 10px;
+            border-bottom: 1px solid #475569;
+            font-size: 0.85rem;
+        }
+        
+        .monthly-trades-table tr:hover {
+            background-color: rgba(59, 130, 246, 0.1);
+            cursor: pointer;
+        }
+        
+        .no-trades-month {
+            text-align: center;
+            padding: 40px;
+            color: #94a3b8;
+        }
+        
         /* مودال جزئیات معامله */
         .details-modal {
             position: fixed;
@@ -1145,7 +1352,7 @@
         }
         
         .details-modal-content {
-            max-width: 500px;
+            max-width: 600px;
             animation: modalSlideUp 0.4s ease-out;
             max-height: 90vh;
             overflow-y: auto;
@@ -1208,6 +1415,49 @@
             gap: 8px;
         }
         
+        .screenshot-gallery {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .screenshot-item {
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 8px;
+            padding: 10px;
+            border: 1px solid #475569;
+        }
+        
+        .screenshot-item h4 {
+            color: #94a3b8;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .screenshot-image {
+            max-width: 100%;
+            max-height: 150px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .screenshot-image:hover {
+            transform: scale(1.05);
+        }
+        
+        .no-screenshot {
+            color: #64748b;
+            font-size: 0.85rem;
+            text-align: center;
+            padding: 20px;
+            background: rgba(30, 41, 59, 0.3);
+            border-radius: 6px;
+            font-style: italic;
+        }
+        
         .details-modal-buttons {
             display: flex;
             gap: 10px;
@@ -1229,9 +1479,107 @@
                 opacity: 1;
             }
         }
+        
+        /* مودال بستن معامله */
+        .close-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            display: none;
+            backdrop-filter: blur(5px);
+        }
+        
+        .close-modal-content {
+            max-width: 400px;
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            padding: 25px;
+            border-radius: 16px;
+            border: 1px solid #475569;
+            width: 90%;
+        }
+        
+        .close-preview {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+            margin: 15px 0;
+            display: none;
+        }
+        
+        .close-preview.active {
+            display: block;
+            margin: 15px auto 0;
+        }
+        
+        /* مودال نمایش تصویر بزرگ */
+        .image-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10001;
+            display: none;
+            cursor: pointer;
+        }
+        
+        .image-modal-content {
+            max-width: 90%;
+            max-height: 90%;
+        }
+        
+        .image-modal-content img {
+            max-width: 100%;
+            max-height: 90vh;
+            border-radius: 8px;
+            border: 2px solid #475569;
+        }
+        
+        .image-modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+            background: rgba(0, 0, 0, 0.5);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .image-modal-close:hover {
+            background: rgba(239, 68, 68, 0.8);
+            transform: scale(1.1);
+        }
     </style>
 </head>
 <body>
+    <!-- مودال نمایش تصویر بزرگ -->
+    <div id="imageModal" class="image-modal" onclick="closeImageModal()">
+        <div class="image-modal-close" onclick="closeImageModal()">
+            <i class="fas fa-times"></i>
+        </div>
+        <div class="image-modal-content">
+            <img id="fullSizeImage" src="" alt="تصویر بزرگ">
+        </div>
+    </div>
+    
     <!-- مودال جزئیات معامله -->
     <div id="detailsModal" class="details-modal">
         <div class="details-modal-content">
@@ -1342,6 +1690,31 @@
                 </div>
             </div>
             
+            <div class="detail-section" id="detail-screenshot-section">
+                <div class="detail-section-title">
+                    <i class="fas fa-camera"></i>
+                    اسکرین‌شات‌ها
+                </div>
+                
+                <div class="screenshot-gallery">
+                    <div class="screenshot-item">
+                        <h4>اسکرین‌شات ورود</h4>
+                        <div id="detail-screenshot-entry-container" style="text-align: center;">
+                            <img id="detail-screenshot-entry" class="screenshot-image" src="" alt="اسکرین‌شات ورود" style="display: none;" onclick="openImageModal(this.src)">
+                            <div id="detail-screenshot-entry-placeholder" class="no-screenshot">اسکرین‌شاتی وجود ندارد</div>
+                        </div>
+                    </div>
+                    
+                    <div class="screenshot-item">
+                        <h4>اسکرین‌شات خروج</h4>
+                        <div id="detail-screenshot-exit-container" style="text-align: center;">
+                            <img id="detail-screenshot-exit" class="screenshot-image" src="" alt="اسکرین‌شات خروج" style="display: none;" onclick="openImageModal(this.src)">
+                            <div id="detail-screenshot-exit-placeholder" class="no-screenshot">اسکرین‌شاتی وجود ندارد</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
             <div class="detail-section" id="detail-result-section" style="display: none;">
                 <div class="detail-section-title">
                     <i class="fas fa-coins"></i>
@@ -1375,6 +1748,46 @@
                 </button>
                 <button type="button" class="btn-warning" onclick="editTradeFromDetails()" style="flex: 1;">
                     <i class="fas fa-edit"></i> ویرایش
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- مودال بستن معامله -->
+    <div id="closeTradeModal" class="close-modal">
+        <div class="close-modal-content">
+            <h3 style="color: #60a5fa; margin-bottom: 20px; text-align: center;">
+                <i class="fas fa-check-circle"></i> بستن معامله
+            </h3>
+            
+            <div class="modal-input-group" style="margin-bottom: 20px;">
+                <label class="modal-label">
+                    <i class="fas fa-dollar-sign"></i>
+                    قیمت بسته شدن
+                </label>
+                <input type="text" id="closePriceInput" class="modal-input" placeholder="مثال: 90715">
+            </div>
+            
+            <div class="screenshot-upload" id="closeScreenshotUpload" onclick="document.getElementById('closeScreenshotFile').click()">
+                <i class="fas fa-camera"></i>
+                <span>آپلود اسکرین‌شات خروج</span>
+                <input type="file" id="closeScreenshotFile" accept="image/*" style="display: none;" onchange="previewCloseScreenshot(this)">
+            </div>
+            
+            <img id="closeScreenshotPreview" class="close-preview" src="" alt="پیش‌نمایش">
+            
+            <div style="margin-top: 15px; text-align: left;">
+                <span class="screenshot-remove" id="closeScreenshotRemove" onclick="removeCloseScreenshot()">
+                    <i class="fas fa-times"></i> حذف تصویر
+                </span>
+            </div>
+            
+            <div class="modal-buttons" style="margin-top: 25px;">
+                <button type="button" class="modal-btn modal-btn-secondary" onclick="closeCloseModal()">
+                    <i class="fas fa-times"></i> انصراف
+                </button>
+                <button type="button" class="modal-btn modal-btn-success" onclick="confirmCloseTrade()">
+                    <i class="fas fa-check"></i> تایید و بستن
                 </button>
             </div>
         </div>
@@ -1610,6 +2023,24 @@
                         </div>
                     </div>
                     
+                    <!-- بخش آپلود اسکرین‌شات - فقط ورود با سایز کوچک -->
+                    <div class="screenshot-section">
+                        <div class="screenshot-title">
+                            <i class="fas fa-camera"></i>
+                            اسکرین‌شات ورود (اختیاری)
+                        </div>
+                        
+                        <div class="screenshot-upload" id="entryScreenshotUpload" onclick="document.getElementById('entryScreenshotFile').click()">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <span>انتخاب تصویر</span>
+                            <input type="file" id="entryScreenshotFile" accept="image/*" style="display: none;" onchange="previewEntryScreenshot(this)">
+                            <img id="entryScreenshotPreview" class="screenshot-preview" src="" alt="پیش‌نمایش">
+                            <div>
+                                <span class="screenshot-remove" id="entryScreenshotRemove" onclick="removeEntryScreenshot(event)">حذف</span>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <!-- خلاصه ریسک -->
                     <div class="risk-summary-section">
                         <div class="risk-summary-title">
@@ -1619,11 +2050,11 @@
                         
                         <div class="risk-summary">
                             <div class="risk-summary-item">
-                                <span class="risk-summary-label">(مقدار ریسک)</span>
+                                <span class="risk-summary-label">مقدار ریسک</span>
                                 <span class="risk-summary-value" id="riskAmount" style="color: #ef4444;">$0</span>
                             </div>
                             <div class="risk-summary-item">
-                                <span class="risk-summary-label">سود</span>
+                                <span class="risk-summary-label">سود بالقوه</span>
                                 <span class="risk-summary-value" id="potentialProfit" style="color: #10b981;">$0</span>
                             </div>
                             <div class="risk-summary-item">
@@ -1668,7 +2099,7 @@
                 </form>
             </section>
             
-            <!-- بخش تاریخچه معاملات -->
+            <!-- بخش تاریخچه معاملات (اول) -->
             <section class="section">
                 <h2 class="section-title"><i class="fas fa-history"></i> تاریخچه معاملات</h2>
                 <div class="trades-table-container">
@@ -1699,9 +2130,70 @@
                 </p>
             </section>
             
-            <!-- بخش آمار و تحلیل -->
+            <!-- بخش داشبورد ماهانه (دوم) -->
+            <section class="dashboard-section">
+                <div class="dashboard-header">
+                    <h2 class="dashboard-title">
+                        <i class="fas fa-chart-pie"></i> داشبورد ماهانه
+                    </h2>
+                    <div class="month-selector">
+                        <button class="month-btn" onclick="changeMonth(-1)" id="prevMonthBtn" title="ماه قبل">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                        <span class="current-month" id="currentMonthDisplay">فروردین 1403</span>
+                        <button class="month-btn" onclick="changeMonth(1)" id="nextMonthBtn" title="ماه بعد">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="dashboard-stats" id="monthlyStats">
+                    <div class="dashboard-stat-card">
+                        <div class="dashboard-stat-label">تعداد معاملات</div>
+                        <div class="dashboard-stat-value" id="monthlyTradeCount">0</div>
+                    </div>
+                    <div class="dashboard-stat-card">
+                        <div class="dashboard-stat-label">سود/ضرر کل</div>
+                        <div class="dashboard-stat-value" id="monthlyTotalPnL" style="color: #94a3b8;">$0</div>
+                    </div>
+                    <div class="dashboard-stat-card">
+                        <div class="dashboard-stat-label">سودآور</div>
+                        <div class="dashboard-stat-value" id="monthlyProfitable" style="color: #10b981;">0</div>
+                    </div>
+                    <div class="dashboard-stat-card">
+                        <div class="dashboard-stat-label">زیان‌ده</div>
+                        <div class="dashboard-stat-value" id="monthlyLoss" style="color: #ef4444;">0</div>
+                    </div>
+                </div>
+                
+                <div class="monthly-trades-container" id="monthlyTradesContainer">
+                    <table class="monthly-trades-table">
+                        <thead>
+                            <tr>
+                                <th>تاریخ</th>
+                                <th>ارز</th>
+                                <th>نوع</th>
+                                <th>ورود</th>
+                                <th>خروج</th>
+                                <th>سود/ضرر</th>
+                                <th>وضعیت</th>
+                            </tr>
+                        </thead>
+                        <tbody id="monthlyTradesBody">
+                            <tr>
+                                <td colspan="7" class="no-trades-month">
+                                    <i class="fas fa-chart-line" style="font-size: 2rem; margin-bottom: 15px; display: block;"></i>
+                                    هیچ معامله‌ای در این ماه وجود ندارد
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            
+            <!-- بخش آمار و تحلیل کلی -->
             <section class="section">
-                <h2 class="section-title"><i class="fas fa-chart-bar"></i> آمار عملکرد</h2>
+                <h2 class="section-title"><i class="fas fa-chart-bar"></i> آمار عملکرد کلی</h2>
                 <div class="stats-container">
                     <div class="stat-card">
                         <div class="stat-icon"><i class="fas fa-exchange-alt"></i></div>
@@ -1808,6 +2300,26 @@
         
         let trades = JSON.parse(localStorage.getItem('crypto_trades')) || [];
         
+        // متغیرهای مربوط به داشبورد ماهانه
+        let currentMonth = new Date();
+        let currentTradeIdForClose = null;
+        let closeScreenshotData = null;
+        
+        // تبدیل تاریخ میلادی به شمسی برای نام ماه
+        function getPersianMonthName(date) {
+            const persianMonthNames = [
+                'فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور',
+                'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'
+            ];
+            
+            // تبدیل تاریخ میلادی به شمسی
+            const persianDate = new Intl.DateTimeFormat('fa-IR', { month: 'long' }).format(date);
+            const persianYear = new Intl.DateTimeFormat('fa-IR', { year: 'numeric' }).format(date);
+            
+            // برای اطمینان از تطابق با نام‌های ماه، از ماه شمسی استفاده می‌کنیم
+            return persianDate + ' ' + persianYear;
+        }
+        
         // بارگذاری اولیه
         document.addEventListener('DOMContentLoaded', function() {
             // تنظیم تاریخ و زمان فعلی
@@ -1816,6 +2328,9 @@
             const localISOTime = new Date(now - timezoneOffset).toISOString().slice(0, 16);
             document.getElementById('date').value = localISOTime;
             
+            // تنظیم ماه فعلی بر اساس اولین معامله اگر وجود داشته باشد
+            setInitialMonthBasedOnFirstTrade();
+            
             // نمایش بالانس و ریسک
             updateBalanceDisplay();
             updateTotalRisk();
@@ -1823,6 +2338,7 @@
             // بارگذاری معاملات
             loadTrades();
             updateStats();
+            updateMonthlyDashboard();
             
             // محاسبه ریسک هنگام تغییر ورودی‌ها
             document.getElementById('entryPrice').addEventListener('input', calculateRisk);
@@ -1830,6 +2346,7 @@
             document.getElementById('takeProfit').addEventListener('input', calculateRisk);
             document.getElementById('riskPercent').addEventListener('input', calculateRisk);
             document.getElementById('feePercent').addEventListener('input', calculateRisk);
+            document.getElementById('type').addEventListener('change', calculateRisk);
             
             // تنظیم مقیاس دینامیک
             adjustScale();
@@ -1864,9 +2381,54 @@
                     }
                 });
             }
+            
+            // بستن مودال بستن معامله با کلیک روی پس‌زمینه
+            const closeModal = document.getElementById('closeTradeModal');
+            if (closeModal) {
+                closeModal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closeCloseModal();
+                    }
+                });
+            }
+            
+            // بستن مودال تصویر با کلیک روی پس‌زمینه
+            const imageModal = document.getElementById('imageModal');
+            if (imageModal) {
+                imageModal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closeImageModal();
+                    }
+                });
+            }
         });
         
-        // ==================== تابع مدیریت مودال‌ها ====================
+        // تنظیم ماه اولیه بر اساس اولین معامله
+        function setInitialMonthBasedOnFirstTrade() {
+            const accountTrades = trades.filter(trade => trade.accountId === activeAccountId);
+            if (accountTrades.length > 0) {
+                // مرتب‌سازی بر اساس تاریخ (قدیمی‌ترین اول)
+                const sortedTrades = [...accountTrades].sort((a, b) => new Date(a.date) - new Date(b.date));
+                const firstTradeDate = new Date(sortedTrades[0].date);
+                currentMonth = new Date(firstTradeDate.getFullYear(), firstTradeDate.getMonth(), 1);
+            }
+        }
+        
+        // ==================== توابع مدیریت تصویر بزرگ ====================
+        function openImageModal(src) {
+            if (src) {
+                document.getElementById('fullSizeImage').src = src;
+                document.getElementById('imageModal').style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+        
+        function closeImageModal() {
+            document.getElementById('imageModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+        
+        // ==================== توابع مدیریت مودال‌ها ====================
         let activeModal = null;
         
         function toggleModal(modalId) {
@@ -1915,7 +2477,154 @@
             activeModal = null;
         }
         
-        // تنظیم مقدار پیش‌فرض بالانس
+        // ==================== توابع پیش‌نمایش اسکرین‌شات ====================
+        function previewEntryScreenshot(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('entryScreenshotPreview');
+                    preview.src = e.target.result;
+                    preview.classList.add('active');
+                    document.getElementById('entryScreenshotRemove').classList.add('active');
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+        
+        function previewCloseScreenshot(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('closeScreenshotPreview');
+                    preview.src = e.target.result;
+                    preview.classList.add('active');
+                    document.getElementById('closeScreenshotRemove').classList.add('active');
+                    closeScreenshotData = e.target.result;
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+        
+        function removeEntryScreenshot(event) {
+            event.stopPropagation();
+            document.getElementById('entryScreenshotFile').value = '';
+            document.getElementById('entryScreenshotPreview').classList.remove('active');
+            document.getElementById('entryScreenshotRemove').classList.remove('active');
+        }
+        
+        function removeCloseScreenshot() {
+            document.getElementById('closeScreenshotFile').value = '';
+            document.getElementById('closeScreenshotPreview').classList.remove('active');
+            document.getElementById('closeScreenshotRemove').classList.remove('active');
+            closeScreenshotData = null;
+        }
+        
+        // ==================== توابع داشبورد ماهانه ====================
+        function changeMonth(direction) {
+            currentMonth.setMonth(currentMonth.getMonth() + direction);
+            updateMonthlyDashboard();
+        }
+        
+        function updateMonthlyDashboard() {
+            const monthDisplay = document.getElementById('currentMonthDisplay');
+            monthDisplay.textContent = getPersianMonthName(currentMonth);
+            
+            // فعال/غیرفعال کردن دکمه‌های ماه
+            const now = new Date();
+            const prevBtn = document.getElementById('prevMonthBtn');
+            const nextBtn = document.getElementById('nextMonthBtn');
+            
+            // نمی‌توانیم به ماه‌های آینده برویم
+            if (currentMonth.getMonth() === now.getMonth() && currentMonth.getFullYear() === now.getFullYear()) {
+                nextBtn.disabled = true;
+            } else {
+                nextBtn.disabled = false;
+            }
+            
+            // فیلتر معاملات ماه جاری
+            const startOfMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
+            const endOfMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0, 23, 59, 59);
+            
+            const monthlyTrades = trades.filter(trade => {
+                const tradeDate = new Date(trade.date);
+                return tradeDate >= startOfMonth && tradeDate <= endOfMonth && trade.accountId === activeAccountId;
+            });
+            
+            // به‌روزرسانی آمار ماهانه
+            document.getElementById('monthlyTradeCount').textContent = monthlyTrades.length;
+            
+            let totalPnL = 0;
+            let profitable = 0;
+            let loss = 0;
+            
+            monthlyTrades.forEach(trade => {
+                if (trade.status === 'closed') {
+                    const pnl = calculateTradePnL(trade);
+                    totalPnL += pnl;
+                    if (pnl > 0) profitable++;
+                    else if (pnl < 0) loss++;
+                }
+            });
+            
+            const totalPnLElement = document.getElementById('monthlyTotalPnL');
+            totalPnLElement.textContent = (totalPnL >= 0 ? '+' : '') + formatCurrency(Math.abs(totalPnL));
+            totalPnLElement.style.color = totalPnL >= 0 ? '#10b981' : '#ef4444';
+            
+            document.getElementById('monthlyProfitable').textContent = profitable;
+            document.getElementById('monthlyLoss').textContent = loss;
+            
+            // نمایش معاملات ماهانه
+            const tbody = document.getElementById('monthlyTradesBody');
+            
+            if (monthlyTrades.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="no-trades-month">
+                            <i class="fas fa-chart-line" style="font-size: 2rem; margin-bottom: 15px; display: block;"></i>
+                            هیچ معامله‌ای در این ماه وجود ندارد
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            // مرتب‌سازی معاملات (جدیدترین اول)
+            const sortedTrades = [...monthlyTrades].sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            let html = '';
+            sortedTrades.forEach(trade => {
+                const date = new Date(trade.date);
+                const dateText = date.toLocaleDateString('fa-IR');
+                
+                const typeText = trade.type === 'buy' ? 'لانگ' : 'شورت';
+                const statusText = trade.status === 'open' ? 'باز' : 'بسته';
+                
+                let pnlText = 'باز';
+                let pnlClass = 'neutral';
+                
+                if (trade.status === 'closed') {
+                    const pnl = calculateTradePnL(trade);
+                    pnlText = (pnl >= 0 ? '+' : '') + formatCurrency(Math.abs(pnl));
+                    pnlClass = pnl > 0 ? 'profit' : (pnl < 0 ? 'loss' : 'neutral');
+                }
+                
+                html += `
+                    <tr onclick="showTradeDetails(${trade.id})">
+                        <td>${dateText}</td>
+                        <td><span class="crypto-badge" style="font-size: 0.8rem;">${trade.symbol}</span></td>
+                        <td>${typeText}</td>
+                        <td class="price-display">${trade.entryPriceStr}</td>
+                        <td class="price-display">${trade.status === 'closed' ? trade.closedPrice : '-'}</td>
+                        <td><span class="${pnlClass}">${pnlText}</span></td>
+                        <td><span class="${trade.status === 'open' ? 'profit' : 'neutral'}">${statusText}</span></td>
+                    </tr>
+                `;
+            });
+            
+            tbody.innerHTML = html;
+        }
+        
+        // ==================== توابع مدیریت معاملات ====================
         function setBalancePreset(amount) {
             document.getElementById('newBalanceInput').value = amount;
         }
@@ -2038,6 +2747,9 @@
             document.getElementById('tradeForm').reset();
             document.getElementById('type').value = '';
             document.getElementById('feeDetails').style.display = 'none';
+            
+            // پاک کردن پیش‌نمایش اسکرین‌شات
+            removeEntryScreenshot(new Event('click'));
         }
         
         // محاسبه ریسک معامله با کارمزد کل
@@ -2054,9 +2766,9 @@
             const stopLoss = parseFloat(stopLossStr) || 0;
             const takeProfit = parseFloat(takeProfitStr) || 0;
             const riskPercent = parseFloat(riskPercentStr) || 0;
-            const totalFeePercent = parseFloat(feePercentStr) || 0; // کارمزد کل (مجموع ورود و خروج)
+            const totalFeePercent = parseFloat(feePercentStr) || 0;
             
-            if (entryPrice <= 0 || stopLoss <= 0 || takeProfit <= 0 || riskPercent <= 0) {
+            if (entryPrice <= 0 || stopLoss <= 0 || takeProfit <= 0 || riskPercent <= 0 || !type) {
                 document.getElementById('feeDetails').style.display = 'none';
                 document.getElementById('riskAmount').textContent = '$0';
                 document.getElementById('potentialProfit').textContent = '$0';
@@ -2064,10 +2776,10 @@
                 return;
             }
             
-            // 1. محاسبه مقدار ریسک دلاری کل (شامل کارمزد)
+            // محاسبه مقدار ریسک دلاری
             const totalRiskAmount = (accountBalance * riskPercent) / 100;
             
-            // 2. محاسبه فاصله حد ضرر (نقطه)
+            // محاسبه فاصله حد ضرر
             let stopLossPoints;
             let takeProfitPoints;
             
@@ -2084,27 +2796,26 @@
                 return;
             }
             
-            // 3. محاسبه اندازه پوزیشن با در نظر گرفتن کارمزد کل
-            // کارمزد کل به عنوان درصدی از ارزش پوزیشن
-            const feePerUnit = (entryPrice * totalFeePercent) / 100; // کارمزد کل به ازای هر واحد
+            // محاسبه اندازه پوزیشن با در نظر گرفتن کارمزد
+            const feePerUnit = (entryPrice * totalFeePercent) / 100;
             const denominator = stopLossPoints + feePerUnit;
             const positionSize = denominator > 0 ? totalRiskAmount / denominator : 0;
             
-            // 4. محاسبه ارزش پوزیشن (حجم دلاری)
+            // محاسبه ارزش پوزیشن
             const positionValue = positionSize * entryPrice;
             
-            // 5. محاسبه کارمزدها (نصف کارمزد کل برای ورود، نصف برای خروج)
+            // محاسبه کارمزدها
             const totalFee = (positionValue * totalFeePercent) / 100;
-            const feeEntry = totalFee / 2; // نصف کارمزد کل برای ورود
-            const feeExit = totalFee / 2; // نصف کارمزد کل برای خروج
+            const feeEntry = totalFee / 2;
+            const feeExit = totalFee / 2;
             
-            // 6. محاسبه سود بالقوه
+            // محاسبه سود بالقوه
             const potentialProfit = positionSize * takeProfitPoints;
             
-            // 7. محاسبه سود خالص پس از کسر کارمزد
+            // محاسبه سود خالص
             const netProfit = potentialProfit - totalFee;
             
-            // 8. محاسبه نسبت ریسک به ریوارد
+            // محاسبه نسبت ریسک به ریوارد
             const riskRewardRatio = stopLossPoints > 0 ? (takeProfitPoints / stopLossPoints).toFixed(2) : 0;
             
             // نمایش نتایج
@@ -2138,7 +2849,7 @@
             };
         }
         
-        // ثبت معامله جدید با کارمزد کل
+        // ثبت معامله جدید
         document.getElementById('tradeForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
@@ -2167,6 +2878,11 @@
             
             // اعتبارسنجی حد ضرر و سود
             const type = document.getElementById('type').value;
+            if (!type) {
+                showNotification('لطفاً نوع معامله را انتخاب کنید.', 'error');
+                return;
+            }
+            
             if (type === 'buy' && stopLoss >= entryPrice) {
                 showNotification('برای لانگ، حد ضرر باید کمتر از قیمت ورود باشد.', 'error');
                 return;
@@ -2182,6 +2898,10 @@
                 showNotification('خطا در محاسبات ریسک.', 'error');
                 return;
             }
+            
+            // دریافت اسکرین‌شات ورود
+            const entryScreenshotPreview = document.getElementById('entryScreenshotPreview');
+            const entryScreenshot = entryScreenshotPreview.classList.contains('active') ? entryScreenshotPreview.src : null;
             
             const trade = {
                 id: Date.now(),
@@ -2202,6 +2922,8 @@
                 status: 'open',
                 closedPrice: null,
                 closedDate: null,
+                entryScreenshot: entryScreenshot,
+                exitScreenshot: null,
                 totalRiskAmount: riskData.totalRiskAmount,
                 positionSize: riskData.positionSize,
                 positionValue: riskData.positionValue,
@@ -2217,6 +2939,14 @@
             updateStats();
             updateTotalRisk();
             
+            // تنظیم ماه بر اساس اولین معامله اگر این اولین معامله است
+            const accountTrades = trades.filter(t => t.accountId === activeAccountId);
+            if (accountTrades.length === 1) {
+                setInitialMonthBasedOnFirstTrade();
+            }
+            
+            updateMonthlyDashboard();
+            
             // پاک کردن فرم
             this.reset();
             
@@ -2227,6 +2957,9 @@
             document.getElementById('date').value = localISOTime;
             document.getElementById('type').value = '';
             document.getElementById('feeDetails').style.display = 'none';
+            
+            // پاک کردن پیش‌نمایش اسکرین‌شات
+            removeEntryScreenshot(new Event('click'));
             
             showNotification('معامله با موفقیت ثبت شد!', 'success');
         });
@@ -2242,7 +2975,7 @@
             }
             
             const totalRiskAmount = (accountBalance * trade.riskPercent) / 100;
-            const feePerUnit = (trade.entryPrice * (trade.totalFeePercent || 0)) / 100; // کارمزد کل به ازای هر واحد
+            const feePerUnit = (trade.entryPrice * (trade.totalFeePercent || 0)) / 100;
             const denominator = stopLossPoints + feePerUnit;
             const positionSize = denominator > 0 ? totalRiskAmount / denominator : 0;
             
@@ -2289,12 +3022,16 @@
                                 date.getHours().toString().padStart(2, '0') + ':' + 
                                 date.getMinutes().toString().padStart(2, '0');
                 
+                // آیکون اسکرین‌شات
+                const screenshotIcon = trade.entryScreenshot ? 
+                    '<i class="fas fa-camera" style="color: #3b82f6; margin-right: 5px;" title="اسکرین‌شات موجود است"></i>' : '';
+                
                 html += `
                 <tr>
                     <td>
                         <div class="crypto-badge">
                             <i class="fas fa-coins"></i>
-                            ${trade.symbol}
+                            ${trade.symbol} ${screenshotIcon}
                         </div>
                     </td>
                     <td>${dateText}</td>
@@ -2310,7 +3047,7 @@
                         <button class="btn-icon" onclick="showTradeDetails(${trade.id})" style="background-color: rgba(14, 165, 233, 0.1); color: #0ea5e9; border: 1px solid rgba(14, 165, 233, 0.3);" title="مشاهده جزئیات">
                             <i class="fas fa-eye"></i>
                         </button>
-                        <button class="btn-icon" onclick="closeTrade(${trade.id})" style="background-color: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.3);" ${trade.status === 'closed' ? 'disabled' : ''} title="بستن معامله">
+                        <button class="btn-icon" onclick="openCloseModal(${trade.id})" style="background-color: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.3);" ${trade.status === 'closed' ? 'disabled' : ''} title="بستن معامله">
                             <i class="fas fa-check-circle"></i>
                         </button>
                         <button class="btn-icon" onclick="deleteTrade(${trade.id})" style="background-color: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3);" title="حذف">
@@ -2324,28 +3061,24 @@
             tbody.innerHTML = html;
         }
         
-        // نمایش جزئیات معامله با کارمزد صحیح
+        // نمایش جزئیات معامله
         function showTradeDetails(tradeId) {
             const trade = trades.find(t => t.id === tradeId);
             if (!trade) return;
             
             const detailsModal = document.getElementById('detailsModal');
-            
-            // ذخیره آی‌دی معامله در مودال برای استفاده در ویرایش
             detailsModal._currentTradeId = tradeId;
             
-            // پر کردن مودال با اطلاعات معامله
+            // اطلاعات پایه
             document.getElementById('detail-symbol').textContent = trade.symbol;
             document.getElementById('detail-type').textContent = trade.type === 'buy' ? 'لانگ' : 'شورت';
             
-            // فرمت تاریخ
             const date = new Date(trade.date);
             const dateText = date.toLocaleDateString('fa-IR') + ' - ' + 
                             date.getHours().toString().padStart(2, '0') + ':' + 
                             date.getMinutes().toString().padStart(2, '0');
             document.getElementById('detail-date').textContent = dateText;
             
-            // وضعیت معامله
             const statusText = trade.status === 'open' ? 'باز' : 'بسته';
             const statusClass = trade.status === 'open' ? 'profit' : 'neutral';
             const statusElement = document.getElementById('detail-status');
@@ -2360,7 +3093,6 @@
             // محاسبات ریسک
             document.getElementById('detail-risk-percent').textContent = trade.riskPercent.toFixed(2) + '%';
             
-            // نمایش ریسک کل (با کارمزد) با رنگ قرمز
             const riskAmountElement = document.getElementById('detail-risk-amount');
             riskAmountElement.textContent = formatCurrency(trade.totalRiskAmount || 0);
             riskAmountElement.style.color = '#ef4444';
@@ -2372,6 +3104,30 @@
             document.getElementById('detail-fee-entry').textContent = formatCurrency(trade.feeEntry || 0);
             document.getElementById('detail-fee-exit').textContent = formatCurrency(trade.feeExit || 0);
             document.getElementById('detail-total-fee').textContent = formatCurrency(trade.totalFee || 0);
+            
+            // اسکرین‌شات‌ها
+            const entryScreenshotImg = document.getElementById('detail-screenshot-entry');
+            const entryPlaceholder = document.getElementById('detail-screenshot-entry-placeholder');
+            const exitScreenshotImg = document.getElementById('detail-screenshot-exit');
+            const exitPlaceholder = document.getElementById('detail-screenshot-exit-placeholder');
+            
+            if (trade.entryScreenshot) {
+                entryScreenshotImg.src = trade.entryScreenshot;
+                entryScreenshotImg.style.display = 'inline';
+                entryPlaceholder.style.display = 'none';
+            } else {
+                entryScreenshotImg.style.display = 'none';
+                entryPlaceholder.style.display = 'block';
+            }
+            
+            if (trade.exitScreenshot) {
+                exitScreenshotImg.src = trade.exitScreenshot;
+                exitScreenshotImg.style.display = 'inline';
+                exitPlaceholder.style.display = 'none';
+            } else {
+                exitScreenshotImg.style.display = 'none';
+                exitPlaceholder.style.display = 'block';
+            }
             
             // اگر معامله بسته شده باشد
             if (trade.status === 'closed') {
@@ -2415,11 +3171,11 @@
             }
             
             // نمایش مودال
-            document.getElementById('detailsModal').style.display = 'flex';
+            detailsModal.style.display = 'flex';
             document.body.style.overflow = 'hidden';
         }
         
-        // بستن مودال جزئیات معامله
+        // بستن مودال جزئیات
         function closeDetailsModal() {
             document.getElementById('detailsModal').style.display = 'none';
             document.body.style.overflow = 'auto';
@@ -2434,7 +3190,57 @@
             }
         }
         
-        // محاسبه سود/ضرر یک معامله بسته شده با کارمزد صحیح
+        // باز کردن مودال بستن معامله
+        function openCloseModal(tradeId) {
+            currentTradeIdForClose = tradeId;
+            document.getElementById('closePriceInput').value = '';
+            removeCloseScreenshot();
+            document.getElementById('closeTradeModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        // بستن مودال بستن معامله
+        function closeCloseModal() {
+            document.getElementById('closeTradeModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            currentTradeIdForClose = null;
+            closeScreenshotData = null;
+        }
+        
+        // تایید بستن معامله
+        function confirmCloseTrade() {
+            const closePrice = document.getElementById('closePriceInput').value.trim();
+            
+            if (!closePrice || isNaN(parseFloat(closePrice))) {
+                showNotification('لطفاً قیمت معتبر وارد کنید.', 'error');
+                return;
+            }
+            
+            if (!currentTradeIdForClose) return;
+            
+            const tradeIndex = trades.findIndex(t => t.id === currentTradeIdForClose);
+            if (tradeIndex !== -1) {
+                trades[tradeIndex].status = 'closed';
+                trades[tradeIndex].closedPrice = parseFloat(closePrice);
+                trades[tradeIndex].closedDate = new Date().toISOString();
+                
+                // اضافه کردن اسکرین‌شات خروج اگر آپلود شده باشد
+                if (closeScreenshotData) {
+                    trades[tradeIndex].exitScreenshot = closeScreenshotData;
+                }
+                
+                saveTrades();
+                loadTrades();
+                updateStats();
+                updateTotalRisk();
+                updateMonthlyDashboard();
+                
+                closeCloseModal();
+                showNotification('معامله بسته شد.', 'success');
+            }
+        }
+        
+        // محاسبه سود/ضرر یک معامله بسته شده
         function calculateTradePnL(trade) {
             if (trade.status !== 'closed' || !trade.closedPrice) return 0;
             
@@ -2447,7 +3253,7 @@
             }
             
             const grossPnl = trade.positionSize * priceDifference;
-            const netPnl = grossPnl - trade.totalFee;
+            const netPnl = grossPnl - (trade.totalFee || 0);
             
             return netPnl;
         }
@@ -2455,7 +3261,6 @@
         // محاسبه سود/ضرر کل
         function calculateTotalPnL() {
             let total = 0;
-            // فقط معاملات حساب فعال
             const accountTrades = trades.filter(trade => trade.accountId === activeAccountId);
             accountTrades.forEach(trade => {
                 total += calculateTradePnL(trade);
@@ -2499,9 +3304,8 @@
             return total;
         }
         
-        // به‌روزرسانی آمار
+        // به‌روزرسانی آمار کلی
         function updateStats() {
-            // فقط معاملات حساب فعال
             const accountTrades = trades.filter(trade => trade.accountId === activeAccountId);
             
             if (accountTrades.length === 0) {
@@ -2513,15 +3317,12 @@
             const openTrades = accountTrades.filter(t => t.status === 'open');
             const totalTrades = accountTrades.length;
             
-            // محاسبات آماری
-            let totalPnl = 0;
             let profitableTrades = 0;
             let maxProfit = 0;
             let maxLoss = 0;
             
             closedTrades.forEach(trade => {
                 const pnl = calculateTradePnL(trade);
-                totalPnl += pnl;
                 
                 if (pnl > 0) {
                     profitableTrades++;
@@ -2531,29 +3332,23 @@
                 }
             });
             
-            // محاسبه سود کل و ضرر کل جداگانه
             const totalProfit = calculateTotalProfit();
             const totalLoss = calculateTotalLoss();
             const totalFees = calculateTotalFees();
             
-            // محاسبه درصدها
             const winRate = closedTrades.length > 0 ? (profitableTrades / closedTrades.length) * 100 : 0;
             
-            // به‌روزرسانی نمایش با کلاس‌های جدید
             document.getElementById('totalTrades').textContent = totalTrades;
             document.getElementById('openTrades').textContent = openTrades.length;
             
-            // سود کل
             const totalProfitElement = document.getElementById('totalProfit');
             totalProfitElement.textContent = formatCurrency(totalProfit);
             totalProfitElement.className = totalProfit > 0 ? 'stat-value positive' : 'stat-value neutral-stat';
             
-            // ضرر کل
             const totalLossElement = document.getElementById('totalLoss');
             totalLossElement.textContent = formatCurrency(totalLoss);
             totalLossElement.className = totalLoss > 0 ? 'stat-value negative' : 'stat-value neutral-stat';
             
-            // کارمزد کل
             const totalFeesElement = document.getElementById('totalFees');
             totalFeesElement.textContent = formatCurrency(totalFees);
             totalFeesElement.className = 'stat-value fee-stat';
@@ -2599,28 +3394,6 @@
             showNotification('معامله برای ویرایش آماده است.', 'info');
         }
         
-        // بستن معامله
-        function closeTrade(id) {
-            const closePrice = prompt('قیمت بسته شدن معامله را وارد کنید:');
-            if (!closePrice || isNaN(parseFloat(closePrice))) {
-                showNotification('قیمت نامعتبر است.', 'error');
-                return;
-            }
-            
-            const tradeIndex = trades.findIndex(t => t.id === id);
-            if (tradeIndex !== -1) {
-                trades[tradeIndex].status = 'closed';
-                trades[tradeIndex].closedPrice = parseFloat(closePrice);
-                trades[tradeIndex].closedDate = new Date().toISOString();
-                
-                saveTrades();
-                loadTrades();
-                updateStats();
-                updateTotalRisk();
-                showNotification('معامله بسته شد.', 'success');
-            }
-        }
-        
         // حذف معامله
         function deleteTrade(id) {
             if (confirm('آیا از حذف این معامله اطمینان دارید؟')) {
@@ -2629,6 +3402,7 @@
                 loadTrades();
                 updateStats();
                 updateTotalRisk();
+                updateMonthlyDashboard();
                 showNotification('معامله حذف شد.', 'warning');
             }
         }
@@ -2644,7 +3418,7 @@
             localStorage.setItem('crypto_active_account_id', activeAccountId.toString());
         }
         
-        // به‌روزرسانی لیست حساب‌ها در مودال مدیریت حساب
+        // به‌روزرسانی لیست حساب‌ها
         function updateAccountsList() {
             const accountsListContainer = document.getElementById('accountsListContainer');
             if (!accountsListContainer) return;
@@ -2691,17 +3465,14 @@
                 return;
             }
             
-            // بررسی اینکه آیا حساب با این نام وجود دارد
             const existingAccount = accounts.find(acc => acc.name.toLowerCase() === newAccountName.toLowerCase());
             if (existingAccount) {
                 showNotification('حسابی با این نام از قبل وجود دارد.', 'error');
                 return;
             }
             
-            // ایجاد شناسه جدید
             const newAccountId = accounts.length > 0 ? Math.max(...accounts.map(acc => acc.id)) + 1 : 1;
             
-            // ایجاد حساب جدید
             const newAccount = {
                 id: newAccountId,
                 name: newAccountName,
@@ -2711,13 +3482,10 @@
             accounts.push(newAccount);
             saveAccounts();
             
-            // پاک کردن فیلدهای ورودی
             document.getElementById('newAccountName').value = '';
             document.getElementById('newAccountBalance').value = '1000';
             
-            // به‌روزرسانی لیست حساب‌ها
             updateAccountsList();
-            
             showNotification('حساب جدید با موفقیت اضافه شد.', 'success');
         }
         
@@ -2734,29 +3502,27 @@
             }
             
             if (confirm('آیا از حذف این حساب اطمینان دارید؟ تمام معاملات مربوط به این حساب نیز حذف خواهند شد.')) {
-                // حذف حساب
                 accounts = accounts.filter(acc => acc.id !== accountId);
-                
-                // حذف معاملات مربوط به این حساب
                 trades = trades.filter(trade => trade.accountId !== accountId);
                 
-                // اگر حساب فعال در حال حذف است، به حساب اصلی برو
                 if (accountId === activeAccountId) {
                     activeAccountId = 1;
                     activeAccount = accounts.find(acc => acc.id === 1);
                     accountBalance = activeAccount.balance;
                 }
                 
-                // ذخیره تغییرات
                 saveAccounts();
                 saveTrades();
                 
-                // به‌روزرسانی نمایش
                 updateBalanceDisplay();
                 updateAccountsList();
                 loadTrades();
                 updateStats();
                 updateTotalRisk();
+                
+                // بازنشانی ماه بر اساس اولین معامله موجود
+                setInitialMonthBasedOnFirstTrade();
+                updateMonthlyDashboard();
                 
                 showNotification('حساب و معاملات مربوطه حذف شدند.', 'warning');
             }
@@ -2777,17 +3543,19 @@
             
             saveAccounts();
             
-            // به‌روزرسانی نمایش
             updateBalanceDisplay();
             updateAccountsList();
             loadTrades();
             updateStats();
             updateTotalRisk();
+            
+            // بازنشانی ماه بر اساس اولین معامله حساب جدید
+            setInitialMonthBasedOnFirstTrade();
+            updateMonthlyDashboard();
             calculateRisk();
             
             showNotification(`حساب "${activeAccount.name}" فعال شد.`, 'success');
             
-            // بستن مودال مدیریت حساب
             closeAllModals();
         }
         
@@ -2854,6 +3622,11 @@
                         updateTotalRisk();
                         loadTrades();
                         updateStats();
+                        
+                        // بازنشانی ماه بر اساس اولین معامله
+                        setInitialMonthBasedOnFirstTrade();
+                        updateMonthlyDashboard();
+                        
                         fileInput.value = '';
                         
                         showNotification('اطلاعات با موفقیت بارگذاری شدند.', 'success');
