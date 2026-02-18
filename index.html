@@ -1,0 +1,4506 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Crypto Journal</title>
+
+    <!-- Apple Web App Mode -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Crypto Journal">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <!-- Apple Touch Icon -->
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+    <!-- Safari macOS favicon -->
+    <link rel="icon" type="image/svg+xml" href="./icons/favicon.svg">
+    <link rel="icon" type="image/png" sizes="96x96" href="./icons/favicon-96x96.png">
+
+    <!-- Safari theme -->
+    <meta name="theme-color" content="#0f172a">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- کتابخانه JSZip برای کار با فایل‌های ZIP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    
+    <style>
+        /* ===== تمام استایل‌های قبلی دقیقاً به همین شکل باقی می‌مانند ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #f1f5f9;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            width: 1400px;
+            background-color: rgba(30, 41, 59, 0.95);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            padding: 25px;
+            border: 1px solid #334155;
+            transform-origin: top center;
+        }
+        
+        @media (max-width: 1399px) {
+            .container {
+                transform: scale(calc(100vw / 1400));
+                transform-origin: top center;
+                margin: 20px 0;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                transform: scale(0.55);
+                transform-origin: top center;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                transform: scale(0.4);
+                transform-origin: top center;
+            }
+        }
+        
+        /* ===== Header ===== */
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #3b82f6;
+            position: relative;
+            padding-top: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 30%;
+            width: 40%;
+            height: 4px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            border-radius: 2px;
+        }
+        
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        
+        .header-title {
+            flex-grow: 1;
+            text-align: center;
+        }
+        
+        h1 {
+            color: #60a5fa;
+            font-size: 2rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            color: #94a3b8;
+            font-size: 1rem;
+            margin-top: 5px;
+        }
+        
+        .calculator-btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            min-width: 140px;
+            justify-content: center;
+            margin-left: 20px;
+        }
+        
+        .calculator-btn:hover {
+            background: linear-gradient(135deg, #059669, #047857);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(16, 185, 129, 0.3);
+        }
+        
+        /* ===== Balance ===== */
+        .balance-container {
+            background: linear-gradient(145deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
+            border-radius: 14px;
+            padding: 20px;
+            border: 1px solid #475569;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .balance-main {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .balance-icon {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .balance-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .balance-title {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+        
+        .balance-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #10b981;
+        }
+        
+        .balance-details {
+            display: flex;
+            gap: 25px;
+        }
+        
+        .balance-detail {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .detail-label {
+            color: #cbd5e1;
+            font-size: 0.8rem;
+            margin-bottom: 4px;
+        }
+        
+        .detail-value {
+            font-size: 1rem;
+            font-weight: 700;
+        }
+        
+        .balance-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .balance-btn {
+            padding: 10px 16px;
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            border-radius: 8px;
+            color: #60a5fa;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .balance-btn:hover {
+            background: rgba(59, 130, 246, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .balance-btn.active {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.4);
+            color: #ef4444;
+        }
+        
+        /* ===== Modal ===== */
+        .modal-box {
+            background: rgba(30, 41, 59, 0.95);
+            border-radius: 12px;
+            border: 1px solid #475569;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(-10px);
+            padding: 0 25px;
+            border-width: 0;
+            margin: 0;
+        }
+        
+        .modal-box.active {
+            max-height: 800px;
+            opacity: 1;
+            transform: translateY(0);
+            padding: 25px;
+            border-width: 1px;
+            margin-top: 15px;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #475569;
+        }
+        
+        .modal-title {
+            color: #60a5fa;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .modal-close {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .modal-close:hover {
+            background: rgba(239, 68, 68, 0.2);
+            transform: rotate(90deg);
+        }
+        
+        .modal-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .modal-input-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .modal-label {
+            color: #cbd5e1;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .modal-input {
+            width: 100%;
+            padding: 12px;
+            background-color: #1e293b;
+            border: 1px solid #475569;
+            border-radius: 8px;
+            color: #f1f5f9;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        
+        .modal-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .modal-btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #6366f1);
+            color: white;
+        }
+        
+        .modal-btn-primary:hover {
+            background: linear-gradient(135deg, #2563eb, #4f46e5);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
+        }
+        
+        .modal-btn-secondary {
+            background-color: #475569;
+            color: #e2e8f0;
+        }
+        
+        .modal-btn-secondary:hover {
+            background-color: #64748b;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(71, 85, 105, 0.3);
+        }
+        
+        .modal-btn-success {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+        
+        .modal-btn-success:hover {
+            background: linear-gradient(135deg, #059669, #047857);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+        }
+        
+        /* استایل مخصوص بخش پشتیبان‌گیری جدید */
+        .backup-progress {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(30, 41, 59, 0.8);
+            border-radius: 8px;
+            border: 1px solid #475569;
+            display: none;
+        }
+        
+        .backup-progress.active {
+            display: block;
+        }
+        
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background: #334155;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 4px;
+        }
+        
+        .progress-text {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            margin-top: 8px;
+            text-align: center;
+        }
+        
+        .backup-status {
+            color: #10b981;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+        
+        /* ===== Accounts ===== */
+        .accounts-list-container {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: 1px solid #475569;
+            padding: 10px;
+            background-color: rgba(15, 23, 42, 0.5);
+        }
+        
+        .account-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            border-bottom: 1px solid #475569;
+            transition: all 0.2s;
+        }
+        
+        .account-item:hover {
+            background-color: rgba(59, 130, 246, 0.1);
+        }
+        
+        .account-item:last-child {
+            border-bottom: none;
+        }
+        
+        .account-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .account-name {
+            font-weight: 600;
+            color: #f1f5f9;
+        }
+        
+        .account-balance {
+            font-size: 0.9rem;
+            color: #94a3b8;
+        }
+        
+        .account-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .account-action-btn {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            font-size: 0.9rem;
+            padding: 5px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        
+        .account-action-btn:hover {
+            color: #3b82f6;
+            background-color: rgba(59, 130, 246, 0.1);
+        }
+        
+        .account-action-btn.delete:hover {
+            color: #ef4444;
+            background-color: rgba(239, 68, 68, 0.1);
+        }
+        
+        .active-account {
+            background-color: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 8px;
+        }
+        
+        .active-badge {
+            background-color: #10b981;
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-top: 5px;
+        }
+        
+        .preset-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .preset-btn {
+            padding: 8px 5px;
+            background: rgba(71, 85, 105, 0.3);
+            border: 1px solid #475569;
+            border-radius: 6px;
+            color: #e2e8f0;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        
+        .preset-btn:hover {
+            background: rgba(59, 130, 246, 0.3);
+            border-color: #3b82f6;
+            transform: translateY(-2px);
+        }
+        
+        .current-balance-display {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .current-balance-label {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+        
+        .current-balance-value {
+            color: #10b981;
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+        
+        /* ===== Main Content ===== */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        
+        .section {
+            background-color: rgba(15, 23, 42, 0.7);
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid #475569;
+        }
+        
+        .section-title {
+            color: #60a5fa;
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #475569;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* ===== Trade Form ===== */
+        .trade-form {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        label {
+            margin-bottom: 8px;
+            color: #cbd5e1;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        input, select {
+            padding: 12px;
+            background-color: #1e293b;
+            border: 1px solid #475569;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            color: #f1f5f9;
+            transition: all 0.3s;
+            height: 44px;
+        }
+        
+        input[type="text"] {
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+            text-align: left;
+            direction: ltr;
+            font-size: 0.95rem;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+        
+        .prices-section {
+            background: rgba(15, 23, 42, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid rgba(71, 85, 105, 0.3);
+        }
+        
+        .prices-title {
+            color: #60a5fa;
+            font-size: 1rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .prices-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+        
+        .price-display {
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            direction: ltr;
+            text-align: left;
+            font-size: 0.95rem;
+        }
+        
+        .quick-risk-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .quick-risk-btn {
+            padding: 8px 12px;
+            background-color: rgba(71, 85, 105, 0.5);
+            border: 1px solid #475569;
+            border-radius: 6px;
+            color: #e2e8f0;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            flex: 1;
+            min-height: 36px;
+        }
+        
+        .quick-risk-btn:hover {
+            background-color: #64748b;
+            transform: translateY(-2px);
+        }
+        
+        /* استایل جدید برای آپلود اسکرین‌شات هم‌شکل با ورودی‌ها */
+        .screenshot-upload-input {
+            width: 100%;
+            padding: 12px;
+            background-color: #1e293b;
+            border: 1px solid #475569;
+            border-radius: 8px;
+            color: #f1f5f9;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            text-align: center;
+        }
+        
+        .screenshot-upload-input:hover {
+            border-color: #3b82f6;
+            background-color: rgba(59, 130, 246, 0.1);
+        }
+        
+        .screenshot-upload-input i {
+            color: #94a3b8;
+        }
+        
+        .screenshot-upload-input span {
+            color: #94a3b8;
+        }
+        
+        /* بخش پیش‌نمایش زیر ورودی‌ها */
+        .screenshot-preview-container {
+            margin-top: 10px;
+            text-align: center;
+            display: none;
+        }
+        
+        .screenshot-preview-container.active {
+            display: block;
+        }
+        
+        .screenshot-preview-image {
+            max-width: 100%;
+            max-height: 150px;
+            border-radius: 8px;
+            border: 1px solid #475569;
+            margin-bottom: 5px;
+        }
+        
+        .screenshot-remove-link {
+            color: #ef4444;
+            cursor: pointer;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .screenshot-remove-link:hover {
+            text-decoration: underline;
+        }
+        
+        .risk-summary-section {
+            background: rgba(15, 23, 42, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid rgba(71, 85, 105, 0.3);
+            margin-top: 15px;
+        }
+        
+        .risk-summary-title {
+            color: #60a5fa;
+            font-size: 1rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .risk-summary {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+        
+        .risk-summary-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(30, 41, 59, 0.5);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #475569;
+        }
+        
+        .risk-summary-label {
+            color: #cbd5e1;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+        }
+        
+        .risk-summary-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+        
+        .fee-info-box {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 8px;
+            padding: 18px;
+            margin-top: 15px;
+        }
+        
+        .fee-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+        
+        .fee-total {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.95rem;
+            font-weight: 600;
+            padding-top: 10px;
+            border-top: 1px solid rgba(245, 158, 11, 0.3);
+            margin-top: 10px;
+        }
+        
+        .fee-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #94a3b8;
+            font-size: 0.8rem;
+            margin-top: 8px;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 10px;
+            justify-content: flex-end;
+        }
+        
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            height: 44px;
+            min-width: 140px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #6366f1);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #2563eb, #4f46e5);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
+        }
+        
+        .btn-secondary {
+            background-color: #475569;
+            color: #e2e8f0;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #64748b;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(71, 85, 105, 0.3);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background: linear-gradient(135deg, #d97706, #b45309);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(245, 158, 11, 0.3);
+        }
+        
+        /* ===== Trades Table ===== */
+        .trades-table-container {
+            overflow-x: auto;
+            border-radius: 10px;
+            border: 1px solid #475569;
+            margin-top: 15px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .trades-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1000px;
+            direction: ltr;
+        }
+        
+        .trades-table th {
+            background: linear-gradient(135deg, #1e40af, #3730a3);
+            color: white;
+            padding: 14px 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #3b82f6;
+            font-size: 0.9rem;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .trades-table td {
+            padding: 12px;
+            border-bottom: 1px solid #475569;
+            font-size: 0.9rem;
+            text-align: left;
+        }
+        
+        .trades-table tr:hover {
+            background-color: rgba(59, 130, 246, 0.1);
+        }
+        
+        .profit {
+            color: #10b981;
+            font-weight: 700;
+            background-color: rgba(16, 185, 129, 0.1);
+            padding: 5px 10px;
+            border-radius: 20px;
+            display: inline-block;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+        }
+        
+        .loss {
+            color: #ef4444;
+            font-weight: 700;
+            background-color: rgba(239, 68, 68, 0.1);
+            padding: 5px 10px;
+            border-radius: 20px;
+            display: inline-block;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+        }
+        
+        .neutral {
+            color: #94a3b8;
+            font-weight: 700;
+            background-color: rgba(148, 163, 184, 0.1);
+            padding: 5px 10px;
+            border-radius: 20px;
+            display: inline-block;
+            font-size: 0.85rem;
+        }
+        
+        .crypto-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background-color: rgba(16, 185, 129, 0.1);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #10b981;
+        }
+        
+        .crypto-badge i {
+            color: #10b981;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: nowrap;
+            min-width: 120px;
+        }
+        
+        .btn-icon {
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 36px;
+            width: 36px;
+            min-width: 36px;
+            flex-shrink: 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn-icon i {
+            font-size: 1rem;
+        }
+        
+        .btn-icon:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn-icon:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .btn-icon:disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+        
+        /* ===== Stats ===== */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(145deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+            border: 1px solid #475569;
+            min-height: 95px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            opacity: 0.7;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            border-color: #60a5fa;
+        }
+        
+        .stat-icon {
+            font-size: 0.95rem;
+            margin-bottom: 8px;
+            opacity: 0.7;
+            color: #94a3b8;
+        }
+        
+        .stat-label {
+            color: #cbd5e1;
+            font-size: 0.8rem;
+            margin-bottom: 8px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+        
+        .stat-value {
+            font-size: 1.25rem;
+            font-weight: 800;
+            margin: 5px 0;
+            font-family: 'Segoe UI', 'Courier New', monospace;
+            letter-spacing: 0.5px;
+        }
+        
+        .positive {
+            color: #10b981;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05));
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+        
+        .negative {
+            color: #ef4444;
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.05));
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+        
+        .neutral-stat {
+            color: #94a3b8;
+            background: linear-gradient(135deg, rgba(148, 163, 184, 0.1), rgba(148, 163, 184, 0.05));
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+        }
+        
+        .fee-stat {
+            color: #f59e0b;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.05));
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+        
+        /* ===== Backup ===== */
+        .backup-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-top: 15px;
+        }
+        
+        .backup-card {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9));
+            padding: 22px;
+            border-radius: 10px;
+            border: 1px solid #475569;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .backup-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+            color: #60a5fa;
+            font-size: 1.05rem;
+        }
+        
+        .backup-description {
+            color: #cbd5e1;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            flex-grow: 1;
+        }
+        
+        .file-input {
+            width: 100%;
+            padding: 12px;
+            background-color: #1e293b;
+            border: 1px solid #475569;
+            border-radius: 8px;
+            color: #f1f5f9;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .btn-backup {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            width: 100%;
+        }
+        
+        .btn-backup:hover {
+            background: linear-gradient(135deg, #059669, #047857);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+        }
+        
+        /* ===== Dashboard ===== */
+        .dashboard-section {
+            background-color: rgba(15, 23, 42, 0.7);
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid #475569;
+        }
+        
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #475569;
+        }
+        
+        .dashboard-title {
+            color: #60a5fa;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .month-selector {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .month-btn {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: #60a5fa;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-width: 36px;
+        }
+        
+        .month-btn:hover {
+            background: rgba(59, 130, 246, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .month-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .month-btn:disabled:hover {
+            transform: none;
+        }
+        
+        .current-month {
+            background: linear-gradient(135deg, #3b82f6, #6366f1);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .dashboard-stat-card {
+            background: linear-gradient(145deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+            border: 1px solid #475569;
+        }
+        
+        .dashboard-stat-label {
+            color: #94a3b8;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+        }
+        
+        .dashboard-stat-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+        
+        .monthly-trades-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border-radius: 8px;
+            border: 1px solid #475569;
+        }
+        
+        .monthly-trades-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1000px;
+            direction: ltr;
+        }
+        
+        .monthly-trades-table th {
+            background: linear-gradient(135deg, #1e40af, #3730a3);
+            color: white;
+            padding: 14px 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #3b82f6;
+            font-size: 0.9rem;
+            position: sticky;
+            top: 0;
+        }
+        
+        .monthly-trades-table td {
+            padding: 12px;
+            border-bottom: 1px solid #475569;
+            font-size: 0.9rem;
+            text-align: left;
+        }
+        
+        .monthly-trades-table tr:hover {
+            background-color: rgba(59, 130, 246, 0.1);
+            cursor: pointer;
+        }
+        
+        .no-trades-month {
+            text-align: center;
+            padding: 40px;
+            color: #94a3b8;
+        }
+        
+        /* ===== Details Modal ===== */
+        .details-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            z-index: 9999;
+            display: none;
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease-out;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .details-modal-content {
+            max-width: 600px;
+            animation: modalSlideUp 0.4s ease-out;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            margin-top: 50px;
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            padding: 25px;
+            border-radius: 16px;
+            border: 1px solid #475569;
+            width: 90%;
+        }
+        
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 12px;
+        }
+        
+        .detail-label {
+            color: #94a3b8;
+            font-size: 0.85rem;
+            margin-bottom: 4px;
+        }
+        
+        .detail-value {
+            color: #f1f5f9;
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 10px;
+            background-color: rgba(30, 41, 59, 0.5);
+            border-radius: 6px;
+            border: 1px solid #475569;
+        }
+        
+        .detail-value.price {
+            font-family: 'Courier New', monospace;
+            direction: ltr;
+            text-align: right;
+        }
+        
+        .detail-section {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #475569;
+        }
+        
+        .detail-section-title {
+            color: #60a5fa;
+            font-size: 0.95rem;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .screenshot-gallery {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .screenshot-item {
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 8px;
+            padding: 10px;
+            border: 1px solid #475569;
+        }
+        
+        .screenshot-item h4 {
+            color: #94a3b8;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .screenshot-image {
+            max-width: 100%;
+            max-height: 150px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .screenshot-image:hover {
+            transform: scale(1.05);
+        }
+        
+        .no-screenshot {
+            color: #64748b;
+            font-size: 0.85rem;
+            text-align: center;
+            padding: 20px;
+            background: rgba(30, 41, 59, 0.3);
+            border-radius: 6px;
+            font-style: italic;
+        }
+        
+        .details-modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes modalSlideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        /* ===== Close Modal ===== */
+        .close-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            display: none;
+            backdrop-filter: blur(5px);
+        }
+        
+        .close-modal-content {
+            max-width: 400px;
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            padding: 25px;
+            border-radius: 16px;
+            border: 1px solid #475569;
+            width: 90%;
+        }
+        
+        .close-preview {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+            margin: 15px 0;
+            display: none;
+        }
+        
+        .close-preview.active {
+            display: block;
+            margin: 15px auto 0;
+        }
+        
+        /* ===== Image Modal ===== */
+        .image-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10001;
+            display: none;
+            cursor: pointer;
+        }
+        
+        .image-modal-content {
+            max-width: 90%;
+            max-height: 90%;
+        }
+        
+        .image-modal-content img {
+            max-width: 100%;
+            max-height: 90vh;
+            border-radius: 8px;
+            border: 2px solid #475569;
+        }
+        
+        .image-modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+            background: rgba(0, 0, 0, 0.5);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .image-modal-close:hover {
+            background: rgba(239, 68, 68, 0.8);
+            transform: scale(1.1);
+        }
+        
+        /* ===== Backup Reminder ===== */
+        .backup-reminder {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            z-index: 10002;
+            display: none;
+            align-items: center;
+            gap: 15px;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        .backup-reminder.show {
+            display: flex;
+        }
+        
+        .backup-reminder i {
+            font-size: 1.5rem;
+        }
+        
+        .backup-reminder-content {
+            flex: 1;
+        }
+        
+        .backup-reminder-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .backup-reminder-text {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+        
+        .backup-reminder-close {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 5px;
+            min-width: auto;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #475569;
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- مودال نمایش تصویر بزرگ -->
+    <div id="imageModal" class="image-modal" onclick="closeImageModal()">
+        <div class="image-modal-close" onclick="closeImageModal()">
+            <i class="fas fa-times"></i>
+        </div>
+        <div class="image-modal-content">
+            <img id="fullSizeImage" src="" alt="تصویر بزرگ">
+        </div>
+    </div>
+    
+    <!-- مودال جزئیات معامله -->
+    <div id="detailsModal" class="details-modal">
+        <div class="details-modal-content">
+            <h3 style="color: #60a5fa; margin-bottom: 20px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <i class="fas fa-chart-line"></i>
+                جزئیات معامله
+            </h3>
+            
+            <div class="details-grid">
+                <div class="detail-item">
+                    <span class="detail-label">ارز دیجیتال</span>
+                    <div class="detail-value" id="detail-symbol">BTC</div>
+                </div>
+                
+                <div class="detail-item">
+                    <span class="detail-label">نوع معامله</span>
+                    <div class="detail-value" id="detail-type">لانگ</div>
+                </div>
+                
+                <div class="detail-item">
+                    <span class="detail-label">تاریخ معامله</span>
+                    <div class="detail-value" id="detail-date">1402/10/15 - 14:30</div>
+                </div>
+                
+                <div class="detail-item">
+                    <span class="detail-label">وضعیت</span>
+                    <div class="detail-value" id="detail-status">باز</div>
+                </div>
+            </div>
+            
+            <div class="detail-section">
+                <div class="detail-section-title">
+                    <i class="fas fa-chart-area"></i>
+                    قیمت‌ها
+                </div>
+                
+                <div class="details-grid">
+                    <div class="detail-item">
+                        <span class="detail-label">قیمت ورود</span>
+                        <div class="detail-value price" id="detail-entry">90075</div>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <span class="detail-label">حد ضرر</span>
+                        <div class="detail-value price" id="detail-sl">89861</div>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <span class="detail-label">حد سود</span>
+                        <div class="detail-value price" id="detail-tp">90715</div>
+                    </div>
+                    
+                    <div class="detail-item" id="detail-closed-price-container" style="display: none;">
+                        <span class="detail-label">قیمت بسته شدن</span>
+                        <div class="detail-value price" id="detail-closed-price">-</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="detail-section">
+                <div class="detail-section-title">
+                    <i class="fas fa-calculator"></i>
+                    محاسبات ریسک
+                </div>
+                
+                <div class="details-grid">
+                    <div class="detail-item">
+                        <span class="detail-label">ریسک (% از بالانس)</span>
+                        <div class="detail-value" id="detail-risk-percent">0.5%</div>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <span class="detail-label">مقدار ریسک ($)</span>
+                        <div class="detail-value" id="detail-risk-amount" style="color: #ef4444;">$7.50</div>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <span class="detail-label">اندازه پوزیشن</span>
+                        <div class="detail-value" id="detail-position-size">0.0234</div>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <span class="detail-label">ریسک به ریوارد</span>
+                        <div class="detail-value" id="detail-rr">1:1.5</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="detail-section" id="detail-fee-section">
+                <div class="detail-section-title">
+                    <i class="fas fa-receipt"></i>
+                    کارمزد
+                </div>
+                
+                <div class="details-grid">
+                    <div class="detail-item">
+                        <span class="detail-label">کارمزد ورود</span>
+                        <div class="detail-value" id="detail-fee-entry" style="color: #f59e0b;">$0.00</div>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">کارمزد خروج</span>
+                        <div class="detail-value" id="detail-fee-exit" style="color: #f59e0b;">$0.00</div>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">کل کارمزد</span>
+                        <div class="detail-value" id="detail-total-fee" style="color: #f59e0b; font-weight: 700;">$0.00</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="detail-section" id="detail-screenshot-section">
+                <div class="detail-section-title">
+                    <i class="fas fa-camera"></i>
+                    اسکرین‌شات‌ها
+                </div>
+                
+                <div class="screenshot-gallery">
+                    <div class="screenshot-item">
+                        <h4>اسکرین‌شات ورود</h4>
+                        <div id="detail-screenshot-entry-container" style="text-align: center;">
+                            <img id="detail-screenshot-entry" class="screenshot-image" src="" alt="اسکرین‌شات ورود" style="display: none;" onclick="openImageModal(this.src)">
+                            <div id="detail-screenshot-entry-placeholder" class="no-screenshot">اسکرین‌شاتی وجود ندارد</div>
+                        </div>
+                    </div>
+                    
+                    <div class="screenshot-item">
+                        <h4>اسکرین‌شات خروج</h4>
+                        <div id="detail-screenshot-exit-container" style="text-align: center;">
+                            <img id="detail-screenshot-exit" class="screenshot-image" src="" alt="اسکرین‌شات خروج" style="display: none;" onclick="openImageModal(this.src)">
+                            <div id="detail-screenshot-exit-placeholder" class="no-screenshot">اسکرین‌شاتی وجود ندارد</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="detail-section" id="detail-result-section" style="display: none;">
+                <div class="detail-section-title">
+                    <i class="fas fa-coins"></i>
+                    نتیجه معامله
+                </div>
+                
+                <div class="details-grid">
+                    <div class="detail-item">
+                        <span class="detail-label">سود/ضرر خام</span>
+                        <div class="detail-value" id="detail-gross-pnl">+$12.50</div>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">کارمزد کسر شده</span>
+                        <div class="detail-value" id="detail-fee-deducted" style="color: #f59e0b;">$0.00</div>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">سود/ضرر خالص</span>
+                        <div class="detail-value" id="detail-net-pnl">+$12.50</div>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <span class="detail-label">تاریخ بسته شدن</span>
+                        <div class="detail-value" id="detail-closed-date">1402/10/16 - 09:45</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="details-modal-buttons">
+                <button type="button" class="btn-secondary" onclick="closeDetailsModal()" style="flex: 1;">
+                    <i class="fas fa-times"></i> بستن
+                </button>
+                <button type="button" class="btn-warning" onclick="editTradeFromDetails()" style="flex: 1;">
+                    <i class="fas fa-edit"></i> ویرایش
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- مودال بستن معامله -->
+    <div id="closeTradeModal" class="close-modal">
+        <div class="close-modal-content">
+            <h3 style="color: #60a5fa; margin-bottom: 20px; text-align: center;">
+                <i class="fas fa-check-circle"></i> بستن معامله
+            </h3>
+            
+            <div class="modal-input-group" style="margin-bottom: 20px;">
+                <label class="modal-label">
+                    <i class="fas fa-dollar-sign"></i>
+                    قیمت بسته شدن
+                </label>
+                <input type="text" id="closePriceInput" class="modal-input">
+            </div>
+            
+            <div class="screenshot-upload" id="closeScreenshotUpload" onclick="document.getElementById('closeScreenshotFile').click()">
+                <i class="fas fa-camera"></i>
+                <span>آپلود اسکرین‌شات خروج</span>
+                <input type="file" id="closeScreenshotFile" accept="image/*" style="display: none;" onchange="previewCloseScreenshot(this)">
+            </div>
+            
+            <img id="closeScreenshotPreview" class="close-preview" src="" alt="پیش‌نمایش">
+            
+            <div style="margin-top: 15px; text-align: left;">
+                <span class="screenshot-remove" id="closeScreenshotRemove" onclick="removeCloseScreenshot()">
+                    <i class="fas fa-times"></i> حذف تصویر
+                </span>
+            </div>
+            
+            <div class="modal-buttons" style="margin-top: 25px;">
+                <button type="button" class="modal-btn modal-btn-secondary" onclick="closeCloseModal()">
+                    <i class="fas fa-times"></i> انصراف
+                </button>
+                <button type="button" class="modal-btn modal-btn-success" onclick="confirmCloseTrade()">
+                    <i class="fas fa-check"></i> تایید و بستن
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- المان یادآور پشتیبان -->
+    <div id="backupReminder" class="backup-reminder">
+        <i class="fas fa-database"></i>
+        <div class="backup-reminder-content">
+            <div class="backup-reminder-title">📁 پشتیبان خودکار ماهانه</div>
+            <div class="backup-reminder-text" id="backupReminderText">در حال تهیه پشتیبان...</div>
+        </div>
+        <button class="backup-reminder-close" onclick="hideBackupReminder()">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    
+    <!-- المان نمایش پیشرفت بارگذاری پشتیبان -->
+    <div id="backupProgress" class="backup-progress">
+        <div class="progress-bar-container">
+            <div id="progressBar" class="progress-bar"></div>
+        </div>
+        <div id="progressText" class="progress-text">در حال آماده‌سازی...</div>
+        <div id="progressStatus" class="backup-status"></div>
+    </div>
+    
+    <div class="container">
+        <header>
+            <div class="header-top">
+                <!-- دکمه ماشین‌حساب -->
+                <button class="calculator-btn" onclick="window.location.href='calculator/'" title="رفتن به ماشین‌حساب">
+                    <i class="fas fa-calculator"></i>
+                    ماشین‌حساب
+                </button>
+                
+                <div class="header-title">
+                    <h1>
+                        <i class="fa-solid fa-coins"></i>
+                          Crypto Journal
+                    </h1>
+                    <p class="subtitle">R-NIKER</p>
+                </div>
+                
+                <!-- اینجا فضای خالی برای تراز کردن -->
+                <div style="width: 140px;"></div>
+            </div>
+        </header>
+        
+        <!-- بخش بالانس حساب -->
+        <div class="balance-container">
+            <div class="balance-main">
+                <div class="balance-icon">
+                    <i class="fas fa-wallet"></i>
+                </div>
+                <div class="balance-info">
+                    <div class="balance-title">موجودی حساب</div>
+                    <div class="balance-value" id="currentBalance">$0</div>
+                    <div id="currentAccountName" style="color: #94a3b8; font-size: 0.8rem; margin-top: 5px;">حساب اصلی</div>
+                </div>
+            </div>
+            
+            <div class="balance-details">
+                <div class="balance-detail">
+                    <div class="detail-label">سود/ضرر کل</div>
+                    <div class="detail-value" id="totalPnL" style="color: #10b981;">$0</div>
+                </div>
+                <div class="balance-detail">
+                    <div class="detail-label">ریسک کل</div>
+                    <div class="detail-value" id="totalRiskPercent">0%</div>
+                </div>
+                <div class="balance-detail">
+                    <div class="detail-label">حساب فعال</div>
+                    <div class="detail-value" id="activeAccountIndicator" style="color: #3b82f6;">1/1</div>
+                </div>
+            </div>
+            
+            <div class="balance-actions">
+                <button class="balance-btn" id="editBalanceBtn" onclick="toggleModal('balanceModal')">
+                    <i class="fas fa-edit"></i>
+                    ویرایش بالانس
+                </button>
+                <button class="balance-btn" id="manageAccountsBtn" onclick="toggleModal('accountModal')">
+                    <i class="fas fa-university"></i>
+                    مدیریت حساب
+                </button>
+            </div>
+        </div>
+        
+        <!-- مودال ویرایش بالانس -->
+        <div id="balanceModal" class="modal-box">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fas fa-edit"></i> ویرایش بالانس حساب
+                </h3>
+                <div class="modal-close" onclick="toggleModal('balanceModal')">
+                    <i class="fas fa-times"></i>
+                </div>
+            </div>
+            
+            <div class="modal-grid">
+                <div class="modal-input-group">
+                    <label class="modal-label">
+                        <i class="fas fa-wallet"></i>
+                        مبلغ جدید (دلار)
+                    </label>
+                    <input type="number" id="newBalanceInput" class="modal-input" step="0.01" min="0">
+                </div>
+            </div>
+            
+            <div class="preset-buttons">
+                <button type="button" class="preset-btn" onclick="setBalancePreset(2000)">$2,000</button>
+                <button type="button" class="preset-btn" onclick="setBalancePreset(5000)">$5,000</button>
+                <button type="button" class="preset-btn" onclick="setBalancePreset(10000)">$10,000</button>
+                <button type="button" class="preset-btn" onclick="setBalancePreset(20000)">$20,000</button>
+            </div>
+            
+            <div class="current-balance-display">
+                <span class="current-balance-label">موجودی فعلی:</span>
+                <span class="current-balance-value" id="currentBalanceDisplay">$0</span>
+            </div>
+            
+            <div class="modal-buttons">
+                <button type="button" class="modal-btn modal-btn-secondary" onclick="toggleModal('balanceModal')">
+                    <i class="fas fa-times"></i> لغو
+                </button>
+                <button type="button" class="modal-btn modal-btn-success" onclick="updateBalance()">
+                    <i class="fas fa-save"></i> ذخیره تغییرات
+                </button>
+            </div>
+        </div>
+        
+        <!-- مودال مدیریت حساب -->
+        <div id="accountModal" class="modal-box">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fas fa-university"></i> مدیریت حساب‌ها
+                </h3>
+                <div class="modal-close" onclick="toggleModal('accountModal')">
+                    <i class="fas fa-times"></i>
+                </div>
+            </div>
+            
+            <div class="accounts-list-container" id="accountsListContainer">
+                <!-- حساب‌ها در اینجا نمایش داده می‌شوند -->
+            </div>
+            
+            <div class="modal-grid">
+                <div class="modal-input-group">
+                    <label class="modal-label">
+                        <i class="fas fa-signature"></i>
+                        نام حساب جدید
+                    </label>
+                    <input type="text" id="newAccountName" class="modal-input">
+                </div>
+                
+                <div class="modal-input-group">
+                    <label class="modal-label">
+                        <i class="fas fa-money-bill-wave"></i>
+                        موجودی اولیه (دلار)
+                    </label>
+                    <input type="number" id="newAccountBalance" class="modal-input" step="0.01" min="0">
+                </div>
+            </div>
+            
+            <div class="modal-buttons">
+                <button type="button" class="modal-btn modal-btn-secondary" onclick="toggleModal('accountModal')">
+                    <i class="fas fa-times"></i> بستن
+                </button>
+                <button type="button" class="modal-btn modal-btn-success" onclick="addNewAccount()">
+                    <i class="fas fa-plus"></i> افزودن حساب جدید
+                </button>
+            </div>
+        </div>
+        
+        <main class="main-content">
+            <!-- بخش ثبت معامله -->
+            <section class="section">
+                <h2 class="section-title"><i class="fas fa-plus-circle"></i> ثبت معامله جدید</h2>
+                <form id="tradeForm" class="trade-form">
+                    <!-- اطلاعات اولیه -->
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="symbol"><i class="fas fa-coins"></i> ارز دیجیتال</label>
+                            <input type="text" id="symbol" list="crypto-list" required>
+                            <datalist id="crypto-list">
+                                <option value="BTC">‌ </option>
+                                <option value="ETH"> </option>
+                                <option value="BNB"> </option>
+                                <option value="SOL"> </option>
+                                <option value="ARB"> </option>
+                                <option value="ENA"> </option>
+                                <option value="ADA"> </option>
+                                <option value="OP"> </option>
+                            </datalist>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="date"><i class="fas fa-calendar"></i> تاریخ معامله</label>
+                            <input type="datetime-local" id="date" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="type"><i class="fas fa-exchange-alt"></i> نوع معامله</label>
+                            <select id="type" required>
+                                <option value="" disabled selected>انتخاب کنید</option>
+                                <option value="buy">لانگ (خرید)</option>
+                                <option value="sell">شورت (فروش)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- بخش قیمت‌ها -->
+                    <div class="prices-section">
+                        <div class="prices-title">
+                            <i class="fas fa-chart-line"></i>
+                            قیمت‌های معامله
+                        </div>
+                        
+                        <div class="prices-grid">
+                            <div class="form-group">
+                                <label><i class="fas fa-arrow-down"></i> قیمت ورود</label>
+                                <input type="text" id="entryPrice" required class="price-display">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label><i class="fas fa-shield-alt"></i> حد ضرر</label>
+                                <input type="text" id="stopLoss" required class="price-display">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label><i class="fas fa-bullseye"></i> حد سود</label>
+                                <input type="text" id="takeProfit" required class="price-display">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- تنظیمات ریسک و کارمزد + اسکرین‌شات -->
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="riskPercent"><i class="fas fa-percentage"></i> ریسک (% از بالانس)</label>
+                            <input type="text" id="riskPercent" required>
+                            <div class="quick-risk-buttons">
+                                <button type="button" class="quick-risk-btn" onclick="setRiskPercent(0.25)">0.25%</button>
+                                <button type="button" class="quick-risk-btn" onclick="setRiskPercent(0.5)">0.5%</button>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="feePercent"><i class="fas fa-receipt"></i> کارمزد کل (%)</label>
+                            <input type="text" id="feePercent" required class="price-display">
+                            <div class="fee-info">
+                                <i class="fas fa-info-circle"></i>
+                                مجموع کارمزد ورود و خروج
+                            </div>
+                        </div>
+                        
+                        <!-- ورودی آپلود اسکرین‌شات با ظاهری مشابه سایر ورودی‌ها -->
+                        <div class="form-group">
+                            <label for="entryScreenshotFile"><i class="fas fa-camera"></i> اسکرین‌شات ورود (اختیاری)</label>
+                            <div class="screenshot-upload-input" id="entryScreenshotUpload" onclick="document.getElementById('entryScreenshotFile').click()">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <span>انتخاب تصویر</span>
+                                <input type="file" id="entryScreenshotFile" accept="image/*" style="display: none;" onchange="previewEntryScreenshot(this)">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- پیش‌نمایش اسکرین‌شات -->
+                    <div id="entryScreenshotPreviewContainer" class="screenshot-preview-container">
+                        <img id="entryScreenshotPreview" class="screenshot-preview-image" src="" alt="پیش‌نمایش">
+                        <div>
+                            <span class="screenshot-remove-link" id="entryScreenshotRemove" onclick="removeEntryScreenshot()">
+                                <i class="fas fa-times"></i> حذف تصویر
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <!-- خلاصه ریسک -->
+                    <div class="risk-summary-section">
+                        <div class="risk-summary-title">
+                            <i class="fas fa-calculator"></i>
+                            خلاصه ریسک
+                        </div>
+                        
+                        <div class="risk-summary">
+                            <div class="risk-summary-item">
+                                <span class="risk-summary-label">مقدار ریسک</span>
+                                <span class="risk-summary-value" id="riskAmount" style="color: #ef4444;">$0</span>
+                            </div>
+                            <div class="risk-summary-item">
+                                <span class="risk-summary-label">سود بالقوه</span>
+                                <span class="risk-summary-value" id="potentialProfit" style="color: #10b981;">$0</span>
+                            </div>
+                            <div class="risk-summary-item">
+                                <span class="risk-summary-label">ریسک به ریوارد</span>
+                                <span class="risk-summary-value" id="riskRewardRatio">1:0</span>
+                            </div>
+                        </div>
+                        
+                        <!-- جزئیات کارمزد -->
+                        <div class="fee-info-box" id="feeDetails" style="display: none;">
+                            <div class="fee-row">
+                                <span>کارمزد ورود:</span>
+                                <span id="feeEntryAmount" style="color: #f59e0b;">$0.00</span>
+                            </div>
+                            <div class="fee-row">
+                                <span>کارمزد خروج:</span>
+                                <span id="feeExitAmount" style="color: #f59e0b;">$0.00</span>
+                            </div>
+                            <div class="fee-total">
+                                <span>کل کارمزد:</span>
+                                <span id="totalFeeAmount" style="color: #f59e0b;">$0.00</span>
+                            </div>
+                            <div class="fee-row" style="margin-top: 10px;">
+                                <span>سود خالص (پس از کارمزد):</span>
+                                <span id="netProfitAmount" style="color: #10b981; font-weight: 600;">$0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- دکمه‌های عملیات -->
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-save"></i> ثبت معامله
+                        </button>
+                        <button type="reset" class="btn-secondary" onclick="resetForm()">
+                            <i class="fas fa-eraser"></i> پاک کردن
+                        </button>
+                        <button type="button" class="btn-warning" onclick="calculateRisk()">
+                            <i class="fas fa-calculator"></i> محاسبه
+                        </button>
+                    </div>
+                </form>
+            </section>
+            
+            <!-- بخش تاریخچه معاملات (اول) -->
+            <section class="section">
+                <h2 class="section-title"><i class="fas fa-history"></i> تاریخچه معاملات</h2>
+                <div class="trades-table-container">
+                    <table class="trades-table">
+                        <thead>
+                            <tr>
+                                <th>ارز</th>
+                                <th>تاریخ</th>
+                                <th>نوع</th>
+                                <th>ورود</th>
+                                <th>حد ضرر</th>
+                                <th>حد سود</th>
+                                <th>ریسک %</th>
+                                <th>کارمزد</th>
+                                <th>وضعیت</th>
+                                <th>سود/ضرر</th>
+                                <th>عملیات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tradesTableBody">
+                            <!-- معاملات اینجا نمایش داده می‌شوند -->
+                        </tbody>
+                    </table>
+                </div>
+                <p id="noTradesMessage" style="text-align: center; padding: 30px; color: #94a3b8; display: none;">
+                    <i class="fas fa-exchange-alt" style="font-size: 2rem; margin-bottom: 15px; display: block;"></i>
+                    هنوز هیچ معامله‌ای ثبت نشده است!
+                </p>
+            </section>
+            
+            <!-- بخش داشبورد ماهانه (دوم) -->
+            <section class="dashboard-section">
+                <div class="dashboard-header">
+                    <h2 class="dashboard-title">
+                        <i class="fas fa-chart-pie"></i> داشبورد ماهانه
+                    </h2>
+                    <div class="month-selector">
+                        <button class="month-btn" onclick="changeMonth(-1)" id="prevMonthBtn" title="ماه قبل">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                        <span class="current-month" id="currentMonthDisplay">فروردین 1403</span>
+                        <button class="month-btn" onclick="changeMonth(1)" id="nextMonthBtn" title="ماه بعد">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="dashboard-stats" id="monthlyStats">
+                    <div class="dashboard-stat-card">
+                        <div class="dashboard-stat-label">تعداد معاملات</div>
+                        <div class="dashboard-stat-value" id="monthlyTradeCount">0</div>
+                    </div>
+                    <div class="dashboard-stat-card">
+                        <div class="dashboard-stat-label">سود/ضرر کل</div>
+                        <div class="dashboard-stat-value" id="monthlyTotalPnL" style="color: #94a3b8;">$0</div>
+                    </div>
+                    <div class="dashboard-stat-card">
+                        <div class="dashboard-stat-label">سودآور</div>
+                        <div class="dashboard-stat-value" id="monthlyProfitable" style="color: #10b981;">0</div>
+                    </div>
+                    <div class="dashboard-stat-card">
+                        <div class="dashboard-stat-label">زیان‌ده</div>
+                        <div class="dashboard-stat-value" id="monthlyLoss" style="color: #ef4444;">0</div>
+                    </div>
+                </div>
+                
+                <div class="monthly-trades-container" id="monthlyTradesContainer">
+                    <table class="monthly-trades-table">
+                        <thead>
+                            <tr>
+                                <th>تاریخ</th>
+                                <th>ارز</th>
+                                <th>نوع</th>
+                                <th>ورود</th>
+                                <th>خروج</th>
+                                <th>سود/ضرر</th>
+                                <th>وضعیت</th>
+                            </tr>
+                        </thead>
+                        <tbody id="monthlyTradesBody">
+                            <tr>
+                                <td colspan="7" class="no-trades-month">
+                                    <i class="fas fa-chart-line" style="font-size: 2rem; margin-bottom: 15px; display: block;"></i>
+                                    هیچ معامله‌ای در این ماه وجود ندارد
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            
+            <!-- بخش آمار و تحلیل کلی -->
+            <section class="section">
+                <h2 class="section-title"><i class="fas fa-chart-bar"></i> آمار عملکرد کلی</h2>
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-exchange-alt"></i></div>
+                        <div class="stat-label">تعداد معاملات</div>
+                        <div class="stat-value neutral-stat" id="totalTrades">0</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-arrow-up"></i></div>
+                        <div class="stat-label">سود کل</div>
+                        <div class="stat-value positive" id="totalProfit">$0</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-arrow-down"></i></div>
+                        <div class="stat-label">ضرر کل</div>
+                        <div class="stat-value negative" id="totalLoss">$0</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-percentage"></i></div>
+                        <div class="stat-label">نرخ موفقیت</div>
+                        <div class="stat-value neutral-stat" id="winRate">0%</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-receipt"></i></div>
+                        <div class="stat-label">کارمزد کل</div>
+                        <div class="stat-value fee-stat" id="totalFees">$0</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-trophy"></i></div>
+                        <div class="stat-label">بیشترین سود</div>
+                        <div class="stat-value positive" id="maxProfit">$0</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                        <div class="stat-label">بیشترین ضرر</div>
+                        <div class="stat-value negative" id="maxLoss">$0</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                        <div class="stat-label">معاملات باز</div>
+                        <div class="stat-value neutral-stat" id="openTrades">0</div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- بخش پشتیبان‌گیری -->
+            <section class="section">
+                <h2 class="section-title"><i class="fas fa-database"></i> پشتیبان‌گیری خودکار ماهانه</h2>
+                <div class="backup-container">
+                    <div class="backup-card">
+                        <div class="backup-header">
+                            <i class="fas fa-download"></i>
+                            <h3>دریافت پشتیبان دستی</h3>
+                        </div>
+                        <p class="backup-description">
+                            علاوه بر پشتیبان خودکار ماهانه، می‌توانید به صورت دستی نیز پشتیبان بگیرید. تمام اطلاعات و تصاویر در یک فایل ZIP ذخیره می‌شوند.
+                        </p>
+                        <button class="btn-backup" onclick="exportData()">
+                            <i class="fas fa-file-export"></i> دانلود پشتیبان (ZIP)
+                        </button>
+                    </div>
+                    
+                    <div class="backup-card">
+                        <div class="backup-header">
+                            <i class="fas fa-upload"></i>
+                            <h3>بارگذاری پشتیبان</h3>
+                        </div>
+                        <p class="backup-description">
+                            اطلاعات قبلی خود را از فایل ZIP بازیابی کنید. بارگذاری به صورت مرحله‌ای انجام می‌شود.
+                        </p>
+                        <input type="file" id="backupFile" class="file-input" accept=".zip">
+                        <button class="btn-backup" onclick="importData()">
+                            <i class="fas fa-file-import"></i> بارگذاری پشتیبان (ZIP)
+                        </button>
+                    </div>
+                </div>
+                <div style="margin-top: 15px; text-align: center; color: #94a3b8; font-size: 0.85rem;">
+                    <i class="fas fa-clock"></i> پشتیبان خودکار اول هر ماه شمسی در پوشه Downloads ذخیره می‌شود
+                </div>
+            </section>
+        </main>
+        
+        <footer style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #475569; color: #94a3b8; font-size: 0.85rem;">
+            <p>Support : ID Telegram : @RNA7600</p>
+        </footer>
+    </div>
+
+    <script>
+        // ============================
+        // توابع تبدیل تاریخ میلادی به شمسی با اعداد انگلیسی
+        // ============================
+        
+        function toPersianDateWithEnglishNumbers(date) {
+            if (!date) return '';
+            
+            const d = new Date(date);
+            
+            // استفاده از Intl برای تبدیل به تاریخ شمسی
+            const formatter = new Intl.DateTimeFormat('fa-IR', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+            });
+            
+            // دریافت تاریخ شمسی با اعداد فارسی
+            const persianParts = formatter.formatToParts(d);
+            
+            // استخراج مقادیر
+            let year = '', month = '', day = '', hour = '', minute = '';
+            
+            for (const part of persianParts) {
+                if (part.type === 'year') year = part.value;
+                else if (part.type === 'month') month = part.value;
+                else if (part.type === 'day') day = part.value;
+                else if (part.type === 'hour') hour = part.value;
+                else if (part.type === 'minute') minute = part.value;
+            }
+            
+            // تبدیل اعداد فارسی به انگلیسی
+            const persianToEnglish = {
+                '۰': '0', '۱': '1', '۲': '2', '۳': '3', '۴': '4',
+                '۵': '5', '۶': '6', '۷': '7', '۸': '8', '۹': '9'
+            };
+            
+            const convertNumber = (str) => {
+                return str.split('').map(ch => persianToEnglish[ch] || ch).join('');
+            };
+            
+            // تبدیل همه اعداد به انگلیسی
+            year = convertNumber(year);
+            month = convertNumber(month);
+            day = convertNumber(day);
+            hour = convertNumber(hour);
+            minute = convertNumber(minute);
+            
+            return { year, month, day, hour, minute };
+        }
+        
+        function formatPersianDate(date, withTime = true) {
+            if (!date) return '';
+            
+            const parts = toPersianDateWithEnglishNumbers(date);
+            if (!parts) return '';
+            
+            if (withTime) {
+                return `${parts.year}/${parts.month}/${parts.day} ${parts.hour}:${parts.minute}`;
+            } else {
+                return `${parts.year}/${parts.month}/${parts.day}`;
+            }
+        }
+
+        // ============================
+        // بخش مدیریت ژورنال تریدینگ با IndexedDB
+        // ============================
+        
+        // ==============================================
+        // کلاس مدیریت IndexedDB - ذخیره‌سازی نامحدود
+        // ==============================================
+        class TradingJournalDB {
+            constructor() {
+                this.dbName = 'CryptoJournal';
+                this.version = 1;
+                this.db = null;
+                this.isReady = false;
+            }
+
+            // باز کردن دیتابیس
+            async open() {
+                return new Promise((resolve, reject) => {
+                    const request = indexedDB.open(this.dbName, this.version);
+
+                    request.onerror = () => {
+                        console.error('خطا در باز کردن دیتابیس:', request.error);
+                        reject(request.error);
+                    };
+                    
+                    request.onsuccess = () => {
+                        this.db = request.result;
+                        this.isReady = true;
+                        console.log('✅ دیتابیس IndexedDB با موفقیت باز شد');
+                        resolve(this.db);
+                    };
+
+                    request.onupgradeneeded = (event) => {
+                        const db = event.target.result;
+                        
+                        // ایجاد ObjectStore برای معاملات
+                        if (!db.objectStoreNames.contains('trades')) {
+                            const tradeStore = db.createObjectStore('trades', { keyPath: 'id' });
+                            tradeStore.createIndex('accountId', 'accountId', { unique: false });
+                            tradeStore.createIndex('date', 'date', { unique: false });
+                            tradeStore.createIndex('status', 'status', { unique: false });
+                            tradeStore.createIndex('symbol', 'symbol', { unique: false });
+                            console.log('✅ جدول trades در IndexedDB ایجاد شد');
+                        }
+                        
+                        // ایجاد ObjectStore برای حساب‌ها
+                        if (!db.objectStoreNames.contains('accounts')) {
+                            const accountStore = db.createObjectStore('accounts', { keyPath: 'id' });
+                            console.log('✅ جدول accounts در IndexedDB ایجاد شد');
+                        }
+                        
+                        // ایجاد ObjectStore برای تنظیمات
+                        if (!db.objectStoreNames.contains('settings')) {
+                            const settingsStore = db.createObjectStore('settings', { keyPath: 'key' });
+                            console.log('✅ جدول settings در IndexedDB ایجاد شد');
+                        }
+                    };
+                });
+            }
+
+            // ========== توابع مربوط به معاملات ==========
+            
+            // ذخیره یک معامله
+            async saveTrade(trade) {
+                this.checkReady();
+                return new Promise((resolve, reject) => {
+                    const transaction = this.db.transaction(['trades'], 'readwrite');
+                    const store = transaction.objectStore('trades');
+                    
+                    const request = store.put(trade);
+                    request.onsuccess = () => resolve(trade.id);
+                    request.onerror = () => reject(request.error);
+                });
+            }
+
+            // ذخیره چند معامله
+            async saveTrades(tradesArray) {
+                this.checkReady();
+                const transaction = this.db.transaction(['trades'], 'readwrite');
+                const store = transaction.objectStore('trades');
+                
+                return Promise.all(tradesArray.map(trade => {
+                    return new Promise((resolve, reject) => {
+                        const request = store.put(trade);
+                        request.onsuccess = () => resolve();
+                        request.onerror = () => reject(request.error);
+                    });
+                }));
+            }
+
+            // دریافت همه معاملات یک حساب
+            async getTradesByAccount(accountId) {
+                this.checkReady();
+                return new Promise((resolve, reject) => {
+                    const transaction = this.db.transaction(['trades'], 'readonly');
+                    const store = transaction.objectStore('trades');
+                    const index = store.index('accountId');
+                    
+                    const request = index.getAll(parseInt(accountId));
+                    request.onsuccess = () => resolve(request.result || []);
+                    request.onerror = () => reject(request.error);
+                });
+            }
+
+            // دریافت همه معاملات (بدون فیلتر)
+            async getAllTrades() {
+                this.checkReady();
+                return new Promise((resolve, reject) => {
+                    const transaction = this.db.transaction(['trades'], 'readonly');
+                    const store = transaction.objectStore('trades');
+                    
+                    const request = store.getAll();
+                    request.onsuccess = () => resolve(request.result || []);
+                    request.onerror = () => reject(request.error);
+                });
+            }
+
+            // دریافت معاملات یک ماه خاص
+            async getTradesByMonth(year, month, accountId) {
+                this.checkReady();
+                const startDate = new Date(year, month, 1).toISOString();
+                const endDate = new Date(year, month + 1, 0, 23, 59, 59).toISOString();
+                
+                return new Promise((resolve, reject) => {
+                    const transaction = this.db.transaction(['trades'], 'readonly');
+                    const store = transaction.objectStore('trades');
+                    const dateIndex = store.index('date');
+                    
+                    const range = IDBKeyRange.bound(startDate, endDate);
+                    const request = dateIndex.getAll(range);
+                    
+                    request.onsuccess = () => {
+                        const trades = request.result.filter(t => t.accountId === accountId);
+                        resolve(trades);
+                    };
+                    request.onerror = () => reject(request.error);
+                });
+            }
+
+            // دریافت یک معامله با ID
+            async getTradeById(tradeId) {
+                this.checkReady();
+                return new Promise((resolve, reject) => {
+                    const transaction = this.db.transaction(['trades'], 'readonly');
+                    const store = transaction.objectStore('trades');
+                    
+                    const request = store.get(parseInt(tradeId));
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = () => reject(request.error);
+                });
+            }
+
+            // حذف یک معامله
+            async deleteTrade(tradeId) {
+                this.checkReady();
+                return new Promise((resolve, reject) => {
+                    const transaction = this.db.transaction(['trades'], 'readwrite');
+                    const store = transaction.objectStore('trades');
+                    
+                    const request = store.delete(parseInt(tradeId));
+                    request.onsuccess = () => resolve();
+                    request.onerror = () => reject(request.error);
+                });
+            }
+
+            // حذف چند معامله
+            async deleteTrades(tradeIds) {
+                this.checkReady();
+                const transaction = this.db.transaction(['trades'], 'readwrite');
+                const store = transaction.objectStore('trades');
+                
+                return Promise.all(tradeIds.map(id => {
+                    return new Promise((resolve, reject) => {
+                        const request = store.delete(parseInt(id));
+                        request.onsuccess = () => resolve();
+                        request.onerror = () => reject(request.error);
+                    });
+                }));
+            }
+
+            // ========== توابع مربوط به حساب‌ها ==========
+
+            // ذخیره حساب‌ها
+            async saveAccounts(accountsArray) {
+                this.checkReady();
+                const transaction = this.db.transaction(['accounts'], 'readwrite');
+                const store = transaction.objectStore('accounts');
+                
+                return Promise.all(accountsArray.map(account => {
+                    return new Promise((resolve, reject) => {
+                        const request = store.put(account);
+                        request.onsuccess = () => resolve();
+                        request.onerror = () => reject(request.error);
+                    });
+                }));
+            }
+
+            // دریافت همه حساب‌ها
+            async getAccounts() {
+                this.checkReady();
+                return new Promise((resolve, reject) => {
+                    const transaction = this.db.transaction(['accounts'], 'readonly');
+                    const store = transaction.objectStore('accounts');
+                    
+                    const request = store.getAll();
+                    request.onsuccess = () => {
+                        const accounts = request.result || [];
+                        console.log('📊 حساب‌های دریافت شده:', accounts);
+                        resolve(accounts);
+                    };
+                    request.onerror = () => reject(request.error);
+                });
+            }
+
+            // دریافت یک حساب با ID
+            async getAccountById(accountId) {
+                this.checkReady();
+                return new Promise((resolve, reject) => {
+                    const transaction = this.db.transaction(['accounts'], 'readonly');
+                    const store = transaction.objectStore('accounts');
+                    
+                    const request = store.get(parseInt(accountId));
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = () => reject(request.error);
+                });
+            }
+
+            // حذف یک حساب
+            async deleteAccount(accountId) {
+                this.checkReady();
+                return new Promise((resolve, reject) => {
+                    const transaction = this.db.transaction(['accounts'], 'readwrite');
+                    const store = transaction.objectStore('accounts');
+                    
+                    const request = store.delete(parseInt(accountId));
+                    request.onsuccess = () => resolve();
+                    request.onerror = () => reject(request.error);
+                });
+            }
+
+            // ========== توابع مربوط به تنظیمات ==========
+
+            // ذخیره تنظیمات
+            async saveSetting(key, value) {
+                this.checkReady();
+                return new Promise((resolve, reject) => {
+                    const transaction = this.db.transaction(['settings'], 'readwrite');
+                    const store = transaction.objectStore('settings');
+                    
+                    const request = store.put({ key, value });
+                    request.onsuccess = () => resolve();
+                    request.onerror = () => reject(request.error);
+                });
+            }
+
+            // دریافت تنظیمات
+            async getSetting(key) {
+                this.checkReady();
+                return new Promise((resolve, reject) => {
+                    const transaction = this.db.transaction(['settings'], 'readonly');
+                    const store = transaction.objectStore('settings');
+                    
+                    const request = store.get(key);
+                    request.onsuccess = () => resolve(request.result?.value);
+                    request.onerror = () => reject(request.error);
+                });
+            }
+
+            // ========== توابع کمکی ==========
+
+            checkReady() {
+                if (!this.isReady || !this.db) {
+                    throw new Error('دیتابیس آماده نیست. ابتدا open() را فراخوانی کنید');
+                }
+            }
+
+            // پشتیبان‌گیری از تمام داده‌ها
+            async backup() {
+                const accounts = await this.getAccounts();
+                const trades = await this.getAllTrades();
+                
+                return {
+                    accounts,
+                    trades,
+                    exportDate: new Date().toISOString(),
+                    version: '3.0'
+                };
+            }
+
+            // بازیابی از پشتیبان
+            async restore(backupData) {
+                if (backupData.accounts && Array.isArray(backupData.accounts)) {
+                    await this.saveAccounts(backupData.accounts);
+                }
+                if (backupData.trades && Array.isArray(backupData.trades)) {
+                    await this.saveTrades(backupData.trades);
+                }
+            }
+
+            // پاک کردن همه داده‌ها
+            async clearAll() {
+                this.checkReady();
+                
+                const clearStore = (storeName) => {
+                    return new Promise((resolve, reject) => {
+                        const transaction = this.db.transaction([storeName], 'readwrite');
+                        const store = transaction.objectStore(storeName);
+                        const request = store.clear();
+                        request.onsuccess = () => resolve();
+                        request.onerror = () => reject(request.error);
+                    });
+                };
+
+                await Promise.all([
+                    clearStore('trades'),
+                    clearStore('accounts'),
+                    clearStore('settings')
+                ]);
+            }
+
+            // دریافت آمار دیتابیس
+            async getStats() {
+                this.checkReady();
+                
+                const getCount = (storeName) => {
+                    return new Promise((resolve, reject) => {
+                        const transaction = this.db.transaction([storeName], 'readonly');
+                        const store = transaction.objectStore(storeName);
+                        const request = store.count();
+                        request.onsuccess = () => resolve(request.result);
+                        request.onerror = () => reject(request.error);
+                    });
+                };
+
+                const [tradeCount, accountCount] = await Promise.all([
+                    getCount('trades'),
+                    getCount('accounts')
+                ]);
+
+                return {
+                    tradeCount,
+                    accountCount,
+                    dbName: this.dbName,
+                    version: this.version
+                };
+            }
+        }
+
+        // ============================
+        // نمونه اصلی دیتابیس
+        // ============================
+        const db = new TradingJournalDB();
+
+        // ============================
+        // متغیرهای سراسری
+        // ============================
+        let accounts = [];
+        let activeAccountId = 1;
+        let activeAccount = null;
+        let accountBalance = 0;
+        let trades = [];
+        
+        // متغیرهای مربوط به داشبورد ماهانه
+        let currentMonth = new Date();
+        let currentTradeIdForClose = null;
+        let closeScreenshotData = null;
+
+        // ============================
+        // توابع اولیه‌سازی
+        // ============================
+        
+        // راه‌اندازی اولیه
+        async function initialize() {
+            try {
+                // ۱. باز کردن دیتابیس IndexedDB
+                await db.open();
+                console.log('✅ دیتابیس IndexedDB آماده است');
+                
+                // ۲. بارگذاری حساب‌ها از IndexedDB
+                await loadAccountsFromDB();
+                
+                // ۳. بارگذاری معاملات از IndexedDB
+                await loadTradesFromDB();
+                
+                // ۴. به‌روزرسانی نمایش
+                updateBalanceDisplay();
+                updateTotalRisk();
+                updateStats();
+                updateMonthlyDashboard();
+                
+                // ۵. تنظیم ماه اولیه
+                setInitialMonthBasedOnFirstTrade();
+                
+                console.log('✅ برنامه با موفقیت راه‌اندازی شد');
+            } catch (error) {
+                console.error('❌ خطا در راه‌اندازی:', error);
+                showNotification('خطا در راه‌اندازی دیتابیس', 'error');
+            }
+        }
+
+        // بارگذاری حساب‌ها از دیتابیس
+        async function loadAccountsFromDB() {
+            try {
+                const dbAccounts = await db.getAccounts();
+                
+                if (dbAccounts && dbAccounts.length > 0) {
+                    accounts = dbAccounts;
+                } else {
+                    // اگر حسابی نبود، حساب پیش‌فرض ایجاد کن
+                    accounts = [
+                        { id: 1, name: 'حساب اصلی', balance: 0 }
+                    ];
+                    await db.saveAccounts(accounts);
+                }
+                
+                // تنظیم حساب فعال
+                const savedActiveId = await db.getSetting('activeAccountId');
+                activeAccountId = savedActiveId ? parseInt(savedActiveId) : 1;
+                activeAccount = accounts.find(acc => acc.id === activeAccountId) || accounts[0];
+                accountBalance = activeAccount ? activeAccount.balance : 0;
+                
+                // به‌روزرسانی لیست حساب‌ها
+                updateAccountsList();
+                
+            } catch (error) {
+                console.error('خطا در بارگذاری حساب‌ها:', error);
+                accounts = [
+                    { id: 1, name: 'حساب اصلی', balance: 0 }
+                ];
+                activeAccountId = 1;
+                activeAccount = accounts[0];
+                accountBalance = 0;
+                updateAccountsList();
+            }
+        }
+
+        // بارگذاری معاملات از دیتابیس
+        async function loadTradesFromDB() {
+            try {
+                trades = await db.getTradesByAccount(activeAccountId);
+                
+                // نمایش در جدول
+                loadTrades();
+                
+            } catch (error) {
+                console.error('خطا در بارگذاری معاملات:', error);
+                trades = [];
+                loadTrades();
+            }
+        }
+
+        // ذخیره معامله جدید
+        async function saveTradeToDB(trade) {
+            try {
+                await db.saveTrade(trade);
+                
+                // به‌روزرسانی متغیر محلی
+                trades = await db.getTradesByAccount(activeAccountId);
+                
+                return true;
+            } catch (error) {
+                console.error('خطا در ذخیره معامله:', error);
+                return false;
+            }
+        }
+
+        // حذف معامله
+        async function deleteTradeFromDB(tradeId) {
+            try {
+                await db.deleteTrade(tradeId);
+                
+                // به‌روزرسانی متغیر محلی
+                trades = await db.getTradesByAccount(activeAccountId);
+                
+                return true;
+            } catch (error) {
+                console.error('خطا در حذف معامله:', error);
+                return false;
+            }
+        }
+
+        // ذخیره حساب‌ها
+        async function saveAccountsToDB() {
+            try {
+                await db.saveAccounts(accounts);
+                await db.saveSetting('activeAccountId', activeAccountId.toString());
+                
+                return true;
+            } catch (error) {
+                console.error('خطا در ذخیره حساب‌ها:', error);
+                return false;
+            }
+        }
+
+        // ============================
+        // توابع قبلی (با تغییرات کوچک)
+        // ============================
+        
+        // نام ماه‌های شمسی
+        const persianMonths = [
+            'فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور',
+            'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'
+        ];
+        
+        // تابع تبدیل تاریخ میلادی به شمسی برای نام ماه
+        function getPersianMonthName(date) {
+            const persianDate = new Intl.DateTimeFormat('fa-IR', { month: 'long' }).format(date);
+            const persianYear = new Intl.DateTimeFormat('fa-IR', { year: 'numeric' }).format(date);
+            
+            // تبدیل سال به اعداد انگلیسی
+            const persianToEnglish = {
+                '۰': '0', '۱': '1', '۲': '2', '۳': '3', '۴': '4',
+                '۵': '5', '۶': '6', '۷': '7', '۸': '8', '۹': '9'
+            };
+            
+            const englishYear = persianYear.split('').map(ch => persianToEnglish[ch] || ch).join('');
+            
+            return persianDate + ' ' + englishYear;
+        }
+        
+        // تابع تشخیص اول ماه شمسی
+        function isFirstDayOfPersianMonth() {
+            const now = new Date();
+            const persianDate = new Intl.DateTimeFormat('fa-IR', { 
+                day: 'numeric',
+                month: 'numeric',
+                year: 'numeric'
+            }).formatToParts(now);
+            
+            const day = parseInt(persianDate.find(p => p.type === 'day').value);
+            return day === 1;
+        }
+        
+        // تابع ذخیره پشتیبان ماهانه
+        async function createMonthlyBackup() {
+            if (!isFirstDayOfPersianMonth()) return;
+            
+            const today = new Date().toISOString().split('T')[0];
+            const lastBackupDate = localStorage.getItem('lastMonthlyBackup');
+            
+            if (lastBackupDate === today) return;
+            
+            showBackupReminder('در حال تهیه پشتیبان ماهانه...');
+            
+            try {
+                // گرفتن پشتیبان از IndexedDB
+                const backupData = await db.backup();
+                
+                const now = new Date();
+                const persianMonth = getPersianMonthName(now);
+                const fileName = `crypto-journal-${persianMonth.replace(/ /g, '-')}.zip`;
+                
+                // ایجاد ZIP
+                const zip = new JSZip();
+                
+                // اضافه کردن فایل JSON
+                zip.file('data.json', JSON.stringify(backupData, null, 2));
+                
+                // ایجاد پوشه تصاویر و اضافه کردن تصاویر
+                const imagesFolder = zip.folder('images');
+                
+                // جمع‌آوری و اضافه کردن تصاویر
+                const imagePromises = [];
+                backupData.trades.forEach(trade => {
+                    if (trade.entryScreenshot) {
+                        const imageName = `entry_${trade.id}.png`;
+                        const base64Data = trade.entryScreenshot.split(',')[1];
+                        imagesFolder.file(imageName, base64Data, { base64: true });
+                        
+                        // تغییر مسیر در داده‌ها
+                        trade.entryScreenshot = `images/${imageName}`;
+                    }
+                    if (trade.exitScreenshot) {
+                        const imageName = `exit_${trade.id}.png`;
+                        const base64Data = trade.exitScreenshot.split(',')[1];
+                        imagesFolder.file(imageName, base64Data, { base64: true });
+                        
+                        // تغییر مسیر در داده‌ها
+                        trade.exitScreenshot = `images/${imageName}`;
+                    }
+                });
+                
+                // به‌روزرسانی فایل JSON با مسیرهای جدید
+                zip.file('data.json', JSON.stringify(backupData, null, 2));
+                
+                // تولید ZIP
+                const content = await zip.generateAsync({ type: 'blob' });
+                
+                // دانلود فایل
+                const url = URL.createObjectURL(content);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = fileName;
+                link.click();
+                URL.revokeObjectURL(url);
+                
+                localStorage.setItem('lastMonthlyBackup', today);
+                
+                updateBackupReminder(`✅ پشتیبان ماه ${persianMonth} با موفقیت ذخیره شد`);
+                
+                setTimeout(() => {
+                    hideBackupReminder();
+                }, 5000);
+                
+                console.log(`✅ پشتیبان ماهانه با نام ${fileName} ذخیره شد`);
+                
+            } catch (error) {
+                console.error('خطا در پشتیبان‌گیری:', error);
+                updateBackupReminder('❌ خطا در پشتیبان‌گیری');
+                setTimeout(() => hideBackupReminder(), 3000);
+            }
+        }
+        
+        // نمایش المان یادآور
+        function showBackupReminder(message) {
+            const reminder = document.getElementById('backupReminder');
+            const text = document.getElementById('backupReminderText');
+            text.textContent = message;
+            reminder.classList.add('show');
+        }
+        
+        function updateBackupReminder(message) {
+            const text = document.getElementById('backupReminderText');
+            text.textContent = message;
+        }
+        
+        function hideBackupReminder() {
+            document.getElementById('backupReminder').classList.remove('show');
+        }
+        
+        function checkMonthlyBackup() {
+            createMonthlyBackup();
+        }
+        
+        function startBackupScheduler() {
+            checkMonthlyBackup();
+            setInterval(() => {
+                checkMonthlyBackup();
+            }, 60 * 60 * 1000);
+        }
+        
+        // بارگذاری اولیه
+        document.addEventListener('DOMContentLoaded', function() {
+            // تنظیم تاریخ و زمان فعلی
+            const now = new Date();
+            const timezoneOffset = now.getTimezoneOffset() * 60000;
+            const localISOTime = new Date(now - timezoneOffset).toISOString().slice(0, 16);
+            document.getElementById('date').value = localISOTime;
+            
+            // راه‌اندازی برنامه با IndexedDB
+            initialize();
+            
+            // محاسبه ریسک هنگام تغییر ورودی‌ها
+            document.getElementById('entryPrice').addEventListener('input', calculateRisk);
+            document.getElementById('stopLoss').addEventListener('input', calculateRisk);
+            document.getElementById('takeProfit').addEventListener('input', calculateRisk);
+            document.getElementById('riskPercent').addEventListener('input', calculateRisk);
+            document.getElementById('feePercent').addEventListener('input', calculateRisk);
+            document.getElementById('type').addEventListener('change', calculateRisk);
+            
+            // تنظیم مقیاس دینامیک
+            adjustScale();
+            window.addEventListener('resize', adjustScale);
+            window.addEventListener('load', adjustScale);
+            
+            // رویدادهای ورودی
+            document.getElementById('newBalanceInput').addEventListener('input', function() {
+                const value = parseFloat(this.value);
+                if (!isNaN(value) && value > 0) {
+                    this.value = Math.round(value * 100) / 100;
+                }
+            });
+            
+            document.getElementById('newAccountBalance').addEventListener('input', function() {
+                const value = parseFloat(this.value);
+                if (!isNaN(value) && value > 0) {
+                    this.value = Math.round(value * 100) / 100;
+                }
+            });
+            
+            // بستن مودال‌ها با کلیک روی پس‌زمینه
+            const detailsModal = document.getElementById('detailsModal');
+            if (detailsModal) {
+                detailsModal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closeDetailsModal();
+                    }
+                });
+            }
+            
+            const closeModal = document.getElementById('closeTradeModal');
+            if (closeModal) {
+                closeModal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closeCloseModal();
+                    }
+                });
+            }
+            
+            const imageModal = document.getElementById('imageModal');
+            if (imageModal) {
+                imageModal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closeImageModal();
+                    }
+                });
+            }
+            
+            // راه‌اندازی سیستم پشتیبان‌گیری خودکار
+            startBackupScheduler();
+        });
+        
+        // تنظیم ماه اولیه بر اساس اولین معامله
+        function setInitialMonthBasedOnFirstTrade() {
+            if (trades.length > 0) {
+                const sortedTrades = [...trades].sort((a, b) => new Date(a.date) - new Date(b.date));
+                const firstTradeDate = new Date(sortedTrades[0].date);
+                currentMonth = new Date(firstTradeDate.getFullYear(), firstTradeDate.getMonth(), 1);
+                updateMonthlyDashboard();
+            }
+        }
+        
+        // ==================== توابع مدیریت تصویر بزرگ ====================
+        function openImageModal(src) {
+            if (src) {
+                document.getElementById('fullSizeImage').src = src;
+                document.getElementById('imageModal').style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+        
+        function closeImageModal() {
+            document.getElementById('imageModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+        
+        // ==================== توابع مدیریت مودال‌ها ====================
+        let activeModal = null;
+        
+        function toggleModal(modalId) {
+            const modal = document.getElementById(modalId);
+            const btn = document.getElementById(modalId.replace('Modal', 'Btn'));
+            
+            if (activeModal && activeModal !== modal) {
+                activeModal.classList.remove('active');
+                const activeBtn = document.getElementById(activeModal.id.replace('Modal', 'Btn'));
+                if (activeBtn) {
+                    activeBtn.classList.remove('active');
+                }
+            }
+            
+            if (modal.classList.contains('active')) {
+                modal.classList.remove('active');
+                if (btn) btn.classList.remove('active');
+                activeModal = null;
+            } else {
+                modal.classList.add('active');
+                if (btn) btn.classList.add('active');
+                activeModal = modal;
+                
+                if (modalId === 'balanceModal') {
+                    document.getElementById('newBalanceInput').value = accountBalance;
+                }
+                if (modalId === 'accountModal') {
+                    updateAccountsList();
+                }
+            }
+        }
+        
+        function closeAllModals() {
+            const modals = document.querySelectorAll('.modal-box');
+            const buttons = document.querySelectorAll('.balance-btn');
+            
+            modals.forEach(modal => {
+                modal.classList.remove('active');
+            });
+            
+            buttons.forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            activeModal = null;
+        }
+        
+        // ==================== توابع پیش‌نمایش اسکرین‌شات ====================
+        function previewEntryScreenshot(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('entryScreenshotPreview');
+                    preview.src = e.target.result;
+                    document.getElementById('entryScreenshotPreviewContainer').classList.add('active');
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+        
+        function previewCloseScreenshot(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('closeScreenshotPreview');
+                    preview.src = e.target.result;
+                    preview.classList.add('active');
+                    document.getElementById('closeScreenshotRemove').classList.add('active');
+                    closeScreenshotData = e.target.result;
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+        
+        function removeEntryScreenshot() {
+            document.getElementById('entryScreenshotFile').value = '';
+            document.getElementById('entryScreenshotPreview').src = '';
+            document.getElementById('entryScreenshotPreviewContainer').classList.remove('active');
+        }
+        
+        function removeCloseScreenshot() {
+            document.getElementById('closeScreenshotFile').value = '';
+            document.getElementById('closeScreenshotPreview').classList.remove('active');
+            document.getElementById('closeScreenshotRemove').classList.remove('active');
+            closeScreenshotData = null;
+        }
+        
+        // ==================== توابع داشبورد ماهانه ====================
+        function changeMonth(direction) {
+            currentMonth.setMonth(currentMonth.getMonth() + direction);
+            updateMonthlyDashboard();
+        }
+        
+        function updateMonthlyDashboard() {
+            const monthDisplay = document.getElementById('currentMonthDisplay');
+            monthDisplay.textContent = getPersianMonthName(currentMonth);
+            
+            const now = new Date();
+            const prevBtn = document.getElementById('prevMonthBtn');
+            const nextBtn = document.getElementById('nextMonthBtn');
+            
+            if (currentMonth.getMonth() === now.getMonth() && currentMonth.getFullYear() === now.getFullYear()) {
+                nextBtn.disabled = true;
+            } else {
+                nextBtn.disabled = false;
+            }
+            
+            const startOfMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
+            const endOfMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0, 23, 59, 59);
+            
+            const monthlyTrades = trades.filter(trade => {
+                const tradeDate = new Date(trade.date);
+                return tradeDate >= startOfMonth && tradeDate <= endOfMonth && trade.accountId === activeAccountId;
+            });
+            
+            document.getElementById('monthlyTradeCount').textContent = monthlyTrades.length;
+            
+            let totalPnL = 0;
+            let profitable = 0;
+            let loss = 0;
+            
+            monthlyTrades.forEach(trade => {
+                if (trade.status === 'closed') {
+                    const pnl = calculateTradePnL(trade);
+                    totalPnL += pnl;
+                    if (pnl > 0) profitable++;
+                    else if (pnl < 0) loss++;
+                }
+            });
+            
+            const totalPnLElement = document.getElementById('monthlyTotalPnL');
+            totalPnLElement.textContent = (totalPnL >= 0 ? '+' : '') + formatCurrency(Math.abs(totalPnL));
+            totalPnLElement.style.color = totalPnL >= 0 ? '#10b981' : '#ef4444';
+            
+            document.getElementById('monthlyProfitable').textContent = profitable;
+            document.getElementById('monthlyLoss').textContent = loss;
+            
+            const tbody = document.getElementById('monthlyTradesBody');
+            
+            if (monthlyTrades.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="no-trades-month">
+                            <i class="fas fa-chart-line" style="font-size: 2rem; margin-bottom: 15px; display: block;"></i>
+                            هیچ معامله‌ای در این ماه وجود ندارد
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            const sortedTrades = [...monthlyTrades].sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            let html = '';
+            sortedTrades.forEach(trade => {
+                const dateText = formatPersianDate(trade.date, true);
+                
+                const typeText = trade.type === 'buy' ? 'لانگ' : 'شورت';
+                const statusText = trade.status === 'open' ? 'باز' : 'بسته';
+                
+                let pnlText = 'باز';
+                let pnlClass = 'neutral';
+                
+                if (trade.status === 'closed') {
+                    const pnl = calculateTradePnL(trade);
+                    pnlText = (pnl >= 0 ? '+' : '') + formatCurrency(Math.abs(pnl));
+                    pnlClass = pnl > 0 ? 'profit' : (pnl < 0 ? 'loss' : 'neutral');
+                }
+                
+                html += `
+                    <tr onclick="showTradeDetails(${trade.id})">
+                        <td>${dateText}</td>
+                        <td><span class="crypto-badge" style="font-size: 0.8rem;">${trade.symbol}</span></td>
+                        <td>${typeText}</td>
+                        <td class="price-display">${trade.entryPriceStr || trade.entryPrice}</td>
+                        <td class="price-display">${trade.status === 'closed' ? trade.closedPrice : '-'}</td>
+                        <td><span class="${pnlClass}">${pnlText}</span></td>
+                        <td><span class="${trade.status === 'open' ? 'profit' : 'neutral'}">${statusText}</span></td>
+                    </tr>
+                `;
+            });
+            
+            tbody.innerHTML = html;
+        }
+        
+        // ==================== توابع مدیریت معاملات ====================
+        function setBalancePreset(amount) {
+            document.getElementById('newBalanceInput').value = amount;
+        }
+        
+        function adjustScale() {
+            const container = document.querySelector('.container');
+            if (!container) return;
+            
+            const containerWidth = 1400;
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+            
+            let scale = windowWidth / containerWidth;
+            scale = Math.max(0.35, Math.min(1, scale));
+            
+            container.style.transform = `scale(${scale})`;
+            container.style.transformOrigin = 'top center';
+            
+            const containerHeight = container.offsetHeight;
+            const scaledHeight = containerHeight * scale;
+            const minBodyHeight = Math.max(windowHeight, scaledHeight + 40);
+            
+            document.body.style.minHeight = `${minBodyHeight}px`;
+        }
+        
+        function updateBalanceDisplay() {
+            document.getElementById('currentBalance').textContent = '$' + formatNumber(accountBalance);
+            document.getElementById('currentBalanceDisplay').textContent = '$' + formatNumber(accountBalance);
+            document.getElementById('currentAccountName').textContent = activeAccount ? activeAccount.name : 'حساب اصلی';
+            
+            const activeAccountIndicator = document.getElementById('activeAccountIndicator');
+            activeAccountIndicator.textContent = `${accounts.findIndex(acc => acc.id === activeAccountId) + 1}/${accounts.length}`;
+            
+            // سود/ضرر کل دیگر از بالانس تأثیر نمی‌گیرد - فقط برای نمایش
+            const totalPnL = calculateTotalPnL();
+            const totalPnLElement = document.getElementById('totalPnL');
+            totalPnLElement.textContent = (totalPnL >= 0 ? '+' : '') + formatCurrency(Math.abs(totalPnL));
+            totalPnLElement.style.color = totalPnL >= 0 ? '#10b981' : '#ef4444';
+        }
+        
+        function formatCurrency(num) {
+            return '$' + parseFloat(num).toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+        
+        function formatNumber(num) {
+            const numValue = parseFloat(num);
+            if (isNaN(numValue)) return '0';
+            
+            if (numValue % 1 !== 0) {
+                return numValue.toLocaleString('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 8
+                });
+            }
+            return numValue.toLocaleString('en-US');
+        }
+        
+        function updateTotalRisk() {
+            const openTrades = trades.filter(t => t.status === 'open');
+            let totalRiskAmount = 0;
+            
+            openTrades.forEach(trade => {
+                const riskData = calculateTradeRisk(trade);
+                if (riskData && riskData.totalRiskAmount) {
+                    totalRiskAmount += riskData.totalRiskAmount;
+                }
+            });
+            
+            const totalRiskPercent = accountBalance > 0 ? (totalRiskAmount / accountBalance) * 100 : 0;
+            document.getElementById('totalRiskPercent').textContent = totalRiskPercent.toFixed(2) + '%';
+        }
+        
+        function setRiskPercent(percent) {
+            document.getElementById('riskPercent').value = percent;
+            calculateRisk();
+        }
+        
+        async function updateBalance() {
+            const newBalanceInput = document.getElementById('newBalanceInput');
+            let newBalance = parseFloat(newBalanceInput.value);
+            
+            if (isNaN(newBalance) || newBalance <= 0) {
+                showNotification('لطفاً یک عدد معتبر وارد کنید.', 'error');
+                return;
+            }
+            
+            newBalance = Math.round(newBalance * 100) / 100;
+            
+            const activeAccountIndex = accounts.findIndex(acc => acc.id === activeAccountId);
+            if (activeAccountIndex !== -1) {
+                accounts[activeAccountIndex].balance = newBalance;
+                activeAccount = accounts[activeAccountIndex];
+                accountBalance = newBalance;
+                
+                // ذخیره در دیتابیس
+                await saveAccountsToDB();
+            }
+            
+            updateBalanceDisplay();
+            updateTotalRisk();
+            updateStats();
+            calculateRisk();
+            closeAllModals();
+            showNotification('بالانس حساب به‌روزرسانی شد.', 'success');
+        }
+        
+        function resetForm() {
+            document.getElementById('tradeForm').reset();
+            document.getElementById('type').value = '';
+            document.getElementById('feeDetails').style.display = 'none';
+            removeEntryScreenshot();
+            
+            // تنظیم تاریخ و زمان فعلی
+            const now = new Date();
+            const timezoneOffset = now.getTimezoneOffset() * 60000;
+            const localISOTime = new Date(now - timezoneOffset).toISOString().slice(0, 16);
+            document.getElementById('date').value = localISOTime;
+        }
+        
+        function calculateRisk() {
+            const entryPriceStr = document.getElementById('entryPrice').value.trim();
+            const stopLossStr = document.getElementById('stopLoss').value.trim();
+            const takeProfitStr = document.getElementById('takeProfit').value.trim();
+            const riskPercentStr = document.getElementById('riskPercent').value.trim();
+            const feePercentStr = document.getElementById('feePercent').value.trim();
+            const type = document.getElementById('type').value;
+            
+            const entryPrice = parseFloat(entryPriceStr) || 0;
+            const stopLoss = parseFloat(stopLossStr) || 0;
+            const takeProfit = parseFloat(takeProfitStr) || 0;
+            const riskPercent = parseFloat(riskPercentStr) || 0;
+            const totalFeePercent = parseFloat(feePercentStr) || 0;
+            
+            if (entryPrice <= 0 || stopLoss <= 0 || takeProfit <= 0 || riskPercent <= 0 || !type) {
+                document.getElementById('feeDetails').style.display = 'none';
+                document.getElementById('riskAmount').textContent = '$0';
+                document.getElementById('potentialProfit').textContent = '$0';
+                document.getElementById('riskRewardRatio').textContent = '1:0';
+                return;
+            }
+            
+            const totalRiskAmount = (accountBalance * riskPercent) / 100;
+            
+            let stopLossPoints, takeProfitPoints;
+            
+            if (type === 'buy') {
+                stopLossPoints = Math.abs(entryPrice - stopLoss);
+                takeProfitPoints = Math.abs(takeProfit - entryPrice);
+            } else {
+                stopLossPoints = Math.abs(stopLoss - entryPrice);
+                takeProfitPoints = Math.abs(entryPrice - takeProfit);
+            }
+            
+            if (stopLossPoints <= 0) {
+                document.getElementById('feeDetails').style.display = 'none';
+                return;
+            }
+            
+            const feePerUnit = (entryPrice * totalFeePercent) / 100;
+            const denominator = stopLossPoints + feePerUnit;
+            const positionSize = denominator > 0 ? totalRiskAmount / denominator : 0;
+            const positionValue = positionSize * entryPrice;
+            const totalFee = (positionValue * totalFeePercent) / 100;
+            const feeEntry = totalFee / 2;
+            const feeExit = totalFee / 2;
+            const potentialProfit = positionSize * takeProfitPoints;
+            const netProfit = potentialProfit - totalFee;
+            const riskRewardRatio = stopLossPoints > 0 ? (takeProfitPoints / stopLossPoints).toFixed(2) : 0;
+            
+            document.getElementById('riskAmount').textContent = formatCurrency(totalRiskAmount);
+            document.getElementById('riskAmount').style.color = '#ef4444';
+            document.getElementById('potentialProfit').textContent = formatCurrency(potentialProfit);
+            document.getElementById('riskRewardRatio').textContent = '1:' + riskRewardRatio;
+            
+            document.getElementById('feeEntryAmount').textContent = formatCurrency(feeEntry);
+            document.getElementById('feeExitAmount').textContent = formatCurrency(feeExit);
+            document.getElementById('totalFeeAmount').textContent = formatCurrency(totalFee);
+            document.getElementById('netProfitAmount').textContent = formatCurrency(netProfit);
+            document.getElementById('feeDetails').style.display = 'block';
+            
+            return {
+                totalRiskAmount, positionSize, positionValue, potentialProfit, netProfit,
+                riskRewardRatio, totalFeePercent, feeEntry, feeExit, totalFee,
+                entryPriceStr, stopLossStr, takeProfitStr
+            };
+        }
+        
+        // ثبت معامله جدید
+        document.getElementById('tradeForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const entryPriceStr = document.getElementById('entryPrice').value.trim();
+            const stopLossStr = document.getElementById('stopLoss').value.trim();
+            const takeProfitStr = document.getElementById('takeProfit').value.trim();
+            const riskPercentStr = document.getElementById('riskPercent').value.trim();
+            const feePercentStr = document.getElementById('feePercent').value.trim();
+            
+            const entryPrice = parseFloat(entryPriceStr);
+            const stopLoss = parseFloat(stopLossStr);
+            const takeProfit = parseFloat(takeProfitStr);
+            const riskPercent = parseFloat(riskPercentStr);
+            const totalFeePercent = parseFloat(feePercentStr) || 0;
+            
+            if (isNaN(entryPrice) || entryPrice <= 0 || 
+                isNaN(stopLoss) || stopLoss <= 0 || 
+                isNaN(takeProfit) || takeProfit <= 0 || 
+                isNaN(riskPercent) || riskPercent <= 0) {
+                showNotification('لطفاً تمام فیلدهای ضروری را به درستی پر کنید.', 'error');
+                return;
+            }
+            
+            const type = document.getElementById('type').value;
+            if (!type) {
+                showNotification('لطفاً نوع معامله را انتخاب کنید.', 'error');
+                return;
+            }
+            
+            if (type === 'buy' && stopLoss >= entryPrice) {
+                showNotification('برای لانگ، حد ضرر باید کمتر از قیمت ورود باشد.', 'error');
+                return;
+            }
+            if (type === 'sell' && stopLoss <= entryPrice) {
+                showNotification('برای شورت، حد ضرر باید بیشتر از قیمت ورود باشد.', 'error');
+                return;
+            }
+            
+            const riskData = calculateRisk();
+            if (!riskData) {
+                showNotification('خطا در محاسبات ریسک.', 'error');
+                return;
+            }
+            
+            const entryScreenshotPreview = document.getElementById('entryScreenshotPreview');
+            const entryScreenshot = entryScreenshotPreview.src ? entryScreenshotPreview.src : null;
+            
+            const trade = {
+                id: Date.now(),
+                symbol: document.getElementById('symbol').value.toUpperCase(),
+                date: document.getElementById('date').value,
+                type: type,
+                entryPrice: entryPrice,
+                entryPriceStr: entryPriceStr,
+                stopLoss: stopLoss,
+                stopLossStr: stopLossStr,
+                takeProfit: takeProfit,
+                takeProfitStr: takeProfitStr,
+                riskPercent: riskPercent,
+                totalFeePercent: totalFeePercent,
+                feeEntry: riskData.feeEntry,
+                feeExit: riskData.feeExit,
+                totalFee: riskData.totalFee,
+                status: 'open',
+                closedPrice: null,
+                closedDate: null,
+                entryScreenshot: entryScreenshot,
+                exitScreenshot: null,
+                totalRiskAmount: riskData.totalRiskAmount,
+                positionSize: riskData.positionSize,
+                positionValue: riskData.positionValue,
+                potentialProfit: riskData.potentialProfit,
+                netProfit: riskData.netProfit,
+                riskRewardRatio: riskData.riskRewardRatio,
+                accountId: activeAccountId
+            };
+            
+            // ذخیره در IndexedDB
+            await saveTradeToDB(trade);
+            
+            // به‌روزرسانی نمایش
+            loadTrades();
+            updateStats();
+            updateTotalRisk();
+            
+            if (trades.length === 1) {
+                setInitialMonthBasedOnFirstTrade();
+            }
+            
+            updateMonthlyDashboard();
+            
+            // پاک کردن فرم
+            this.reset();
+            
+            const now = new Date();
+            const timezoneOffset = now.getTimezoneOffset() * 60000;
+            const localISOTime = new Date(now - timezoneOffset).toISOString().slice(0, 16);
+            document.getElementById('date').value = localISOTime;
+            document.getElementById('type').value = '';
+            document.getElementById('feeDetails').style.display = 'none';
+            
+            removeEntryScreenshot();
+            
+            showNotification('معامله با موفقیت ثبت شد!', 'success');
+        });
+        
+        function calculateTradeRisk(trade) {
+            let stopLossPoints;
+            
+            if (trade.type === 'buy') {
+                stopLossPoints = Math.abs(trade.entryPrice - trade.stopLoss);
+            } else {
+                stopLossPoints = Math.abs(trade.stopLoss - trade.entryPrice);
+            }
+            
+            const totalRiskAmount = (accountBalance * trade.riskPercent) / 100;
+            const feePerUnit = (trade.entryPrice * (trade.totalFeePercent || 0)) / 100;
+            const denominator = stopLossPoints + feePerUnit;
+            const positionSize = denominator > 0 ? totalRiskAmount / denominator : 0;
+            
+            return { totalRiskAmount, positionSize };
+        }
+        
+        function loadTrades() {
+            const tbody = document.getElementById('tradesTableBody');
+            const noTradesMessage = document.getElementById('noTradesMessage');
+            
+            const accountTrades = trades.filter(trade => trade.accountId === activeAccountId);
+            
+            if (accountTrades.length === 0) {
+                tbody.innerHTML = '';
+                noTradesMessage.style.display = 'block';
+                return;
+            }
+            
+            noTradesMessage.style.display = 'none';
+            
+            const sortedTrades = [...accountTrades].sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            let html = '';
+            sortedTrades.forEach(trade => {
+                const pnl = calculateTradePnL(trade);
+                const pnlClass = pnl > 0 ? 'profit' : (pnl < 0 ? 'loss' : 'neutral');
+                const pnlText = trade.status === 'closed' ? 
+                    (pnl >= 0 ? '+' : '') + formatCurrency(Math.abs(pnl)) : 
+                    'باز';
+                
+                const typeText = trade.type === 'buy' ? 'لانگ' : 'شورت';
+                const statusText = trade.status === 'open' ? 'باز' : 'بسته';
+                const statusClass = trade.status === 'open' ? 'profit' : 'neutral';
+                const feeText = trade.totalFeePercent > 0 ? `${trade.totalFeePercent}%` : '-';
+                
+                const dateText = formatPersianDate(trade.date, true);
+                
+                const screenshotIcon = trade.entryScreenshot ? 
+                    '<i class="fas fa-camera" style="color: #3b82f6; margin-right: 5px;" title="اسکرین‌شات موجود است"></i>' : '';
+                
+                html += `
+                <tr>
+                    <td>
+                        <div class="crypto-badge">
+                            <i class="fas fa-coins"></i>
+                            ${trade.symbol} ${screenshotIcon}
+                        </div>
+                    </td>
+                    <td>${dateText}</td>
+                    <td>${typeText}</td>
+                    <td class="price-display">${trade.entryPriceStr || trade.entryPrice}</td>
+                    <td class="price-display">${trade.stopLossStr || trade.stopLoss}</td>
+                    <td class="price-display">${trade.takeProfitStr || trade.takeProfit}</td>
+                    <td>${trade.riskPercent.toFixed(2)}%</td>
+                    <td>${feeText}</td>
+                    <td><span class="${statusClass}">${statusText}</span></td>
+                    <td><span class="${pnlClass}">${pnlText}</span></td>
+                    <td class="actions">
+                        <button class="btn-icon" onclick="showTradeDetails(${trade.id})" style="background-color: rgba(14, 165, 233, 0.1); color: #0ea5e9; border: 1px solid rgba(14, 165, 233, 0.3);">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn-icon" onclick="openCloseModal(${trade.id})" style="background-color: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.3);" ${trade.status === 'closed' ? 'disabled' : ''}>
+                            <i class="fas fa-check-circle"></i>
+                        </button>
+                        <button class="btn-icon" onclick="deleteTrade(${trade.id})" style="background-color: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3);">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+                `;
+            });
+            
+            tbody.innerHTML = html;
+        }
+        
+        async function showTradeDetails(tradeId) {
+            const trade = trades.find(t => t.id === tradeId);
+            if (!trade) return;
+            
+            const detailsModal = document.getElementById('detailsModal');
+            detailsModal._currentTradeId = tradeId;
+            
+            document.getElementById('detail-symbol').textContent = trade.symbol;
+            document.getElementById('detail-type').textContent = trade.type === 'buy' ? 'لانگ' : 'شورت';
+            
+            const dateText = formatPersianDate(trade.date, true);
+            document.getElementById('detail-date').textContent = dateText;
+            
+            const statusText = trade.status === 'open' ? 'باز' : 'بسته';
+            const statusClass = trade.status === 'open' ? 'profit' : 'neutral';
+            const statusElement = document.getElementById('detail-status');
+            statusElement.textContent = statusText;
+            statusElement.className = 'detail-value ' + statusClass;
+            
+            document.getElementById('detail-entry').textContent = trade.entryPriceStr || trade.entryPrice;
+            document.getElementById('detail-sl').textContent = trade.stopLossStr || trade.stopLoss;
+            document.getElementById('detail-tp').textContent = trade.takeProfitStr || trade.takeProfit;
+            
+            document.getElementById('detail-risk-percent').textContent = trade.riskPercent.toFixed(2) + '%';
+            document.getElementById('detail-risk-amount').textContent = formatCurrency(trade.totalRiskAmount || 0);
+            document.getElementById('detail-position-size').textContent = formatNumber(trade.positionSize || 0);
+            document.getElementById('detail-rr').textContent = '1:' + (trade.riskRewardRatio || 0);
+            
+            document.getElementById('detail-fee-entry').textContent = formatCurrency(trade.feeEntry || 0);
+            document.getElementById('detail-fee-exit').textContent = formatCurrency(trade.feeExit || 0);
+            document.getElementById('detail-total-fee').textContent = formatCurrency(trade.totalFee || 0);
+            
+            const entryScreenshotImg = document.getElementById('detail-screenshot-entry');
+            const entryPlaceholder = document.getElementById('detail-screenshot-entry-placeholder');
+            const exitScreenshotImg = document.getElementById('detail-screenshot-exit');
+            const exitPlaceholder = document.getElementById('detail-screenshot-exit-placeholder');
+            
+            if (trade.entryScreenshot) {
+                entryScreenshotImg.src = trade.entryScreenshot;
+                entryScreenshotImg.style.display = 'inline';
+                entryPlaceholder.style.display = 'none';
+            } else {
+                entryScreenshotImg.style.display = 'none';
+                entryPlaceholder.style.display = 'block';
+            }
+            
+            if (trade.exitScreenshot) {
+                exitScreenshotImg.src = trade.exitScreenshot;
+                exitScreenshotImg.style.display = 'inline';
+                exitPlaceholder.style.display = 'none';
+            } else {
+                exitScreenshotImg.style.display = 'none';
+                exitPlaceholder.style.display = 'block';
+            }
+            
+            if (trade.status === 'closed') {
+                document.getElementById('detail-closed-price-container').style.display = 'block';
+                document.getElementById('detail-result-section').style.display = 'block';
+                
+                document.getElementById('detail-closed-price').textContent = trade.closedPrice || '0';
+                
+                const pnl = calculateTradePnL(trade);
+                const pnlElement = document.getElementById('detail-net-pnl');
+                pnlElement.textContent = (pnl >= 0 ? '+' : '') + formatCurrency(Math.abs(pnl));
+                pnlElement.style.color = pnl >= 0 ? '#10b981' : '#ef4444';
+                
+                let priceDifference;
+                if (trade.type === 'buy') {
+                    priceDifference = trade.closedPrice - trade.entryPrice;
+                } else {
+                    priceDifference = trade.entryPrice - trade.closedPrice;
+                }
+                const grossPnl = trade.positionSize * priceDifference;
+                
+                document.getElementById('detail-gross-pnl').textContent = 
+                    (grossPnl >= 0 ? '+' : '') + formatCurrency(Math.abs(grossPnl));
+                document.getElementById('detail-gross-pnl').style.color = 
+                    grossPnl >= 0 ? '#10b981' : '#ef4444';
+                
+                document.getElementById('detail-fee-deducted').textContent = formatCurrency(trade.totalFee || 0);
+                
+                if (trade.closedDate) {
+                    const closedDateText = formatPersianDate(trade.closedDate, true);
+                    document.getElementById('detail-closed-date').textContent = closedDateText;
+                }
+            } else {
+                document.getElementById('detail-closed-price-container').style.display = 'none';
+                document.getElementById('detail-result-section').style.display = 'none';
+            }
+            
+            detailsModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeDetailsModal() {
+            document.getElementById('detailsModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+        
+        function editTradeFromDetails() {
+            const modal = document.getElementById('detailsModal');
+            if (modal && modal._currentTradeId) {
+                closeDetailsModal();
+                editTrade(modal._currentTradeId);
+            }
+        }
+        
+        function openCloseModal(tradeId) {
+            currentTradeIdForClose = tradeId;
+            document.getElementById('closePriceInput').value = '';
+            removeCloseScreenshot();
+            document.getElementById('closeTradeModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeCloseModal() {
+            document.getElementById('closeTradeModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            currentTradeIdForClose = null;
+            closeScreenshotData = null;
+        }
+        
+        async function confirmCloseTrade() {
+            const closePrice = document.getElementById('closePriceInput').value.trim();
+            
+            if (!closePrice || isNaN(parseFloat(closePrice))) {
+                showNotification('لطفاً قیمت معتبر وارد کنید.', 'error');
+                return;
+            }
+            
+            if (!currentTradeIdForClose) return;
+            
+            const tradeIndex = trades.findIndex(t => t.id === currentTradeIdForClose);
+            if (tradeIndex !== -1) {
+                const trade = trades[tradeIndex];
+                
+                // بستن معامله - بدون تغییر بالانس
+                trades[tradeIndex].status = 'closed';
+                trades[tradeIndex].closedPrice = parseFloat(closePrice);
+                trades[tradeIndex].closedDate = new Date().toISOString();
+                
+                if (closeScreenshotData) {
+                    trades[tradeIndex].exitScreenshot = closeScreenshotData;
+                }
+                
+                // ذخیره در دیتابیس
+                await saveTradeToDB(trades[tradeIndex]);
+                
+                loadTrades();
+                updateStats();
+                updateTotalRisk();
+                updateMonthlyDashboard();
+                
+                closeCloseModal();
+                
+                // محاسبه سود/ضرر برای نمایش پیام
+                const priceDiff = trade.type === 'buy' 
+                    ? parseFloat(closePrice) - trade.entryPrice
+                    : trade.entryPrice - parseFloat(closePrice);
+                const pnl = priceDiff * trade.positionSize - (trade.totalFee || 0);
+                
+                showNotification(`معامله بسته شد. ${pnl >= 0 ? 'سود' : 'ضرر'}: ${formatCurrency(Math.abs(pnl))}`, pnl >= 0 ? 'success' : 'warning');
+            }
+        }
+        
+        function calculateTradePnL(trade) {
+            if (trade.status !== 'closed' || !trade.closedPrice) return 0;
+            
+            let priceDifference;
+            
+            if (trade.type === 'buy') {
+                priceDifference = trade.closedPrice - trade.entryPrice;
+            } else {
+                priceDifference = trade.entryPrice - trade.closedPrice;
+            }
+            
+            const grossPnl = trade.positionSize * priceDifference;
+            const netPnl = grossPnl - (trade.totalFee || 0);
+            
+            return netPnl;
+        }
+        
+        function calculateTotalPnL() {
+            let total = 0;
+            trades.forEach(trade => {
+                total += calculateTradePnL(trade);
+            });
+            return total;
+        }
+        
+        function calculateTotalProfit() {
+            let total = 0;
+            trades.forEach(trade => {
+                const pnl = calculateTradePnL(trade);
+                if (pnl > 0) total += pnl;
+            });
+            return total;
+        }
+        
+        function calculateTotalLoss() {
+            let total = 0;
+            trades.forEach(trade => {
+                const pnl = calculateTradePnL(trade);
+                if (pnl < 0) total += Math.abs(pnl);
+            });
+            return total;
+        }
+        
+        function calculateTotalFees() {
+            let total = 0;
+            trades.forEach(trade => {
+                total += trade.totalFee || 0;
+            });
+            return total;
+        }
+        
+        function updateStats() {
+            if (trades.length === 0) {
+                resetStats();
+                return;
+            }
+            
+            const closedTrades = trades.filter(t => t.status === 'closed');
+            const openTrades = trades.filter(t => t.status === 'open');
+            const totalTrades = trades.length;
+            
+            let profitableTrades = 0;
+            let maxProfit = 0;
+            let maxLoss = 0;
+            
+            closedTrades.forEach(trade => {
+                const pnl = calculateTradePnL(trade);
+                if (pnl > 0) {
+                    profitableTrades++;
+                    if (pnl > maxProfit) maxProfit = pnl;
+                } else if (pnl < maxLoss) {
+                    maxLoss = pnl;
+                }
+            });
+            
+            const totalProfit = calculateTotalProfit();
+            const totalLoss = calculateTotalLoss();
+            const totalFees = calculateTotalFees();
+            const winRate = closedTrades.length > 0 ? (profitableTrades / closedTrades.length) * 100 : 0;
+            
+            document.getElementById('totalTrades').textContent = totalTrades;
+            document.getElementById('openTrades').textContent = openTrades.length;
+            document.getElementById('totalProfit').textContent = formatCurrency(totalProfit);
+            document.getElementById('totalLoss').textContent = formatCurrency(totalLoss);
+            document.getElementById('totalFees').textContent = formatCurrency(totalFees);
+            document.getElementById('winRate').textContent = winRate.toFixed(1) + '%';
+            document.getElementById('maxProfit').textContent = '+' + formatCurrency(Math.abs(maxProfit));
+            document.getElementById('maxLoss').textContent = formatCurrency(Math.abs(maxLoss));
+        }
+        
+        function resetStats() {
+            document.getElementById('totalTrades').textContent = '0';
+            document.getElementById('openTrades').textContent = '0';
+            document.getElementById('totalProfit').textContent = '$0.00';
+            document.getElementById('totalLoss').textContent = '$0.00';
+            document.getElementById('totalFees').textContent = '$0.00';
+            document.getElementById('winRate').textContent = '0%';
+            document.getElementById('maxProfit').textContent = '$0.00';
+            document.getElementById('maxLoss').textContent = '$0.00';
+        }
+        
+        async function editTrade(id) {
+            const trade = trades.find(t => t.id === id);
+            if (!trade) return;
+            
+            document.getElementById('symbol').value = trade.symbol;
+            document.getElementById('date').value = trade.date;
+            document.getElementById('type').value = trade.type;
+            document.getElementById('entryPrice').value = trade.entryPriceStr || trade.entryPrice;
+            document.getElementById('stopLoss').value = trade.stopLossStr || trade.stopLoss;
+            document.getElementById('takeProfit').value = trade.takeProfitStr || trade.takeProfit;
+            document.getElementById('riskPercent').value = trade.riskPercent;
+            document.getElementById('feePercent').value = trade.totalFeePercent || '';
+            
+            // حذف از دیتابیس
+            await deleteTradeFromDB(id);
+            
+            calculateRisk();
+            showNotification('معامله برای ویرایش آماده است.', 'info');
+        }
+        
+        async function deleteTrade(id) {
+            if (confirm('آیا از حذف این معامله اطمینان دارید؟')) {
+                await deleteTradeFromDB(id);
+                
+                loadTrades();
+                updateStats();
+                updateTotalRisk();
+                updateMonthlyDashboard();
+                showNotification('معامله حذف شد.', 'warning');
+            }
+        }
+        
+        function updateAccountsList() {
+            const container = document.getElementById('accountsListContainer');
+            if (!container) {
+                console.error('❌ container accountsListContainer یافت نشد');
+                return;
+            }
+            
+            console.log('📊 به‌روزرسانی لیست حساب‌ها:', accounts);
+            
+            if (!accounts || accounts.length === 0) {
+                container.innerHTML = '<div class="account-item" style="justify-content: center;">هیچ حسابی وجود ندارد</div>';
+                return;
+            }
+            
+            let html = '';
+            
+            accounts.forEach(account => {
+                const isActive = account.id === activeAccountId;
+                
+                html += `
+                    <div class="account-item ${isActive ? 'active-account' : ''}">
+                        <div class="account-info">
+                            <div class="account-name">${account.name}</div>
+                            <div class="account-balance">${formatCurrency(account.balance)}</div>
+                            ${isActive ? '<div class="active-badge">فعال</div>' : ''}
+                        </div>
+                        <div class="account-actions">
+                            <button class="account-action-btn" onclick="switchAccount(${account.id})" ${isActive ? 'disabled' : ''} title="انتخاب به عنوان حساب فعال">
+                                <i class="fas fa-check-circle"></i>
+                            </button>
+                            <button class="account-action-btn delete" onclick="deleteAccount(${account.id})" ${account.id === 1 ? 'disabled' : ''} title="حذف حساب">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+            console.log('✅ لیست حساب‌ها به‌روزرسانی شد');
+        }
+        
+        async function addNewAccount() {
+            const newAccountName = document.getElementById('newAccountName').value.trim();
+            const newAccountBalance = parseFloat(document.getElementById('newAccountBalance').value);
+            
+            if (!newAccountName) {
+                showNotification('لطفاً نام حساب را وارد کنید.', 'error');
+                return;
+            }
+            
+            if (isNaN(newAccountBalance) || newAccountBalance <= 0) {
+                showNotification('لطفاً موجودی اولیه معتبر وارد کنید.', 'error');
+                return;
+            }
+            
+            const existingAccount = accounts.find(acc => acc.name.toLowerCase() === newAccountName.toLowerCase());
+            if (existingAccount) {
+                showNotification('حسابی با این نام از قبل وجود دارد.', 'error');
+                return;
+            }
+            
+            const newAccountId = accounts.length > 0 ? Math.max(...accounts.map(acc => acc.id)) + 1 : 1;
+            
+            const newAccount = {
+                id: newAccountId,
+                name: newAccountName,
+                balance: newAccountBalance
+            };
+            
+            accounts.push(newAccount);
+            
+            // ذخیره در دیتابیس
+            await saveAccountsToDB();
+            
+            document.getElementById('newAccountName').value = '';
+            document.getElementById('newAccountBalance').value = '';
+            
+            updateAccountsList();
+            showNotification('حساب جدید با موفقیت اضافه شد.', 'success');
+        }
+        
+        async function deleteAccount(accountId) {
+            if (accountId === 1) {
+                showNotification('حساب اصلی قابل حذف نیست.', 'error');
+                return;
+            }
+            
+            if (accounts.length <= 1) {
+                showNotification('حداقل باید یک حساب وجود داشته باشد.', 'error');
+                return;
+            }
+            
+            if (confirm('آیا از حذف این حساب اطمینان دارید؟ تمام معاملات مربوط به این حساب نیز حذف خواهند شد.')) {
+                // حذف حساب
+                accounts = accounts.filter(acc => acc.id !== accountId);
+                
+                // حذف معاملات مربوط به این حساب
+                const tradesToDelete = trades.filter(t => t.accountId === accountId).map(t => t.id);
+                if (tradesToDelete.length > 0) {
+                    await db.deleteTrades(tradesToDelete);
+                }
+                trades = trades.filter(t => t.accountId !== accountId);
+                
+                if (accountId === activeAccountId) {
+                    activeAccountId = 1;
+                    activeAccount = accounts.find(acc => acc.id === 1);
+                    accountBalance = activeAccount ? activeAccount.balance : 0;
+                }
+                
+                await saveAccountsToDB();
+                
+                updateBalanceDisplay();
+                updateAccountsList();
+                loadTrades();
+                updateStats();
+                updateTotalRisk();
+                setInitialMonthBasedOnFirstTrade();
+                updateMonthlyDashboard();
+                
+                showNotification('حساب و معاملات مربوطه حذف شدند.', 'warning');
+            }
+        }
+        
+        async function switchAccount(accountId) {
+            const newActiveAccount = accounts.find(acc => acc.id === accountId);
+            if (!newActiveAccount) {
+                showNotification('حساب مورد نظر یافت نشد.', 'error');
+                return;
+            }
+            
+            activeAccountId = accountId;
+            activeAccount = newActiveAccount;
+            accountBalance = activeAccount.balance;
+            
+            await db.saveSetting('activeAccountId', activeAccountId.toString());
+            
+            // بارگذاری معاملات حساب جدید
+            trades = await db.getTradesByAccount(activeAccountId);
+            
+            updateBalanceDisplay();
+            updateAccountsList();
+            loadTrades();
+            updateStats();
+            updateTotalRisk();
+            setInitialMonthBasedOnFirstTrade();
+            updateMonthlyDashboard();
+            calculateRisk();
+            
+            showNotification(`حساب "${activeAccount.name}" فعال شد.`, 'success');
+            closeAllModals();
+        }
+        
+        // ==================== توابع جدید پشتیبان‌گیری ZIP ====================
+        
+        // نمایش پیشرفت
+        function showProgress(message, percent = 0) {
+            const progressDiv = document.getElementById('backupProgress');
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            const progressStatus = document.getElementById('progressStatus');
+            
+            progressDiv.classList.add('active');
+            progressBar.style.width = percent + '%';
+            progressText.textContent = message;
+            progressStatus.textContent = percent + '%';
+        }
+        
+        function hideProgress() {
+            const progressDiv = document.getElementById('backupProgress');
+            progressDiv.classList.remove('active');
+        }
+        
+        // پشتیبان‌گیری دستی (ZIP)
+        async function exportData() {
+            try {
+                showProgress('در حال آماده‌سازی داده‌ها...', 10);
+                
+                const backupData = await db.backup();
+                
+                showProgress('در حال ایجاد فایل ZIP...', 30);
+                
+                // ایجاد ZIP
+                const zip = new JSZip();
+                
+                // اضافه کردن فایل JSON
+                zip.file('data.json', JSON.stringify(backupData, null, 2));
+                
+                showProgress('در حال پردازش تصاویر...', 50);
+                
+                // ایجاد پوشه تصاویر و اضافه کردن تصاویر
+                const imagesFolder = zip.folder('images');
+                
+                // شمارش تعداد تصاویر
+                let imageCount = 0;
+                backupData.trades.forEach(trade => {
+                    if (trade.entryScreenshot) imageCount++;
+                    if (trade.exitScreenshot) imageCount++;
+                });
+                
+                let processedImages = 0;
+                
+                // اضافه کردن تصاویر با نمایش پیشرفت
+                for (const trade of backupData.trades) {
+                    if (trade.entryScreenshot) {
+                        const imageName = `entry_${trade.id}.png`;
+                        const base64Data = trade.entryScreenshot.split(',')[1];
+                        imagesFolder.file(imageName, base64Data, { base64: true });
+                        
+                        // تغییر مسیر در داده‌ها
+                        trade.entryScreenshot = `images/${imageName}`;
+                        
+                        processedImages++;
+                        const percent = 50 + Math.floor((processedImages / imageCount) * 40);
+                        showProgress(`در حال پردازش تصویر ${processedImages} از ${imageCount}...`, percent);
+                    }
+                    if (trade.exitScreenshot) {
+                        const imageName = `exit_${trade.id}.png`;
+                        const base64Data = trade.exitScreenshot.split(',')[1];
+                        imagesFolder.file(imageName, base64Data, { base64: true });
+                        
+                        // تغییر مسیر در داده‌ها
+                        trade.exitScreenshot = `images/${imageName}`;
+                        
+                        processedImages++;
+                        const percent = 50 + Math.floor((processedImages / imageCount) * 40);
+                        showProgress(`در حال پردازش تصویر ${processedImages} از ${imageCount}...`, percent);
+                    }
+                }
+                
+                // به‌روزرسانی فایل JSON با مسیرهای جدید
+                zip.file('data.json', JSON.stringify(backupData, null, 2));
+                
+                showProgress('در حال نهایی‌سازی فایل ZIP...', 90);
+                
+                const now = new Date();
+                const persianDate = new Intl.DateTimeFormat('fa-IR', { 
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit'
+                }).format(now).replace(/\//g, '-');
+                
+                const fileName = `crypto-journal-${persianDate}.zip`;
+                
+                // تولید ZIP
+                const content = await zip.generateAsync({ 
+                    type: 'blob',
+                    compression: 'DEFLATE',
+                    compressionOptions: { level: 6 }
+                });
+                
+                showProgress('در حال دانلود فایل...', 100);
+                
+                // دانلود فایل
+                const url = URL.createObjectURL(content);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = fileName;
+                link.click();
+                URL.revokeObjectURL(url);
+                
+                setTimeout(hideProgress, 2000);
+                showNotification('پشتیبان با موفقیت دانلود شد.', 'success');
+                
+            } catch (error) {
+                console.error('خطا در پشتیبان‌گیری:', error);
+                hideProgress();
+                showNotification('خطا در پشتیبان‌گیری: ' + error.message, 'error');
+            }
+        }
+        
+        // بارگذاری پشتیبان (ZIP)
+        async function importData() {
+            const fileInput = document.getElementById('backupFile');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showNotification('لطفاً یک فایل ZIP انتخاب کنید.', 'error');
+                return;
+            }
+            
+            if (!confirm('بارگذاری این فایل، اطلاعات فعلی را جایگزین می‌کند. ادامه می‌دهید؟')) {
+                return;
+            }
+            
+            try {
+                showProgress('در حال خواندن فایل ZIP...', 10);
+                
+                // خواندن فایل ZIP
+                const zip = new JSZip();
+                const zipContent = await zip.loadAsync(file);
+                
+                showProgress('در حال استخراج اطلاعات...', 30);
+                
+                // خواندن فایل JSON
+                const dataFile = zipContent.file('data.json');
+                if (!dataFile) {
+                    throw new Error('فایل data.json در ZIP یافت نشد');
+                }
+                
+                const dataStr = await dataFile.async('string');
+                const backupData = JSON.parse(dataStr);
+                
+                showProgress('در حال پردازش تصاویر...', 50);
+                
+                // ایجاد مپ برای ذخیره تصاویر
+                const imagesMap = new Map();
+                
+                // خواندن همه تصاویر از پوشه images
+                const imageFiles = zipContent.folder('images');
+                if (imageFiles) {
+                    const imagePromises = [];
+                    imageFiles.forEach(async (relativePath, file) => {
+                        if (!file.dir) {
+                            const promise = file.async('base64').then(content => {
+                                imagesMap.set(relativePath, 'data:image/png;base64,' + content);
+                            });
+                            imagePromises.push(promise);
+                        }
+                    });
+                    
+                    await Promise.all(imagePromises);
+                }
+                
+                showProgress('در حال بازیابی تصاویر...', 70);
+                
+                // جایگزینی مسیرهای تصاویر با داده‌های Base64
+                if (backupData.trades && Array.isArray(backupData.trades)) {
+                    for (const trade of backupData.trades) {
+                        if (trade.entryScreenshot && imagesMap.has(trade.entryScreenshot)) {
+                            trade.entryScreenshot = imagesMap.get(trade.entryScreenshot);
+                        }
+                        if (trade.exitScreenshot && imagesMap.has(trade.exitScreenshot)) {
+                            trade.exitScreenshot = imagesMap.get(trade.exitScreenshot);
+                        }
+                    }
+                }
+                
+                showProgress('در حال ذخیره در دیتابیس...', 90);
+                
+                // پاک کردن دیتابیس فعلی
+                await db.clearAll();
+                
+                // ذخیره داده‌های جدید
+                if (backupData.accounts && Array.isArray(backupData.accounts)) {
+                    await db.saveAccounts(backupData.accounts);
+                    accounts = backupData.accounts;
+                }
+                
+                if (backupData.trades && Array.isArray(backupData.trades)) {
+                    // ذخیره مرحله‌ای معاملات برای جلوگیری از فشار به حافظه
+                    const batchSize = 10;
+                    for (let i = 0; i < backupData.trades.length; i += batchSize) {
+                        const batch = backupData.trades.slice(i, i + batchSize);
+                        await db.saveTrades(batch);
+                        const percent = 90 + Math.floor((i / backupData.trades.length) * 10);
+                        showProgress(`در حال ذخیره معاملات (${i + batch.length}/${backupData.trades.length})...`, percent);
+                        
+                        // کمی تاخیر برای جلوگیری از مسدود شدن مرورگر
+                        await new Promise(resolve => setTimeout(resolve, 10));
+                    }
+                    
+                    trades = backupData.trades;
+                }
+                
+                // تنظیم حساب فعال
+                activeAccountId = accounts.length > 0 ? accounts[0].id : 1;
+                activeAccount = accounts.find(acc => acc.id === activeAccountId) || accounts[0];
+                accountBalance = activeAccount ? activeAccount.balance : 0;
+                
+                showProgress('در حال به‌روزرسانی نمایش...', 100);
+                
+                // به‌روزرسانی
+                updateBalanceDisplay();
+                updateAccountsList();
+                loadTrades();
+                updateStats();
+                updateTotalRisk();
+                setInitialMonthBasedOnFirstTrade();
+                updateMonthlyDashboard();
+                
+                fileInput.value = '';
+                
+                setTimeout(hideProgress, 2000);
+                showNotification('اطلاعات با موفقیت بارگذاری شدند.', 'success');
+                
+            } catch (error) {
+                console.error('خطا در خواندن فایل:', error);
+                hideProgress();
+                showNotification('خطا در خواندن فایل: ' + error.message, 'error');
+            }
+        }
+        
+        function showNotification(message, type = 'info') {
+            // حذف نوتیفیکیشن قبلی
+            const existingNotification = document.querySelector('.notification');
+            if (existingNotification) {
+                existingNotification.remove();
+            }
+            
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            notification.style.position = 'fixed';
+            notification.style.top = '20px';
+            notification.style.left = '50%';
+            notification.style.transform = 'translateX(-50%)';
+            notification.style.padding = '12px 20px';
+            notification.style.borderRadius = '8px';
+            notification.style.zIndex = '10000';
+            notification.style.fontWeight = '600';
+            notification.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.3)';
+            
+            if (type === 'success') {
+                notification.style.backgroundColor = '#10b981';
+                notification.style.color = 'white';
+            } else if (type === 'warning') {
+                notification.style.backgroundColor = '#f59e0b';
+                notification.style.color = '#78350f';
+            } else if (type === 'error') {
+                notification.style.backgroundColor = '#ef4444';
+                notification.style.color = 'white';
+            } else {
+                notification.style.backgroundColor = '#3b82f6';
+                notification.style.color = 'white';
+            }
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transition = 'opacity 0.5s';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 500);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
