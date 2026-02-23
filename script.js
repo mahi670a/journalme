@@ -147,6 +147,8 @@ function getMimeType(fileName) {
 // ============================
 let isImportCancelled = false;
 let importStartTime = 0;
+let accountGrowthChart = null;
+let monthlyGrowthChart = null;
 
 // ============================
 // کلاس مدیریت IndexedDB - ذخیره‌سازی نامحدود
@@ -489,6 +491,7 @@ let accounts = [];
 let activeAccountId = 1;
 let activeAccount = null;
 let accountBalance = 0;
+let initialAccountBalance = 0;
 let trades = [];
 
 let currentYear = null;
@@ -500,6 +503,405 @@ const persianMonths = [
     'فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور',
     'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'
 ];
+
+// ============================
+// تابع سوئیچ بین بخش‌ها
+// ============================
+function switchSection(sectionId) {
+    const sections = document.querySelectorAll('.section, .dashboard-section');
+    sections.forEach(section => {
+        section.classList.remove('active-section');
+        section.style.display = 'none';
+    });
+    
+    const targetSection = document.getElementById(sectionId + '-section');
+    if (targetSection) {
+        targetSection.classList.add('active-section');
+        targetSection.style.display = 'block';
+    }
+    
+    const toolbarBtns = document.querySelectorAll('.toolbar-btn');
+    toolbarBtns.forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    const activeBtn = document.querySelector(`.toolbar-btn[data-section="${sectionId}"]`);
+    if (activeBtn) {
+        activeBtn.classList.add('active');
+    }
+    
+    // نمایش یا مخفی کردن بالانس بر اساس بخش
+    const balanceSection = document.getElementById('balanceSection');
+    if (balanceSection) {
+        if (sectionId === 'trade-form') {
+            balanceSection.style.display = 'flex';
+        } else {
+            balanceSection.style.display = 'none';
+        }
+    }
+    
+    if (sectionId === 'stats') {
+        updateStats();
+        updateDetailedStats();
+        updateGrowthChart();
+    }
+    
+    if (sectionId === 'dashboard') {
+        updateMonthlyDashboard();
+        updateMonthlyGrowthChart();
+    }
+    
+    if (sectionId === 'history') {
+        loadTrades();
+    }
+    
+    if (sectionId === 'trade-form') {
+        loadOpenTrades();
+    }
+    
+    closeAllModals();
+}
+
+// ============================
+// تابع به‌روزرسانی آمار تفصیلی
+// ============================
+function updateDetailedStats() {
+    // موجودی اولیه
+    document.getElementById('initialBalance').textContent = formatCurrency(initialAccountBalance);
+    
+    // موجودی فعلی (محاسبه شده از سود و ضرر معاملات بسته شده)
+    const totalPnL = calculateTotalPnL();
+    const currentCalculatedBalance = initialAccountBalance + totalPnL;
+    document.getElementById('currentBalanceStats').textContent = formatCurrency(currentCalculatedBalance);
+    
+    // سود و ضرر کل
+    const totalPnLElement = document.getElementById('totalPnLStats');
+    totalPnLElement.textContent = (totalPnL >= 0 ? '+' : '') + formatCurrency(Math.abs(totalPnL));
+    totalPnLElement.style.color = totalPnL >= 0 ? '#10b981' : '#ef4444';
+    
+    // درصد سود/ضرر نسبت به بالانس اولیه با باکس رنگی
+    const profitPercentage = initialAccountBalance > 0 ? (totalPnL / initialAccountBalance) * 100 : 0;
+    const profitPercentageElement = document.getElementById('profitPercentage');
+    profitPercentageElement.textContent = (profitPercentage >= 0 ? '+' : '') + profitPercentage.toFixed(2) + '%';
+    profitPercentageElement.className = profitPercentage >= 0 ? 'stats-value percentage-box' : 'stats-value percentage-box negative';
+    
+    // سود خالص (مجموع معاملات سودده) با باکس رنگی
+    const totalProfit = calculateTotalProfit();
+    const netProfitElement = document.getElementById('netProfit');
+    netProfitElement.textContent = formatCurrency(totalProfit);
+    netProfitElement.className = 'stats-value positive-box';
+    
+    // ضرر خالص (مجموع معاملات ضررده) با باکس رنگی
+    const totalLoss = calculateTotalLoss();
+    const netLossElement = document.getElementById('netLoss');
+    netLossElement.textContent = formatCurrency(totalLoss);
+    netLossElement.className = 'stats-value negative-box';
+    
+    // تعداد کل معاملات
+    document.getElementById('totalTradesStats').textContent = trades.length;
+    
+    // تعداد معاملات لانگ و شورت
+    const longTrades = trades.filter(t => t.type === 'buy').length;
+    const shortTrades = trades.filter(t => t.type === 'sell').length;
+    document.getElementById('longTradesCount').textContent = longTrades;
+    document.getElementById('shortTradesCount').textContent = shortTrades;
+}
+
+// ============================
+// تابع به‌روزرسانی نمودار رشد حساب کلی
+// ============================
+function updateGrowthChart() {
+    const ctx = document.getElementById('accountGrowthChart').getContext('2d');
+    
+    // مرتب‌سازی معاملات بر اساس تاریخ
+    const sortedTrades = [...trades]
+        .filter(t => t.status === 'closed')
+        .sort((a, b) => new Date(a.date) - new Date(b.date));
+    
+    // محاسبه رشد حساب
+    let balance = initialAccountBalance;
+    const balanceHistory = [balance];
+    const tradeNumbers = [0];
+    
+    sortedTrades.forEach((trade, index) => {
+        const pnl = calculateTradePnL(trade);
+        balance += pnl;
+        balanceHistory.push(balance);
+        tradeNumbers.push(index + 1);
+    });
+    
+    // اگر معامله‌ای وجود نداشت
+    if (sortedTrades.length === 0) {
+        balanceHistory.push(initialAccountBalance);
+        tradeNumbers.push(1);
+    }
+    
+    // نابود کردن نمودار قبلی اگر وجود دارد
+    if (accountGrowthChart) {
+        accountGrowthChart.destroy();
+    }
+    
+    // ایجاد نمودار جدید با خط صاف و افکت نئونی
+    accountGrowthChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: tradeNumbers,
+            datasets: [{
+                label: 'رشد حساب ($)',
+                data: balanceHistory,
+                borderColor: '#3b82f6',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                borderWidth: 4,
+                pointBackgroundColor: '#60a5fa',
+                pointBorderColor: '#1e293b',
+                pointRadius: 5,
+                pointHoverRadius: 8,
+                tension: 0.1,
+                fill: true,
+                borderDash: [], // خط صاف (بدون نقطه چین)
+                shadowOffsetX: 0,
+                shadowOffsetY: 0,
+                shadowBlur: 15,
+                shadowColor: 'rgba(59, 130, 246, 0.8)'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: '#1e293b',
+                    titleColor: '#f1f5f9',
+                    bodyColor: '#94a3b8',
+                    borderColor: '#3b82f6',
+                    borderWidth: 2
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        color: 'rgba(71, 85, 105, 0.2)'
+                    },
+                    ticks: {
+                        color: '#94a3b8'
+                    },
+                    title: {
+                        display: true,
+                        text: 'تعداد معاملات',
+                        color: '#cbd5e1'
+                    }
+                },
+                y: {
+                    grid: {
+                        color: 'rgba(71, 85, 105, 0.2)'
+                    },
+                    ticks: {
+                        color: '#94a3b8',
+                        callback: function(value) {
+                            return '$' + value;
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'رشد سرمایه ($)',
+                        color: '#cbd5e1'
+                    }
+                }
+            },
+            elements: {
+                line: {
+                    borderJoinStyle: 'round',
+                    borderCapStyle: 'round'
+                }
+            }
+        }
+    });
+}
+
+// ============================
+// تابع به‌روزرسانی نمودار رشد ماهانه
+// ============================
+function updateMonthlyGrowthChart() {
+    const ctx = document.getElementById('monthlyGrowthChart').getContext('2d');
+    
+    // فیلتر معاملات ماه جاری
+    const monthlyTrades = trades.filter(trade => {
+        if (trade.accountId !== activeAccountId) return false;
+        
+        const persianDate = getPersianDateParts(trade.date);
+        if (!persianDate) return false;
+        
+        return persianDate.year === currentYear && persianDate.month === currentMonth;
+    });
+    
+    // مرتب‌سازی معاملات ماه جاری بر اساس تاریخ
+    const sortedMonthlyTrades = [...monthlyTrades]
+        .filter(t => t.status === 'closed')
+        .sort((a, b) => new Date(a.date) - new Date(b.date));
+    
+    // محاسبه رشد حساب در ماه جاری
+    let monthlyBalance = initialAccountBalance;
+    const monthlyBalanceHistory = [monthlyBalance];
+    const monthlyTradeNumbers = [0];
+    
+    sortedMonthlyTrades.forEach((trade, index) => {
+        const pnl = calculateTradePnL(trade);
+        monthlyBalance += pnl;
+        monthlyBalanceHistory.push(monthlyBalance);
+        monthlyTradeNumbers.push(index + 1);
+    });
+    
+    // اگر معامله‌ای در ماه جاری وجود نداشت
+    if (sortedMonthlyTrades.length === 0) {
+        monthlyBalanceHistory.push(initialAccountBalance);
+        monthlyTradeNumbers.push(1);
+    }
+    
+    // نابود کردن نمودار قبلی اگر وجود دارد
+    if (monthlyGrowthChart) {
+        monthlyGrowthChart.destroy();
+    }
+    
+    // ایجاد نمودار جدید با خط صاف و افکت نئونی
+    monthlyGrowthChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: monthlyTradeNumbers,
+            datasets: [{
+                label: 'رشد حساب ماهانه ($)',
+                data: monthlyBalanceHistory,
+                borderColor: '#f59e0b',
+                backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                borderWidth: 4,
+                pointBackgroundColor: '#fbbf24',
+                pointBorderColor: '#1e293b',
+                pointRadius: 5,
+                pointHoverRadius: 8,
+                tension: 0.1,
+                fill: true,
+                borderDash: [], // خط صاف (بدون نقطه چین)
+                shadowOffsetX: 0,
+                shadowOffsetY: 0,
+                shadowBlur: 15,
+                shadowColor: 'rgba(245, 158, 11, 0.8)'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: '#1e293b',
+                    titleColor: '#f1f5f9',
+                    bodyColor: '#94a3b8',
+                    borderColor: '#f59e0b',
+                    borderWidth: 2
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        color: 'rgba(71, 85, 105, 0.2)'
+                    },
+                    ticks: {
+                        color: '#94a3b8'
+                    },
+                    title: {
+                        display: true,
+                        text: 'تعداد معاملات',
+                        color: '#cbd5e1'
+                    }
+                },
+                y: {
+                    grid: {
+                        color: 'rgba(71, 85, 105, 0.2)'
+                    },
+                    ticks: {
+                        color: '#94a3b8',
+                        callback: function(value) {
+                            return '$' + value;
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'رشد سرمایه ($)',
+                        color: '#cbd5e1'
+                    }
+                }
+            },
+            elements: {
+                line: {
+                    borderJoinStyle: 'round',
+                    borderCapStyle: 'round'
+                }
+            }
+        }
+    });
+}
+
+// ============================
+// تابع بارگذاری معاملات باز در فرم ثبت معامله
+// ============================
+function loadOpenTrades() {
+    const openTradesList = document.getElementById('openTradesList');
+    if (!openTradesList) return;
+    
+    const openTrades = trades.filter(t => t.status === 'open' && t.accountId === activeAccountId);
+    
+    if (openTrades.length === 0) {
+        openTradesList.innerHTML = '<div class="no-open-trades"><i class="fas fa-check-circle"></i> هیچ معامله بازی وجود ندارد</div>';
+        return;
+    }
+    
+    let html = '';
+    openTrades.forEach(trade => {
+        const dateText = formatPersianDate(trade.date, true);
+        const typeText = trade.type === 'buy' ? 'لانگ' : 'شورت';
+        const typeIcon = trade.type === 'buy' ? 'fa-arrow-up' : 'fa-arrow-down';
+        const typeColor = trade.type === 'buy' ? '#10b981' : '#ef4444';
+        
+        html += `
+        <div class="open-trade-item">
+            <div class="open-trade-info">
+                <span class="open-trade-symbol">${trade.symbol}</span>
+                <div class="open-trade-detail">
+                    <i class="fas ${typeIcon}" style="color: ${typeColor}"></i>
+                    <span>${typeText}</span>
+                </div>
+                <div class="open-trade-detail">
+                    <i class="fas fa-calendar"></i>
+                    <span>${dateText}</span>
+                </div>
+                <div class="open-trade-detail">
+                    <i class="fas fa-arrow-right"></i>
+                    <span>${trade.entryPriceStr || trade.entryPrice}</span>
+                </div>
+                <div class="open-trade-detail">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>${trade.stopLossStr || trade.stopLoss}</span>
+                </div>
+                <div class="open-trade-detail">
+                    <i class="fas fa-bullseye"></i>
+                    <span>${trade.takeProfitStr || trade.takeProfit}</span>
+                </div>
+            </div>
+            <div class="open-trade-actions">
+                <button class="btn-icon" onclick="openCloseModal(${trade.id})" title="بستن معامله">
+                    <i class="fas fa-check-circle"></i>
+                </button>
+            </div>
+        </div>
+        `;
+    });
+    
+    openTradesList.innerHTML = html;
+}
 
 // ============================
 // توابع اولیه‌سازی
@@ -517,9 +919,19 @@ async function initialize() {
         updateBalanceDisplay();
         updateTotalRisk();
         updateStats();
+        updateDetailedStats();
         
         setInitialMonthBasedOnLastTrade();
         updateMonthlyDashboard();
+        
+        switchSection('trade-form');
+        loadOpenTrades();
+        
+        // مقداردهی اولیه نمودارها
+        setTimeout(() => {
+            updateGrowthChart();
+            updateMonthlyGrowthChart();
+        }, 500);
         
         console.log('✅ برنامه با موفقیت راه‌اندازی شد');
     } catch (error) {
@@ -570,6 +982,7 @@ async function loadAccountsFromDB() {
         activeAccountId = savedActiveId ? parseInt(savedActiveId) : 1;
         activeAccount = accounts.find(acc => acc.id === activeAccountId) || accounts[0];
         accountBalance = activeAccount ? activeAccount.balance : 0;
+        initialAccountBalance = accountBalance; // ذخیره موجودی اولیه
         
         updateAccountsList();
         
@@ -581,6 +994,7 @@ async function loadAccountsFromDB() {
         activeAccountId = 1;
         activeAccount = accounts[0];
         accountBalance = 0;
+        initialAccountBalance = 0;
         updateAccountsList();
     }
 }
@@ -589,10 +1003,12 @@ async function loadTradesFromDB() {
     try {
         trades = await db.getTradesByAccount(activeAccountId);
         loadTrades();
+        loadOpenTrades();
     } catch (error) {
         console.error('خطا در بارگذاری معاملات:', error);
         trades = [];
         loadTrades();
+        loadOpenTrades();
     }
 }
 
@@ -819,6 +1235,7 @@ async function updateBalance() {
         accounts[activeAccountIndex].balance = newBalance;
         activeAccount = accounts[activeAccountIndex];
         accountBalance = newBalance;
+        initialAccountBalance = newBalance; // به‌روزرسانی موجودی اولیه
         
         await saveAccountsToDB();
     }
@@ -826,6 +1243,9 @@ async function updateBalance() {
     updateBalanceDisplay();
     updateTotalRisk();
     updateStats();
+    updateDetailedStats();
+    updateGrowthChart();
+    updateMonthlyGrowthChart();
     calculateRisk();
     closeAllModals();
     showNotification('بالانس حساب به‌روزرسانی شد.', 'success');
@@ -1006,7 +1426,11 @@ document.getElementById('tradeForm').addEventListener('submit', async function(e
     
     loadTrades();
     updateStats();
+    updateDetailedStats();
     updateTotalRisk();
+    loadOpenTrades();
+    updateGrowthChart();
+    updateMonthlyGrowthChart();
     
     setInitialMonthBasedOnLastTrade();
     updateMonthlyDashboard();
@@ -1094,13 +1518,13 @@ function loadTrades() {
             <td><span class="${statusClass}">${statusText}</span></td>
             <td><span class="${pnlClass}">${pnlText}</span></td>
             <td class="actions">
-                <button class="btn-icon" onclick="showTradeDetails(${trade.id})" style="background-color: rgba(14, 165, 233, 0.1); color: #0ea5e9; border: 1px solid rgba(14, 165, 233, 0.3);">
+                <button class="btn-icon" onclick="showTradeDetails(${trade.id})" style="background-color: rgba(14, 165, 233, 0.1); color: #0ea5e9; border: 1px solid rgba(14, 165, 233, 0.3);" title="مشاهده جزئیات">
                     <i class="fas fa-eye"></i>
                 </button>
-                <button class="btn-icon" onclick="openCloseModal(${trade.id})" style="background-color: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.3);" ${trade.status === 'closed' ? 'disabled' : ''}>
-                    <i class="fas fa-check-circle"></i>
+                <button class="btn-icon" onclick="editTrade(${trade.id})" style="background-color: rgba(245, 158, 11, 0.1); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3);" title="ویرایش معامله">
+                    <i class="fas fa-edit"></i>
                 </button>
-                <button class="btn-icon" onclick="deleteTrade(${trade.id})" style="background-color: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3);">
+                <button class="btn-icon" onclick="deleteTrade(${trade.id})" style="background-color: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3);" title="حذف معامله">
                     <i class="fas fa-trash"></i>
                 </button>
             </td>
@@ -1116,7 +1540,6 @@ async function showTradeDetails(tradeId) {
     if (!trade) return;
     
     const detailsModal = document.getElementById('detailsModal');
-    detailsModal._currentTradeId = tradeId;
     
     document.getElementById('detail-symbol').textContent = trade.symbol;
     document.getElementById('detail-type').textContent = trade.type === 'buy' ? 'لانگ' : 'شورت';
@@ -1210,14 +1633,6 @@ function closeDetailsModal() {
     document.body.style.overflow = 'auto';
 }
 
-function editTradeFromDetails() {
-    const modal = document.getElementById('detailsModal');
-    if (modal && modal._currentTradeId) {
-        closeDetailsModal();
-        editTrade(modal._currentTradeId);
-    }
-}
-
 function openCloseModal(tradeId) {
     currentTradeIdForClose = tradeId;
     document.getElementById('closePriceInput').value = '';
@@ -1261,8 +1676,12 @@ async function confirmCloseTrade() {
         
         loadTrades();
         updateStats();
+        updateDetailedStats();
         updateTotalRisk();
         updateMonthlyDashboard();
+        loadOpenTrades();
+        updateGrowthChart();
+        updateMonthlyGrowthChart();
         
         closeCloseModal();
         
@@ -1393,6 +1812,9 @@ async function editTrade(id) {
     
     calculateRisk();
     showNotification('معامله برای ویرایش آماده است.', 'info');
+    
+    switchSection('trade-form');
+    loadOpenTrades();
 }
 
 async function deleteTrade(id) {
@@ -1401,7 +1823,11 @@ async function deleteTrade(id) {
         
         loadTrades();
         updateStats();
+        updateDetailedStats();
         updateTotalRisk();
+        loadOpenTrades();
+        updateGrowthChart();
+        updateMonthlyGrowthChart();
         setInitialMonthBasedOnLastTrade();
         updateMonthlyDashboard();
         showNotification('معامله حذف شد.', 'warning');
@@ -1513,6 +1939,7 @@ async function deleteAccount(accountId) {
             activeAccountId = 1;
             activeAccount = accounts.find(acc => acc.id === 1);
             accountBalance = activeAccount ? activeAccount.balance : 0;
+            initialAccountBalance = accountBalance;
         }
         
         await saveAccountsToDB();
@@ -1520,8 +1947,12 @@ async function deleteAccount(accountId) {
         updateBalanceDisplay();
         updateAccountsList();
         loadTrades();
+        loadOpenTrades();
         updateStats();
+        updateDetailedStats();
         updateTotalRisk();
+        updateGrowthChart();
+        updateMonthlyGrowthChart();
         setInitialMonthBasedOnLastTrade();
         updateMonthlyDashboard();
         
@@ -1539,6 +1970,7 @@ async function switchAccount(accountId) {
     activeAccountId = accountId;
     activeAccount = newActiveAccount;
     accountBalance = activeAccount.balance;
+    initialAccountBalance = accountBalance;
     
     await db.saveSetting('activeAccountId', activeAccountId.toString());
     
@@ -1547,8 +1979,12 @@ async function switchAccount(accountId) {
     updateBalanceDisplay();
     updateAccountsList();
     loadTrades();
+    loadOpenTrades();
     updateStats();
+    updateDetailedStats();
     updateTotalRisk();
+    updateGrowthChart();
+    updateMonthlyGrowthChart();
     setInitialMonthBasedOnLastTrade();
     updateMonthlyDashboard();
     calculateRisk();
@@ -1576,6 +2012,7 @@ function changeMonth(direction) {
     currentMonth = newMonth;
     
     updateMonthlyDashboard();
+    updateMonthlyGrowthChart();
 }
 
 function updateMonthlyDashboard() {
@@ -2008,6 +2445,7 @@ async function importData() {
             activeAccountId = savedActiveId ? parseInt(savedActiveId) : accounts[0].id;
             activeAccount = accounts.find(acc => acc.id === activeAccountId) || accounts[0];
             accountBalance = activeAccount ? activeAccount.balance : 0;
+            initialAccountBalance = accountBalance;
         }
         
         showProgress('در حال به‌روزرسانی نمایش...', 100);
@@ -2015,8 +2453,12 @@ async function importData() {
         updateBalanceDisplay();
         updateAccountsList();
         loadTrades();
+        loadOpenTrades();
         updateStats();
+        updateDetailedStats();
         updateTotalRisk();
+        updateGrowthChart();
+        updateMonthlyGrowthChart();
         setInitialMonthBasedOnLastTrade();
         updateMonthlyDashboard();
         
@@ -2105,38 +2547,6 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('riskPercent').addEventListener('input', calculateRisk);
     document.getElementById('feePercent').addEventListener('input', calculateRisk);
     document.getElementById('type').addEventListener('change', calculateRisk);
-    
-    function adjustScale() {
-        const container = document.querySelector('.container');
-        if (!container) return;
-        
-        const containerWidth = 1400;
-        const windowWidth = window.innerWidth;
-        
-        if (windowWidth < 700) {
-            container.style.transform = 'scale(1)';
-            container.style.width = '1400px';
-            container.style.overflowX = 'auto';
-            document.body.style.overflowX = 'auto';
-        } else {
-            let scale = windowWidth / containerWidth;
-            scale = Math.max(0.5, Math.min(1, scale));
-            container.style.transform = `scale(${scale})`;
-            container.style.transformOrigin = 'top center';
-            container.style.width = '';
-            container.style.overflowX = '';
-        }
-        
-        const containerHeight = container.offsetHeight;
-        const scaledHeight = containerHeight * (windowWidth < 700 ? 1 : Math.max(0.5, Math.min(1, windowWidth / containerWidth)));
-        const minBodyHeight = Math.max(window.innerHeight, scaledHeight + 40);
-        
-        document.body.style.minHeight = `${minBodyHeight}px`;
-    }
-    
-    adjustScale();
-    window.addEventListener('resize', adjustScale);
-    window.addEventListener('load', adjustScale);
     
     document.getElementById('newBalanceInput').addEventListener('input', function() {
         const value = parseFloat(this.value);
