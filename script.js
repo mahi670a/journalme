@@ -647,22 +647,22 @@ function updateGrowthChart() {
         data: {
             labels: tradeNumbers,
             datasets: [{
-                label: 'رشد حساب ($)',
+                 label: 'رشد حساب ($)',
                 data: balanceHistory,
-                borderColor: '#3b82f6',
-                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                borderColor: '#10b981',       
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
                 borderWidth: 4,
-                pointBackgroundColor: '#60a5fa',
+                pointBackgroundColor: '#34d399',
                 pointBorderColor: '#1e293b',
                 pointRadius: 5,
                 pointHoverRadius: 8,
                 tension: 0.1,
                 fill: true,
-                borderDash: [], // خط صاف (بدون نقطه چین)
+                borderDash: [],
                 shadowOffsetX: 0,
                 shadowOffsetY: 0,
                 shadowBlur: 15,
-                shadowColor: 'rgba(59, 130, 246, 0.8)'
+                shadowColor: 'rgba(16, 185, 129, 0.8)'
             }]
         },
         options: {
