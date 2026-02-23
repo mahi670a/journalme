@@ -10,132 +10,131 @@ body {
     color: #f1f5f9;
     line-height: 1.6;
     min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
     overflow-x: hidden;
 }
 
-.container {
-    width: 1400px;
-    background-color: rgba(30, 41, 59, 0.95);
-    border-radius: 16px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-    padding: 25px;
-    border: 1px solid #334155;
-    transform-origin: top center;
-}
-
-@media (max-width: 1399px) {
-    .container {
-        transform: scale(calc(100vw / 1400));
-        transform-origin: top center;
-        margin: 20px 0;
-    }
-}
-
-@media (max-width: 768px) {
-    .container {
-        transform: scale(0.55);
-        transform-origin: top center;
-    }
-}
-
-@media (max-width: 480px) {
-    .container {
-        transform: scale(0.4);
-        transform-origin: top center;
-    }
-}
-
-/* هدر با خط نئونی بزرگتر و انیمیشن ساده دو مرحله‌ای */
-header {
-    text-align: center;
-    margin-bottom: 30px;
-    padding-bottom: 20px;
-    border-bottom: 2px solid #3b82f6;
-    position: relative;
-    padding-top: 10px;
+/* ساختار اصلی با Toolbar */
+.app-wrapper {
     display: flex;
     flex-direction: column;
-    align-items: center;
-}
-
-/* خط نئونی بزرگتر - عرض 60% */
-header::after {
-    content: '';
-    position: absolute;
-    bottom: -2px;
-    left: 20%;
-    width: 60%;
-    height: 4px;
-    background: linear-gradient(90deg, #00ffff, #ff00ff);
-    border-radius: 4px;
-    filter: blur(1px);
-    /* انیمیشن ساده دو مرحله‌ای */
-    animation: simpleGlow 1.8s ease-in-out infinite;
-    box-shadow: 
-        0 0 10px #00ffff,
-        0 0 20px #ff00ff;
-}
-
-/* انیمیشن ساده دو مرحله‌ای - فقط کم و زیاد شدن نور */
-@keyframes simpleGlow {
-    0% {
-        opacity: 0.7;
-        box-shadow: 
-            0 0 10px #00ffff,
-            0 0 20px #ff00ff;
-    }
-    100% {
-        opacity: 1;
-        box-shadow: 
-            0 0 20px #00ffff,
-            0 0 40px #ff00ff,
-            0 0 60px #00ffff;
-    }
-}
-
-.header-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    min-height: 100vh;
     width: 100%;
-    margin-bottom: 20px;
 }
 
-.header-title {
-    flex-grow: 1;
-    text-align: center;
+/* ===== Toolbar بالا - با دکمه‌های هم اندازه ===== */
+.toolbar {
+    width: 100%;
+    height: 70px;
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid #334155;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 30px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
 }
 
-.header-spacer {
-    width: 140px;
+.toolbar-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-shrink: 0;
 }
 
-h1 {
+.toolbar-logo {
+    width: 45px;
+    height: 45px;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    color: white;
+    box-shadow: 0 5px 10px rgba(59, 130, 246, 0.3);
+}
+
+.toolbar-title {
+    font-size: 1.2rem;
+    font-weight: 600;
     color: #60a5fa;
-    font-size: 2rem;
-    margin-bottom: 10px;
     background: linear-gradient(90deg, #60a5fa, #a78bfa);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
-.subtitle {
-    color: #94a3b8;
-    font-size: 1rem;
-    margin-top: 5px;
+.toolbar-menu {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    justify-content: center;
 }
 
-.calculator-btn {
-    padding: 10px 20px;
+.toolbar-btn {
+    background: transparent;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    color: #94a3b8;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+    min-width: 120px;
+    justify-content: center;
+    height: 44px;
+}
+
+.toolbar-btn i {
+    font-size: 1.1rem;
+    color: #64748b;
+    transition: all 0.2s;
+}
+
+.toolbar-btn:hover {
+    background: rgba(59, 130, 246, 0.1);
+    color: #f1f5f9;
+    transform: translateY(-2px);
+}
+
+.toolbar-btn:hover i {
+    color: #3b82f6;
+}
+
+.toolbar-btn.active {
+    background: rgba(59, 130, 246, 0.2);
+    color: #60a5fa;
+    border-bottom: 2px solid #3b82f6;
+}
+
+.toolbar-btn.active i {
+    color: #3b82f6;
+}
+
+.toolbar-calculator {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.toolbar-calculator .calculator-btn {
+    padding: 8px 16px;
     background: linear-gradient(135deg, #10b981, #059669);
     color: white;
     border: none;
     border-radius: 8px;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s;
@@ -143,17 +142,73 @@ h1 {
     align-items: center;
     gap: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    min-width: 140px;
+    min-width: 120px;
     justify-content: center;
-    margin-left: 20px;
+    height: 44px;
 }
 
-.calculator-btn:hover {
+.toolbar-calculator .calculator-btn:hover {
     background: linear-gradient(135deg, #059669, #047857);
     transform: translateY(-2px);
     box-shadow: 0 6px 12px rgba(16, 185, 129, 0.3);
 }
 
+/* محتوای اصلی */
+.main-wrapper {
+    margin-top: 90px;
+    padding: 20px;
+    width: 100%;
+}
+
+.container {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    background-color: rgba(30, 41, 59, 0.95);
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    padding: 25px;
+    border: 1px solid #334155;
+}
+
+/* واکنش‌گرایی برای موبایل */
+@media (max-width: 1024px) {
+    .toolbar-btn {
+        min-width: 100px;
+        padding: 8px 12px;
+    }
+}
+
+@media (max-width: 768px) {
+    .toolbar {
+        height: auto;
+        flex-direction: column;
+        padding: 15px;
+        gap: 15px;
+    }
+    
+    .toolbar-menu {
+        flex-wrap: wrap;
+        width: 100%;
+    }
+    
+    .toolbar-btn {
+        min-width: calc(50% - 5px);
+        flex: 1;
+    }
+    
+    .main-wrapper {
+        margin-top: 180px;
+    }
+}
+
+@media (max-width: 480px) {
+    .toolbar-btn {
+        min-width: 100%;
+    }
+}
+
+/* بالانس */
 .balance-container {
     background: linear-gradient(145deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
     border-radius: 14px;
@@ -163,6 +218,8 @@ h1 {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
 }
 
 .balance-main {
@@ -208,6 +265,7 @@ h1 {
 .balance-details {
     display: flex;
     gap: 25px;
+    flex-wrap: wrap;
 }
 
 .balance-detail {
@@ -238,6 +296,7 @@ h1 {
 .balance-actions {
     display: flex;
     gap: 10px;
+    flex-wrap: wrap;
 }
 
 .balance-btn {
@@ -260,12 +319,114 @@ h1 {
     transform: translateY(-2px);
 }
 
-.balance-btn.active {
-    background: rgba(239, 68, 68, 0.2);
-    border-color: rgba(239, 68, 68, 0.4);
-    color: #ef4444;
+/* ===== معاملات باز ===== */
+.open-trades-container {
+    background: rgba(15, 23, 42, 0.5);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 30px;
+    border: 1px solid #334155;
 }
 
+.open-trades-title {
+    color: #f59e0b;
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.open-trades-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.open-trade-item {
+    background: rgba(30, 41, 59, 0.6);
+    border-radius: 10px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid #334155;
+    transition: all 0.2s;
+}
+
+.open-trade-item:hover {
+    border-color: #f59e0b;
+    background: rgba(245, 158, 11, 0.1);
+}
+
+.open-trade-info {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.open-trade-symbol {
+    font-weight: 700;
+    color: #f59e0b;
+    background: rgba(245, 158, 11, 0.1);
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 1rem;
+}
+
+.open-trade-detail {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #94a3b8;
+    font-size: 0.9rem;
+}
+
+.open-trade-detail i {
+    color: #64748b;
+    width: 16px;
+}
+
+.open-trade-detail span {
+    color: #f1f5f9;
+    font-weight: 600;
+}
+
+.open-trade-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.open-trade-actions .btn-icon {
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.open-trade-actions .btn-icon:hover {
+    background: rgba(245, 158, 11, 0.2);
+    transform: scale(1.05);
+}
+
+.no-open-trades {
+    text-align: center;
+    padding: 30px;
+    color: #64748b;
+    font-style: italic;
+    background: rgba(30, 41, 59, 0.3);
+    border-radius: 8px;
+}
+
+/* مودال‌ها */
 .modal-box {
     background: rgba(30, 41, 59, 0.95);
     border-radius: 12px;
@@ -556,11 +717,29 @@ h1 {
     gap: 30px;
 }
 
-.section {
+/* بخش‌های اصلی */
+.section, .dashboard-section {
     background-color: rgba(15, 23, 42, 0.7);
     border-radius: 12px;
     padding: 25px;
     border: 1px solid #475569;
+    display: none;
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.section.active-section, .dashboard-section.active-section {
+    display: block;
 }
 
 .section-title {
@@ -574,6 +753,7 @@ h1 {
     gap: 10px;
 }
 
+/* فرم ثبت معامله */
 .trade-form {
     display: flex;
     flex-direction: column;
@@ -849,6 +1029,7 @@ input:focus, select:focus {
     gap: 12px;
     margin-top: 10px;
     justify-content: flex-end;
+    flex-wrap: wrap;
 }
 
 button {
@@ -900,6 +1081,7 @@ button {
     box-shadow: 0 5px 15px rgba(245, 158, 11, 0.3);
 }
 
+/* جداول */
 .trades-table-container {
     overflow-x: auto;
     border-radius: 10px;
@@ -1028,6 +1210,7 @@ button {
     cursor: not-allowed;
 }
 
+/* آمار */
 .stats-container {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -1122,6 +1305,143 @@ button {
     border: 1px solid rgba(245, 158, 11, 0.2);
 }
 
+/* ===== باکس‌های رنگی برای آمار ===== */
+.percentage-box {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.percentage-box.negative {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.positive-box {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.negative-box {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* ===== بخش آمار تفصیلی ===== */
+.detailed-stats-table {
+    background: rgba(15, 23, 42, 0.5);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 25px 0;
+    border: 1px solid #334155;
+}
+
+.detailed-stats-title {
+    color: #60a5fa;
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.stats-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    background: rgba(30, 41, 59, 0.3);
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid #2d3748;
+}
+
+.stats-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.stats-label {
+    color: #94a3b8;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.stats-value {
+    color: #f1f5f9;
+    font-size: 1.1rem;
+    font-weight: 600;
+    font-family: 'Courier New', monospace;
+}
+
+/* ===== بخش نمودار رشد حساب ===== */
+.growth-chart-container,
+.monthly-chart-container {
+    background: rgba(15, 23, 42, 0.5);
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 25px;
+    border: 1px solid #334155;
+}
+
+.growth-chart-title,
+.monthly-chart-title {
+    color: #60a5fa;
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#accountGrowthChart,
+#monthlyGrowthChart {
+    width: 100%;
+    height: 300px;
+    max-height: 300px;
+    background: rgba(30, 41, 59, 0.3);
+    border-radius: 10px;
+    padding: 10px;
+}
+
+.chart-axis-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+    color: #94a3b8;
+    font-size: 0.9rem;
+}
+
+.axis-label.x-axis {
+    margin-right: auto;
+}
+
+.axis-label.y-axis {
+    margin-left: auto;
+}
+
+/* پشتیبان‌گیری */
 .backup-container {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -1178,13 +1498,7 @@ button {
     font-size: 0.9rem;
 }
 
-.dashboard-section {
-    background-color: rgba(15, 23, 42, 0.7);
-    border-radius: 12px;
-    padding: 25px;
-    border: 1px solid #475569;
-}
-
+/* داشبورد */
 .dashboard-header {
     display: flex;
     justify-content: space-between;
@@ -1192,6 +1506,8 @@ button {
     margin-bottom: 20px;
     padding-bottom: 10px;
     border-bottom: 1px solid #475569;
+    flex-wrap: wrap;
+    gap: 15px;
 }
 
 .dashboard-title {
@@ -1324,6 +1640,68 @@ button {
     color: #94a3b8;
 }
 
+/* ===== مودال‌های تصویر و جزئیات ===== */
+
+/* مودال تصویر بزرگ - مخصوص نمایش تمام صفحه */
+.image-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.95);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 20000;
+    display: none;
+    cursor: pointer;
+}
+
+.image-modal-content {
+    max-width: 95%;
+    max-height: 95%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.image-modal-content img {
+    max-width: 100%;
+    max-height: 95vh;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: 8px;
+    border: 2px solid #475569;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+}
+
+.image-modal-close {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    color: white;
+    font-size: 2rem;
+    cursor: pointer;
+    background: rgba(239, 68, 68, 0.8);
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+    z-index: 20001;
+    border: 2px solid white;
+}
+
+.image-modal-close:hover {
+    background: #ef4444;
+    transform: scale(1.1);
+}
+
+/* مودال جزئیات معامله */
 .details-modal {
     position: fixed;
     top: 0;
@@ -1334,26 +1712,24 @@ button {
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    z-index: 9999;
+    z-index: 15000;
     display: none;
     backdrop-filter: blur(5px);
-    animation: fadeIn 0.3s ease-out;
     overflow-y: auto;
     padding: 20px;
 }
 
 .details-modal-content {
-    max-width: 600px;
-    animation: modalSlideUp 0.4s ease-out;
-    max-height: 90vh;
-    overflow-y: auto;
-    position: relative;
-    margin-top: 50px;
+    max-width: 650px;
+    width: 95%;
     background: linear-gradient(135deg, #1e293b, #0f172a);
     padding: 25px;
-    border-radius: 16px;
+    border-radius: 20px;
     border: 1px solid #475569;
-    width: 90%;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    animation: modalSlideUp 0.4s ease-out;
+    margin: 30px auto;
+    position: relative;
 }
 
 .details-modal-content h3 {
@@ -1364,128 +1740,102 @@ button {
     align-items: center;
     justify-content: center;
     gap: 10px;
+    font-size: 1.3rem;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #334155;
 }
 
-.details-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
-    margin-top: 20px;
-}
-
-.detail-item {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 12px;
-}
-
-.detail-label {
-    color: #94a3b8;
-    font-size: 0.85rem;
-    margin-bottom: 4px;
-}
-
-.detail-value {
-    color: #f1f5f9;
-    font-weight: 600;
-    font-size: 0.9rem;
-    padding: 10px;
-    background-color: rgba(30, 41, 59, 0.5);
-    border-radius: 6px;
-    border: 1px solid #475569;
-}
-
-.detail-value.price {
-    font-family: 'Courier New', monospace;
-    direction: ltr;
-    text-align: right;
-}
-
-#detail-risk-amount {
-    color: #ef4444;
-}
-
-.detail-section {
-    margin-top: 20px;
-    padding-top: 15px;
-    border-top: 1px solid #475569;
-}
-
-.detail-section-title {
-    color: #60a5fa;
-    font-size: 0.95rem;
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-#detail-fee-entry, #detail-fee-exit, #detail-total-fee {
-    color: #f59e0b;
-}
-
-#detail-total-fee {
-    font-weight: 700;
-}
-
+/* استایل اسکرین‌شات‌ها در مودال جزئیات */
 .screenshot-gallery {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 15px;
-    margin-top: 10px;
+    gap: 20px;
+    margin-top: 15px;
 }
 
 .screenshot-item {
-    background: rgba(30, 41, 59, 0.5);
-    border-radius: 8px;
-    padding: 10px;
-    border: 1px solid #475569;
+    background: rgba(15, 23, 42, 0.6);
+    border-radius: 12px;
+    padding: 15px;
+    border: 1px solid #334155;
 }
 
 .screenshot-item h4 {
     color: #94a3b8;
-    font-size: 0.85rem;
-    margin-bottom: 10px;
-    text-align: center;
-}
-
-#detail-screenshot-entry-container, #detail-screenshot-exit-container {
+    font-size: 0.9rem;
+    margin-bottom: 12px;
     text-align: center;
 }
 
 .screenshot-image {
     max-width: 100%;
     max-height: 150px;
-    border-radius: 6px;
+    width: auto;
+    height: auto;
+    border-radius: 8px;
     cursor: pointer;
-    transition: transform 0.2s;
+    transition: all 0.3s;
+    border: 2px solid transparent;
+    display: block;
+    margin: 0 auto;
 }
 
 .screenshot-image:hover {
-    transform: scale(1.05);
+    transform: scale(1.02);
+    border-color: #3b82f6;
+    box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
 }
 
-.no-screenshot {
-    color: #64748b;
-    font-size: 0.85rem;
-    text-align: center;
-    padding: 20px;
-    background: rgba(30, 41, 59, 0.3);
-    border-radius: 6px;
-    font-style: italic;
-}
-
-.details-modal-buttons {
+/* مودال بستن معامله */
+.close-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.85);
     display: flex;
-    gap: 10px;
-    margin-top: 20px;
+    justify-content: center;
+    align-items: center;
+    z-index: 15000;
+    display: none;
+    backdrop-filter: blur(5px);
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+.close-modal-content {
+    max-width: 450px;
+    width: 90%;
+    background: linear-gradient(135deg, #1e293b, #0f172a);
+    padding: 30px;
+    border-radius: 20px;
+    border: 1px solid #475569;
+    animation: modalSlideUp 0.4s ease-out;
 }
 
+.close-modal-content h3 {
+    color: #60a5fa;
+    margin-bottom: 25px;
+    text-align: center;
+    font-size: 1.2rem;
+}
+
+.close-preview {
+    max-width: 100%;
+    max-height: 200px;
+    width: auto;
+    height: auto;
+    border-radius: 8px;
+    margin: 15px 0;
+    display: none;
+    border: 2px solid #334155;
+}
+
+.close-preview.active {
+    display: block;
+    margin: 15px auto 0;
+}
+
+/* انیمیشن */
 @keyframes modalSlideUp {
     from {
         transform: translateY(50px);
@@ -1497,113 +1847,119 @@ button {
     }
 }
 
-.close-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.85);
+/* بقیه استایل‌های مودال */
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.detail-item {
     display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 10000;
-    display: none;
-    backdrop-filter: blur(5px);
+    flex-direction: column;
 }
 
-.close-modal-content {
-    max-width: 400px;
-    background: linear-gradient(135deg, #1e293b, #0f172a);
-    padding: 25px;
-    border-radius: 16px;
-    border: 1px solid #475569;
-    width: 90%;
+.detail-label {
+    color: #94a3b8;
+    font-size: 0.8rem;
+    margin-bottom: 5px;
 }
 
-.close-modal-content h3 {
-    color: #60a5fa;
-    margin-bottom: 20px;
-    text-align: center;
-}
-
-.close-preview {
-    max-width: 100%;
-    max-height: 200px;
+.detail-value {
+    color: #f1f5f9;
+    font-weight: 600;
+    font-size: 0.95rem;
+    padding: 10px 12px;
+    background-color: rgba(30, 41, 59, 0.5);
     border-radius: 8px;
-    margin: 15px 0;
-    display: none;
+    border: 1px solid #334155;
 }
 
-.close-preview.active {
-    display: block;
-    margin: 15px auto 0;
+.detail-value.price {
+    font-family: 'Courier New', monospace;
+    direction: ltr;
+    text-align: right;
+}
+
+.detail-section {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #334155;
+}
+
+.detail-section-title {
+    color: #60a5fa;
+    font-size: 1rem;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.no-screenshot {
+    color: #64748b;
+    font-size: 0.85rem;
+    text-align: center;
+    padding: 30px;
+    background: rgba(30, 41, 59, 0.3);
+    border-radius: 8px;
+    font-style: italic;
+}
+
+.details-modal-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 25px;
+    justify-content: center;
 }
 
 .screenshot-remove-wrapper {
     margin-top: 15px;
-    text-align: left;
+    text-align: center;
 }
 
 .screenshot-remove {
     color: #ef4444;
     cursor: pointer;
     display: none;
+    font-size: 0.9rem;
+    padding: 5px 10px;
+    border-radius: 6px;
+    background: rgba(239, 68, 68, 0.1);
 }
 
 .screenshot-remove.active {
-    display: inline;
+    display: inline-block;
 }
 
-.image-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
+.screenshot-remove:hover {
+    background: rgba(239, 68, 68, 0.2);
+}
+
+.screenshot-upload {
     width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.95);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 10001;
-    display: none;
-    cursor: pointer;
-}
-
-.image-modal-content {
-    max-width: 90%;
-    max-height: 90%;
-}
-
-.image-modal-content img {
-    max-width: 100%;
-    max-height: 90vh;
+    padding: 12px;
+    background-color: #1e293b;
+    border: 2px dashed #475569;
     border-radius: 8px;
-    border: 2px solid #475569;
-}
-
-.image-modal-close {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    color: white;
-    font-size: 2rem;
+    color: #f1f5f9;
+    font-size: 0.9rem;
     cursor: pointer;
-    background: rgba(0, 0, 0, 0.5);
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 8px;
+    margin: 15px 0;
     transition: all 0.3s;
 }
 
-.image-modal-close:hover {
-    background: rgba(239, 68, 68, 0.8);
-    transform: scale(1.1);
+.screenshot-upload:hover {
+    border-color: #3b82f6;
+    background-color: rgba(59, 130, 246, 0.1);
 }
 
+/* پیشرفت پشتیبان */
 .backup-progress {
     margin-top: 20px;
     padding: 15px;
@@ -1658,15 +2014,6 @@ button {
     margin: 0 auto;
 }
 
-footer {
-    text-align: center;
-    margin-top: 40px;
-    padding-top: 20px;
-    border-top: 1px solid #475569;
-    color: #94a3b8;
-    font-size: 0.85rem;
-}
-
 #noTradesMessage {
     text-align: center;
     padding: 30px;
@@ -1678,4 +2025,26 @@ footer {
     font-size: 2rem;
     margin-bottom: 15px;
     display: block;
+}
+
+/* واکنش‌گرایی برای بخش‌های جدید */
+@media (max-width: 768px) {
+    .stats-row {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    .stats-item {
+        padding: 10px 0;
+        border-bottom: 1px solid #2d3748;
+    }
+    
+    .stats-item:last-child {
+        border-bottom: none;
+    }
+    
+    #accountGrowthChart,
+    #monthlyGrowthChart {
+        height: 250px;
+    }
 }
