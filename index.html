@@ -20,8 +20,11 @@
     <!-- Safari theme -->
     <meta name="theme-color" content="#0f172a">
 
-    <!-- Font Awesome -->
+    <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- کتابخانه Chart.js برای نمودار -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     
     <!-- کتابخانه JSZip برای کار با فایل‌های ZIP -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -190,9 +193,6 @@
                 <button type="button" class="btn-secondary" onclick="closeDetailsModal()">
                     <i class="fas fa-times"></i> بستن
                 </button>
-                <button type="button" class="btn-warning" onclick="editTradeFromDetails()">
-                    <i class="fas fa-edit"></i> ویرایش
-                </button>
             </div>
         </div>
     </div>
@@ -253,477 +253,586 @@
         </button>
     </div>
     
-    <!-- کانتینر اصلی -->
-    <div class="container">
-        <!-- هدر -->
-        <header>
-            <div class="header-top">
+    <!-- ساختار اصلی با Toolbar -->
+    <div class="app-wrapper">
+        <!-- Toolbar بالا -->
+        <div class="toolbar">
+            <div class="toolbar-header">
+                <div class="toolbar-logo">
+                    <!-- گزینه ۱: نمودار خطی (پیشنهادی) -->
+                    <i class="fas fa-chart-line" style="color: #60a5fa; font-size: 1.8rem;"></i>
+                    
+                    <!-- گزینه ۲: آیکون سکه (همون قبلی) - اگه خواستی اینو فعال کن و خط بالا رو غیرفعال -->
+                    <!-- <i class="fas fa-coins" style="color: #fbbf24; font-size: 1.8rem;"></i> -->
+                    
+                    <!-- گزینه ۳: آیکون کتاب/ژورنال -->
+                    <!-- <i class="fas fa-book-open" style="color: #60a5fa; font-size: 1.8rem;"></i> -->
+                </div>
+                <div class="toolbar-title">Crypto Journal</div>
+            </div>
+            
+            <div class="toolbar-menu">
+                <button class="toolbar-btn active" data-section="trade-form" onclick="switchSection('trade-form')">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>فرم ثبت معاملات</span>
+                </button>
+                
+                <button class="toolbar-btn" data-section="history" onclick="switchSection('history')">
+                    <i class="fas fa-history"></i>
+                    <span>تاریخچه معاملات</span>
+                </button>
+                
+                <button class="toolbar-btn" data-section="dashboard" onclick="switchSection('dashboard')">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>داشبورد ماهانه</span>
+                </button>
+                
+                <button class="toolbar-btn" data-section="stats" onclick="switchSection('stats')">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>آمار/ریسک</span>
+                </button>
+                
+                <button class="toolbar-btn" data-section="backup" onclick="switchSection('backup')">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <span>بکاپ</span>
+                </button>
+            </div>
+            
+            <div class="toolbar-calculator">
                 <button class="calculator-btn" onclick="window.location.href='calculator/'" title="رفتن به ماشین‌حساب">
                     <i class="fas fa-calculator"></i>
-                    ماشین‌حساب
-                </button>
-                
-                <div class="header-title">
-                    <h1>
-                        <i class="fa-solid fa-coins"></i>
-                        Crypto Journal
-                    </h1>
-                    <p class="subtitle">R-NIKER</p>
-                </div>
-                
-                <div class="header-spacer"></div>
-            </div>
-        </header>
-        
-        <!-- بخش بالانس حساب -->
-        <div class="balance-container">
-            <div class="balance-main">
-                <div class="balance-icon">
-                    <i class="fas fa-wallet"></i>
-                </div>
-                <div class="balance-info">
-                    <div class="balance-title">موجودی حساب</div>
-                    <div class="balance-value" id="currentBalance">$0</div>
-                    <div id="currentAccountName">حساب اصلی</div>
-                </div>
-            </div>
-            
-            <div class="balance-details">
-                <div class="balance-detail">
-                    <div class="detail-label">سود/ضرر کل</div>
-                    <div class="detail-value" id="totalPnL">$0</div>
-                </div>
-                <div class="balance-detail">
-                    <div class="detail-label">ریسک کل</div>
-                    <div class="detail-value" id="totalRiskPercent">0%</div>
-                </div>
-                <div class="balance-detail">
-                    <div class="detail-label">حساب فعال</div>
-                    <div class="detail-value" id="activeAccountIndicator">1/1</div>
-                </div>
-            </div>
-            
-            <div class="balance-actions">
-                <button class="balance-btn" id="editBalanceBtn" onclick="toggleModal('balanceModal')">
-                    <i class="fas fa-edit"></i>
-                    ویرایش بالانس
-                </button>
-                <button class="balance-btn" id="manageAccountsBtn" onclick="toggleModal('accountModal')">
-                    <i class="fas fa-university"></i>
-                    مدیریت حساب
+                    <span>ماشین‌حساب</span>
                 </button>
             </div>
         </div>
         
-        <!-- مودال ویرایش بالانس -->
-        <div id="balanceModal" class="modal-box">
-            <div class="modal-header">
-                <h3 class="modal-title">
-                    <i class="fas fa-edit"></i> ویرایش بالانس حساب
-                </h3>
-                <div class="modal-close" onclick="toggleModal('balanceModal')">
-                    <i class="fas fa-times"></i>
-                </div>
-            </div>
-            
-            <div class="modal-grid">
-                <div class="modal-input-group">
-                    <label class="modal-label">
-                        <i class="fas fa-wallet"></i>
-                        مبلغ جدید (دلار)
-                    </label>
-                    <input type="number" id="newBalanceInput" class="modal-input" step="0.01" min="0">
-                </div>
-            </div>
-            
-            <div class="preset-buttons">
-                <button type="button" class="preset-btn" onclick="setBalancePreset(2000)">$2,000</button>
-                <button type="button" class="preset-btn" onclick="setBalancePreset(5000)">$5,000</button>
-                <button type="button" class="preset-btn" onclick="setBalancePreset(10000)">$10,000</button>
-                <button type="button" class="preset-btn" onclick="setBalancePreset(20000)">$20,000</button>
-            </div>
-            
-            <div class="current-balance-display">
-                <span class="current-balance-label">موجودی فعلی:</span>
-                <span class="current-balance-value" id="currentBalanceDisplay">$0</span>
-            </div>
-            
-            <div class="modal-buttons">
-                <button type="button" class="modal-btn modal-btn-secondary" onclick="toggleModal('balanceModal')">
-                    <i class="fas fa-times"></i> لغو
-                </button>
-                <button type="button" class="modal-btn modal-btn-success" onclick="updateBalance()">
-                    <i class="fas fa-save"></i> ذخیره تغییرات
-                </button>
-            </div>
-        </div>
-        
-        <!-- مودال مدیریت حساب -->
-        <div id="accountModal" class="modal-box">
-            <div class="modal-header">
-                <h3 class="modal-title">
-                    <i class="fas fa-university"></i> مدیریت حساب‌ها
-                </h3>
-                <div class="modal-close" onclick="toggleModal('accountModal')">
-                    <i class="fas fa-times"></i>
-                </div>
-            </div>
-            
-            <div class="accounts-list-container" id="accountsListContainer"></div>
-            
-            <div class="modal-grid">
-                <div class="modal-input-group">
-                    <label class="modal-label">
-                        <i class="fas fa-signature"></i>
-                        نام حساب جدید
-                    </label>
-                    <input type="text" id="newAccountName" class="modal-input">
-                </div>
-                
-                <div class="modal-input-group">
-                    <label class="modal-label">
-                        <i class="fas fa-money-bill-wave"></i>
-                        موجودی اولیه (دلار)
-                    </label>
-                    <input type="number" id="newAccountBalance" class="modal-input" step="0.01" min="0">
-                </div>
-            </div>
-            
-            <div class="modal-buttons">
-                <button type="button" class="modal-btn modal-btn-secondary" onclick="toggleModal('accountModal')">
-                    <i class="fas fa-times"></i> بستن
-                </button>
-                <button type="button" class="modal-btn modal-btn-success" onclick="addNewAccount()">
-                    <i class="fas fa-plus"></i> افزودن حساب جدید
-                </button>
-            </div>
-        </div>
-        
-        <main class="main-content">
-            <!-- بخش ثبت معامله -->
-            <section class="section">
-                <h2 class="section-title"><i class="fas fa-plus-circle"></i> ثبت معامله جدید</h2>
-                <form id="tradeForm" class="trade-form">
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="symbol"><i class="fas fa-coins"></i> ارز دیجیتال</label>
-                            <input type="text" id="symbol" list="crypto-list" required>
-                            <datalist id="crypto-list">
-                                <option value="BTC"></option>
-                                <option value="ETH"></option>
-                                <option value="BNB"></option>
-                                <option value="SOL"></option>
-                                <option value="ARB"></option>
-                                <option value="ENA"></option>
-                                <option value="ADA"></option>
-                                <option value="OP"></option>
-                            </datalist>
+        <!-- محتوای اصلی -->
+        <div class="main-wrapper">
+            <!-- کانتینر اصلی -->
+            <div class="container">
+                <!-- بالانس حساب - فقط در فرم ثبت معامله نمایش داده می‌شود -->
+                <div id="balanceSection" class="balance-container">
+                    <div class="balance-main">
+                        <div class="balance-icon">
+                            <i class="fas fa-wallet"></i>
                         </div>
-                        
-                        <div class="form-group">
-                            <label for="date"><i class="fas fa-calendar"></i> تاریخ معامله</label>
-                            <input type="datetime-local" id="date" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="type"><i class="fas fa-exchange-alt"></i> نوع معامله</label>
-                            <select id="type" required>
-                                <option value="" disabled selected>انتخاب کنید</option>
-                                <option value="buy">لانگ (خرید)</option>
-                                <option value="sell">شورت (فروش)</option>
-                            </select>
+                        <div class="balance-info">
+                            <div class="balance-title">موجودی حساب</div>
+                            <div class="balance-value" id="currentBalance">$0</div>
+                            <div id="currentAccountName">حساب اصلی</div>
                         </div>
                     </div>
                     
-                    <div class="prices-section">
-                        <div class="prices-title">
-                            <i class="fas fa-chart-line"></i>
-                            قیمت‌های معامله
+                    <div class="balance-details">
+                        <div class="balance-detail">
+                            <div class="detail-label">سود/ضرر کل</div>
+                            <div class="detail-value" id="totalPnL">$0</div>
                         </div>
-                        
-                        <div class="prices-grid">
-                            <div class="form-group">
-                                <label><i class="fas fa-arrow-down"></i> قیمت ورود</label>
-                                <input type="text" id="entryPrice" required class="price-display">
-                            </div>
-                            <div class="form-group">
-                                <label><i class="fas fa-shield-alt"></i> حد ضرر</label>
-                                <input type="text" id="stopLoss" required class="price-display">
-                            </div>
-                            <div class="form-group">
-                                <label><i class="fas fa-bullseye"></i> حد سود</label>
-                                <input type="text" id="takeProfit" required class="price-display">
-                            </div>
+                        <div class="balance-detail">
+                            <div class="detail-label">ریسک کل</div>
+                            <div class="detail-value" id="totalRiskPercent">0%</div>
+                        </div>
+                        <div class="balance-detail">
+                            <div class="detail-label">حساب فعال</div>
+                            <div class="detail-value" id="activeAccountIndicator">1/1</div>
                         </div>
                     </div>
                     
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="riskPercent"><i class="fas fa-percentage"></i> ریسک (% از بالانس)</label>
-                            <input type="text" id="riskPercent" required>
-                            <div class="quick-risk-buttons">
-                                <button type="button" class="quick-risk-btn" onclick="setRiskPercent(0.25)">0.25%</button>
-                                <button type="button" class="quick-risk-btn" onclick="setRiskPercent(0.5)">0.5%</button>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="feePercent"><i class="fas fa-receipt"></i> کارمزد کل (%)</label>
-                            <input type="text" id="feePercent" required class="price-display">
-                            <div class="fee-info">
-                                <i class="fas fa-info-circle"></i>
-                                مجموع کارمزد ورود و خروج
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="entryScreenshotFile"><i class="fas fa-camera"></i> اسکرین‌شات ورود (اختیاری)</label>
-                            <div class="screenshot-upload-input" id="entryScreenshotUpload" onclick="document.getElementById('entryScreenshotFile').click()">
-                                <i class="fas fa-cloud-upload-alt"></i>
-                                <span>انتخاب تصویر</span>
-                                <input type="file" id="entryScreenshotFile" accept="image/*" style="display: none;" onchange="previewEntryScreenshot(this)">
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div id="entryScreenshotPreviewContainer" class="screenshot-preview-container">
-                        <img id="entryScreenshotPreview" class="screenshot-preview-image" src="" alt="پیش‌نمایش">
-                        <div>
-                            <span class="screenshot-remove-link" id="entryScreenshotRemove" onclick="removeEntryScreenshot()">
-                                <i class="fas fa-times"></i> حذف تصویر
-                            </span>
-                        </div>
-                    </div>
-                    
-                    <div class="risk-summary-section">
-                        <div class="risk-summary-title">
-                            <i class="fas fa-calculator"></i>
-                            خلاصه ریسک
-                        </div>
-                        
-                        <div class="risk-summary">
-                            <div class="risk-summary-item">
-                                <span class="risk-summary-label">مقدار ریسک</span>
-                                <span class="risk-summary-value" id="riskAmount">$0</span>
-                            </div>
-                            <div class="risk-summary-item">
-                                <span class="risk-summary-label">سود بالقوه</span>
-                                <span class="risk-summary-value" id="potentialProfit">$0</span>
-                            </div>
-                            <div class="risk-summary-item">
-                                <span class="risk-summary-label">ریسک به ریوارد</span>
-                                <span class="risk-summary-value" id="riskRewardRatio">1:0</span>
-                            </div>
-                        </div>
-                        
-                        <div class="fee-info-box" id="feeDetails" style="display: none;">
-                            <div class="fee-row">
-                                <span>کارمزد ورود:</span>
-                                <span id="feeEntryAmount">$0.00</span>
-                            </div>
-                            <div class="fee-row">
-                                <span>کارمزد خروج:</span>
-                                <span id="feeExitAmount">$0.00</span>
-                            </div>
-                            <div class="fee-total">
-                                <span>کل کارمزد:</span>
-                                <span id="totalFeeAmount">$0.00</span>
-                            </div>
-                            <div class="fee-row">
-                                <span>سود خالص (پس از کارمزد):</span>
-                                <span id="netProfitAmount">$0.00</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-actions">
-                        <button type="submit" class="btn-primary">
-                            <i class="fas fa-save"></i> ثبت معامله
+                    <div class="balance-actions">
+                        <button class="balance-btn" id="editBalanceBtn" onclick="toggleModal('balanceModal')">
+                            <i class="fas fa-edit"></i>
+                            ویرایش بالانس
                         </button>
-                        <button type="reset" class="btn-secondary" onclick="resetForm()">
-                            <i class="fas fa-eraser"></i> پاک کردن
-                        </button>
-                        <button type="button" class="btn-warning" onclick="calculateRisk()">
-                            <i class="fas fa-calculator"></i> محاسبه
-                        </button>
-                    </div>
-                </form>
-            </section>
-            
-            <!-- بخش تاریخچه معاملات -->
-            <section class="section">
-                <h2 class="section-title"><i class="fas fa-history"></i> تاریخچه معاملات</h2>
-                <div class="trades-table-container">
-                    <table class="trades-table">
-                        <thead>
-                            <tr>
-                                <th>ارز</th>
-                                <th>تاریخ</th>
-                                <th>نوع</th>
-                                <th>ورود</th>
-                                <th>حد ضرر</th>
-                                <th>حد سود</th>
-                                <th>ریسک %</th>
-                                <th>کارمزد</th>
-                                <th>وضعیت</th>
-                                <th>سود/ضرر</th>
-                                <th>عملیات</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tradesTableBody"></tbody>
-                    </table>
-                </div>
-                <p id="noTradesMessage">
-                    <i class="fas fa-exchange-alt"></i>
-                    هنوز هیچ معامله‌ای ثبت نشده است!
-                </p>
-            </section>
-            
-            <!-- بخش داشبورد ماهانه -->
-            <section class="dashboard-section">
-                <div class="dashboard-header">
-                    <h2 class="dashboard-title">
-                        <i class="fas fa-chart-pie"></i> داشبورد ماهانه
-                    </h2>
-                    <div class="month-selector">
-                        <button class="month-btn" onclick="changeMonth(-1)" id="prevMonthBtn" title="ماه قبل">
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
-                        <span class="current-month" id="currentMonthDisplay">فروردین 1403</span>
-                        <button class="month-btn" onclick="changeMonth(1)" id="nextMonthBtn" title="ماه بعد">
-                            <i class="fas fa-chevron-left"></i>
+                        <button class="balance-btn" id="manageAccountsBtn" onclick="toggleModal('accountModal')">
+                            <i class="fas fa-university"></i>
+                            مدیریت حساب
                         </button>
                     </div>
                 </div>
                 
-                <div class="dashboard-stats" id="monthlyStats">
-                    <div class="dashboard-stat-card">
-                        <div class="dashboard-stat-label">تعداد معاملات</div>
-                        <div class="dashboard-stat-value" id="monthlyTradeCount">0</div>
+                <!-- مودال ویرایش بالانس -->
+                <div id="balanceModal" class="modal-box">
+                    <div class="modal-header">
+                        <h3 class="modal-title">
+                            <i class="fas fa-edit"></i> ویرایش بالانس حساب
+                        </h3>
+                        <div class="modal-close" onclick="toggleModal('balanceModal')">
+                            <i class="fas fa-times"></i>
+                        </div>
                     </div>
-                    <div class="dashboard-stat-card">
-                        <div class="dashboard-stat-label">سود/ضرر کل</div>
-                        <div class="dashboard-stat-value" id="monthlyTotalPnL">$0</div>
+                    
+                    <div class="modal-grid">
+                        <div class="modal-input-group">
+                            <label class="modal-label">
+                                <i class="fas fa-wallet"></i>
+                                مبلغ جدید (دلار)
+                            </label>
+                            <input type="number" id="newBalanceInput" class="modal-input" step="0.01" min="0">
+                        </div>
                     </div>
-                    <div class="dashboard-stat-card">
-                        <div class="dashboard-stat-label">سودآور</div>
-                        <div class="dashboard-stat-value" id="monthlyProfitable">0</div>
+                    
+                    <div class="preset-buttons">
+                        <button type="button" class="preset-btn" onclick="setBalancePreset(2000)">$2,000</button>
+                        <button type="button" class="preset-btn" onclick="setBalancePreset(5000)">$5,000</button>
+                        <button type="button" class="preset-btn" onclick="setBalancePreset(10000)">$10,000</button>
+                        <button type="button" class="preset-btn" onclick="setBalancePreset(20000)">$20,000</button>
                     </div>
-                    <div class="dashboard-stat-card">
-                        <div class="dashboard-stat-label">زیان‌ده</div>
-                        <div class="dashboard-stat-value" id="monthlyLoss">0</div>
+                    
+                    <div class="current-balance-display">
+                        <span class="current-balance-label">موجودی فعلی:</span>
+                        <span class="current-balance-value" id="currentBalanceDisplay">$0</span>
+                    </div>
+                    
+                    <div class="modal-buttons">
+                        <button type="button" class="modal-btn modal-btn-secondary" onclick="toggleModal('balanceModal')">
+                            <i class="fas fa-times"></i> لغو
+                        </button>
+                        <button type="button" class="modal-btn modal-btn-success" onclick="updateBalance()">
+                            <i class="fas fa-save"></i> ذخیره تغییرات
+                        </button>
                     </div>
                 </div>
                 
-                <div class="monthly-trades-container" id="monthlyTradesContainer">
-                    <table class="monthly-trades-table">
-                        <thead>
-                            <tr>
-                                <th>تاریخ</th>
-                                <th>ارز</th>
-                                <th>نوع</th>
-                                <th>ورود</th>
-                                <th>خروج</th>
-                                <th>سود/ضرر</th>
-                                <th>وضعیت</th>
-                            </tr>
-                        </thead>
-                        <tbody id="monthlyTradesBody">
-                            <tr>
-                                <td colspan="7" class="no-trades-month">
+                <!-- مودال مدیریت حساب -->
+                <div id="accountModal" class="modal-box">
+                    <div class="modal-header">
+                        <h3 class="modal-title">
+                            <i class="fas fa-university"></i> مدیریت حساب‌ها
+                        </h3>
+                        <div class="modal-close" onclick="toggleModal('accountModal')">
+                            <i class="fas fa-times"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="accounts-list-container" id="accountsListContainer"></div>
+                    
+                    <div class="modal-grid">
+                        <div class="modal-input-group">
+                            <label class="modal-label">
+                                <i class="fas fa-signature"></i>
+                                نام حساب جدید
+                            </label>
+                            <input type="text" id="newAccountName" class="modal-input">
+                        </div>
+                        
+                        <div class="modal-input-group">
+                            <label class="modal-label">
+                                <i class="fas fa-money-bill-wave"></i>
+                                موجودی اولیه (دلار)
+                            </label>
+                            <input type="number" id="newAccountBalance" class="modal-input" step="0.01" min="0">
+                        </div>
+                    </div>
+                    
+                    <div class="modal-buttons">
+                        <button type="button" class="modal-btn modal-btn-secondary" onclick="toggleModal('accountModal')">
+                            <i class="fas fa-times"></i> بستن
+                        </button>
+                        <button type="button" class="modal-btn modal-btn-success" onclick="addNewAccount()">
+                            <i class="fas fa-plus"></i> افزودن حساب جدید
+                        </button>
+                    </div>
+                </div>
+                
+                <main class="main-content">
+                    <!-- بخش ثبت معامله (پیش‌فرض فعال) -->
+                    <section id="trade-form-section" class="section active-section">
+                        <h2 class="section-title"><i class="fas fa-plus-circle"></i> ثبت معامله جدید</h2>
+                        
+                        <form id="tradeForm" class="trade-form">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="symbol"><i class="fas fa-coins"></i> ارز دیجیتال</label>
+                                    <input type="text" id="symbol" list="crypto-list" required>
+                                    <datalist id="crypto-list">
+                                        <option value="BTC"></option>
+                                        <option value="ETH"></option>
+                                        <option value="BNB"></option>
+                                        <option value="SOL"></option>
+                                        <option value="ARB"></option>
+                                        <option value="ENA"></option>
+                                        <option value="ADA"></option>
+                                        <option value="OP"></option>
+                                    </datalist>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="date"><i class="fas fa-calendar"></i> تاریخ معامله</label>
+                                    <input type="datetime-local" id="date" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="type"><i class="fas fa-exchange-alt"></i> نوع معامله</label>
+                                    <select id="type" required>
+                                        <option value="" disabled selected>انتخاب کنید</option>
+                                        <option value="buy">لانگ (خرید)</option>
+                                        <option value="sell">شورت (فروش)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="prices-section">
+                                <div class="prices-title">
                                     <i class="fas fa-chart-line"></i>
-                                    هیچ معامله‌ای در این ماه وجود ندارد
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-            
-            <!-- بخش آمار و تحلیل کلی -->
-            <section class="section">
-                <h2 class="section-title"><i class="fas fa-chart-bar"></i> آمار عملکرد کلی</h2>
-                <div class="stats-container">
-                    <div class="stat-card">
-                        <div class="stat-icon"><i class="fas fa-exchange-alt"></i></div>
-                        <div class="stat-label">تعداد معاملات</div>
-                        <div class="stat-value neutral-stat" id="totalTrades">0</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon"><i class="fas fa-arrow-up"></i></div>
-                        <div class="stat-label">سود کل</div>
-                        <div class="stat-value positive" id="totalProfit">$0</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon"><i class="fas fa-arrow-down"></i></div>
-                        <div class="stat-label">ضرر کل</div>
-                        <div class="stat-value negative" id="totalLoss">$0</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon"><i class="fas fa-percentage"></i></div>
-                        <div class="stat-label">نرخ موفقیت</div>
-                        <div class="stat-value neutral-stat" id="winRate">0%</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon"><i class="fas fa-receipt"></i></div>
-                        <div class="stat-label">کارمزد کل</div>
-                        <div class="stat-value fee-stat" id="totalFees">$0</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon"><i class="fas fa-trophy"></i></div>
-                        <div class="stat-label">بیشترین سود</div>
-                        <div class="stat-value positive" id="maxProfit">$0</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon"><i class="fas fa-exclamation-triangle"></i></div>
-                        <div class="stat-label">بیشترین ضرر</div>
-                        <div class="stat-value negative" id="maxLoss">$0</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon"><i class="fas fa-clock"></i></div>
-                        <div class="stat-label">معاملات باز</div>
-                        <div class="stat-value neutral-stat" id="openTrades">0</div>
-                    </div>
-                </div>
-            </section>
-            
-            <!-- بخش پشتیبان‌گیری -->
-            <section class="section">
-                <h2 class="section-title"><i class="fas fa-database"></i> پشتیبان‌گیری</h2>
-                <div class="backup-container">
-                    <div class="backup-card">
-                        <div class="backup-header">
-                            <i class="fas fa-download"></i>
-                            <h3>دریافت پشتیبان</h3>
+                                    قیمت‌های معامله
+                                </div>
+                                
+                                <div class="prices-grid">
+                                    <div class="form-group">
+                                        <label><i class="fas fa-arrow-down"></i> قیمت ورود</label>
+                                        <input type="text" id="entryPrice" required class="price-display">
+                                    </div>
+                                    <div class="form-group">
+                                        <label><i class="fas fa-shield-alt"></i> حد ضرر</label>
+                                        <input type="text" id="stopLoss" required class="price-display">
+                                    </div>
+                                    <div class="form-group">
+                                        <label><i class="fas fa-bullseye"></i> حد سود</label>
+                                        <input type="text" id="takeProfit" required class="price-display">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="riskPercent"><i class="fas fa-percentage"></i> ریسک (% از بالانس)</label>
+                                    <input type="text" id="riskPercent" required>
+                                    <div class="quick-risk-buttons">
+                                        <button type="button" class="quick-risk-btn" onclick="setRiskPercent(0.25)">0.25%</button>
+                                        <button type="button" class="quick-risk-btn" onclick="setRiskPercent(0.5)">0.5%</button>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="feePercent"><i class="fas fa-receipt"></i> کارمزد کل (%)</label>
+                                    <input type="text" id="feePercent" required class="price-display">
+                                    <div class="fee-info">
+                                        <i class="fas fa-info-circle"></i>
+                                        مجموع کارمزد ورود و خروج
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="entryScreenshotFile"><i class="fas fa-camera"></i> اسکرین‌شات ورود (اختیاری)</label>
+                                    <div class="screenshot-upload-input" id="entryScreenshotUpload" onclick="document.getElementById('entryScreenshotFile').click()">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                        <span>انتخاب تصویر</span>
+                                        <input type="file" id="entryScreenshotFile" accept="image/*" style="display: none;" onchange="previewEntryScreenshot(this)">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div id="entryScreenshotPreviewContainer" class="screenshot-preview-container">
+                                <img id="entryScreenshotPreview" class="screenshot-preview-image" src="" alt="پیش‌نمایش">
+                                <div>
+                                    <span class="screenshot-remove-link" id="entryScreenshotRemove" onclick="removeEntryScreenshot()">
+                                        <i class="fas fa-times"></i> حذف تصویر
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div class="risk-summary-section">
+                                <div class="risk-summary-title">
+                                    <i class="fas fa-calculator"></i>
+                                    خلاصه ریسک
+                                </div>
+                                
+                                <div class="risk-summary">
+                                    <div class="risk-summary-item">
+                                        <span class="risk-summary-label">مقدار ریسک</span>
+                                        <span class="risk-summary-value" id="riskAmount">$0</span>
+                                    </div>
+                                    <div class="risk-summary-item">
+                                        <span class="risk-summary-label">سود بالقوه</span>
+                                        <span class="risk-summary-value" id="potentialProfit">$0</span>
+                                    </div>
+                                    <div class="risk-summary-item">
+                                        <span class="risk-summary-label">ریسک به ریوارد</span>
+                                        <span class="risk-summary-value" id="riskRewardRatio">1:0</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="fee-info-box" id="feeDetails" style="display: none;">
+                                    <div class="fee-row">
+                                        <span>کارمزد ورود:</span>
+                                        <span id="feeEntryAmount">$0.00</span>
+                                    </div>
+                                    <div class="fee-row">
+                                        <span>کارمزد خروج:</span>
+                                        <span id="feeExitAmount">$0.00</span>
+                                    </div>
+                                    <div class="fee-total">
+                                        <span>کل کارمزد:</span>
+                                        <span id="totalFeeAmount">$0.00</span>
+                                    </div>
+                                    <div class="fee-row">
+                                        <span>سود خالص (پس از کارمزد):</span>
+                                        <span id="netProfitAmount">$0.00</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="submit" class="btn-primary">
+                                    <i class="fas fa-save"></i> ثبت معامله
+                                </button>
+                                <button type="reset" class="btn-secondary" onclick="resetForm()">
+                                    <i class="fas fa-eraser"></i> پاک کردن
+                                </button>
+                                <button type="button" class="btn-warning" onclick="calculateRisk()">
+                                    <i class="fas fa-calculator"></i> محاسبه
+                                </button>
+                            </div>
+                        </form>
+                        
+                        <!-- معاملات باز - بعد از فرم ثبت معامله -->
+                        <div class="open-trades-container">
+                            <h3 class="open-trades-title"><i class="fas fa-clock"></i> معاملات باز</h3>
+                            <div id="openTradesList" class="open-trades-list"></div>
                         </div>
-                        <p class="backup-description">
-                            از تمام اطلاعات و تصاویر خود یک فایل ZIP پشتیبان بگیرید.
-                        </p>
-                        <button class="btn-backup" onclick="exportData()">
-                            <i class="fas fa-file-export"></i> دانلود پشتیبان (ZIP)
-                        </button>
-                    </div>
+                    </section>
                     
-                    <div class="backup-card">
-                        <div class="backup-header">
-                            <i class="fas fa-upload"></i>
-                            <h3>بارگذاری پشتیبان</h3>
+                    <!-- بخش تاریخچه معاملات (مخفی در ابتدا) -->
+                    <section id="history-section" class="section">
+                        <h2 class="section-title"><i class="fas fa-history"></i> تاریخچه معاملات</h2>
+                        <div class="trades-table-container">
+                            <table class="trades-table">
+                                <thead>
+                                    <tr>
+                                        <th>ارز</th>
+                                        <th>تاریخ</th>
+                                        <th>نوع</th>
+                                        <th>ورود</th>
+                                        <th>حد ضرر</th>
+                                        <th>حد سود</th>
+                                        <th>ریسک %</th>
+                                        <th>کارمزد</th>
+                                        <th>وضعیت</th>
+                                        <th>سود/ضرر</th>
+                                        <th>عملیات</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tradesTableBody"></tbody>
+                            </table>
                         </div>
-                        <p class="backup-description">
-                            اطلاعات قبلی خود را از فایل ZIP بازیابی کنید.
+                        <p id="noTradesMessage">
+                            <i class="fas fa-exchange-alt"></i>
+                            هنوز هیچ معامله‌ای ثبت نشده است!
                         </p>
-                        <input type="file" id="backupFile" class="file-input" accept=".zip">
-                        <button class="btn-backup" onclick="importData()">
-                            <i class="fas fa-file-import"></i> بارگذاری پشتیبان (ZIP)
-                        </button>
-                    </div>
-                </div>
-            </section>
-        </main>
-        
-        <footer>
-            <p>Support : ID Telegram : @RNA7600</p>
-        </footer>
+                    </section>
+                    
+                    <!-- بخش داشبورد ماهانه (مخفی در ابتدا) -->
+                    <section id="dashboard-section" class="dashboard-section">
+                        <h2 class="section-title"><i class="fas fa-chart-pie"></i> داشبورد ماهانه</h2>
+                        <div class="dashboard-header">
+                            <div class="month-selector">
+                                <button class="month-btn" onclick="changeMonth(-1)" id="prevMonthBtn" title="ماه قبل">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                                <span class="current-month" id="currentMonthDisplay">فروردین 1403</span>
+                                <button class="month-btn" onclick="changeMonth(1)" id="nextMonthBtn" title="ماه بعد">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="dashboard-stats" id="monthlyStats">
+                            <div class="dashboard-stat-card">
+                                <div class="dashboard-stat-label">تعداد معاملات</div>
+                                <div class="dashboard-stat-value" id="monthlyTradeCount">0</div>
+                            </div>
+                            <div class="dashboard-stat-card">
+                                <div class="dashboard-stat-label">سود/ضرر کل</div>
+                                <div class="dashboard-stat-value" id="monthlyTotalPnL">$0</div>
+                            </div>
+                            <div class="dashboard-stat-card">
+                                <div class="dashboard-stat-label">سودآور</div>
+                                <div class="dashboard-stat-value" id="monthlyProfitable">0</div>
+                            </div>
+                            <div class="dashboard-stat-card">
+                                <div class="dashboard-stat-label">زیان‌ده</div>
+                                <div class="dashboard-stat-value" id="monthlyLoss">0</div>
+                            </div>
+                        </div>
+                        
+                        <!-- نمودار رشد ماهانه -->
+                        <div class="monthly-chart-container">
+                            <h3 class="monthly-chart-title"><i class="fas fa-chart-line"></i> رشد حساب در ماه جاری</h3>
+                            <canvas id="monthlyGrowthChart"></canvas>
+                            <div class="chart-axis-labels">
+                                <span class="axis-label x-axis">تعداد معاملات</span>
+                                <span class="axis-label y-axis">رشد سرمایه ($)</span>
+                            </div>
+                        </div>
+                        
+                        <div class="monthly-trades-container" id="monthlyTradesContainer">
+                            <table class="monthly-trades-table">
+                                <thead>
+                                    <tr>
+                                        <th>تاریخ</th>
+                                        <th>ارز</th>
+                                        <th>نوع</th>
+                                        <th>ورود</th>
+                                        <th>خروج</th>
+                                        <th>سود/ضرر</th>
+                                        <th>وضعیت</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="monthlyTradesBody">
+                                    <tr>
+                                        <td colspan="7" class="no-trades-month">
+                                            <i class="fas fa-chart-line"></i>
+                                            هیچ معامله‌ای در این ماه وجود ندارد
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                    
+                    <!-- بخش آمار و تحلیل کلی (مخفی در ابتدا) -->
+                    <section id="stats-section" class="section">
+                        <h2 class="section-title"><i class="fas fa-chart-bar"></i> آمار عملکرد کلی</h2>
+                        
+                        <!-- کارت‌های آماری -->
+                        <div class="stats-container">
+                            <div class="stat-card">
+                                <div class="stat-icon"><i class="fas fa-exchange-alt"></i></div>
+                                <div class="stat-label">تعداد معاملات</div>
+                                <div class="stat-value neutral-stat" id="totalTrades">0</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon"><i class="fas fa-arrow-up"></i></div>
+                                <div class="stat-label">سود کل</div>
+                                <div class="stat-value positive" id="totalProfit">$0</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon"><i class="fas fa-arrow-down"></i></div>
+                                <div class="stat-label">ضرر کل</div>
+                                <div class="stat-value negative" id="totalLoss">$0</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon"><i class="fas fa-percentage"></i></div>
+                                <div class="stat-label">نرخ موفقیت</div>
+                                <div class="stat-value neutral-stat" id="winRate">0%</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon"><i class="fas fa-receipt"></i></div>
+                                <div class="stat-label">کارمزد کل</div>
+                                <div class="stat-value fee-stat" id="totalFees">$0</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon"><i class="fas fa-trophy"></i></div>
+                                <div class="stat-label">بیشترین سود</div>
+                                <div class="stat-value positive" id="maxProfit">$0</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                                <div class="stat-label">بیشترین ضرر</div>
+                                <div class="stat-value negative" id="maxLoss">$0</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                                <div class="stat-label">معاملات باز</div>
+                                <div class="stat-value neutral-stat" id="openTrades">0</div>
+                            </div>
+                        </div>
+                        
+                        <!-- جدول آمار تفصیلی -->
+                        <div class="detailed-stats-table">
+                            <h3 class="detailed-stats-title"><i class="fas fa-chart-simple"></i> آمار تفصیلی</h3>
+                            <div class="stats-grid">
+                                <div class="stats-row">
+                                    <div class="stats-item">
+                                        <span class="stats-label">موجودی اولیه:</span>
+                                        <span class="stats-value" id="initialBalance">$0</span>
+                                    </div>
+                                    <div class="stats-item">
+                                        <span class="stats-label">موجودی فعلی:</span>
+                                        <span class="stats-value" id="currentBalanceStats">$0</span>
+                                    </div>
+                                    <div class="stats-item">
+                                        <span class="stats-label">سود و ضرر:</span>
+                                        <span class="stats-value" id="totalPnLStats">$0</span>
+                                    </div>
+                                </div>
+                                <div class="stats-row">
+                                    <div class="stats-item">
+                                        <span class="stats-label">درصد سود:</span>
+                                        <span class="stats-value percentage-box" id="profitPercentage">0%</span>
+                                    </div>
+                                    <div class="stats-item">
+                                        <span class="stats-label">سود خالص:</span>
+                                        <span class="stats-value positive-box" id="netProfit">$0</span>
+                                    </div>
+                                    <div class="stats-item">
+                                        <span class="stats-label">ضرر خالص:</span>
+                                        <span class="stats-value negative-box" id="netLoss">$0</span>
+                                    </div>
+                                </div>
+                                <div class="stats-row">
+                                    <div class="stats-item">
+                                        <span class="stats-label">تعداد کل معاملات:</span>
+                                        <span class="stats-value" id="totalTradesStats">0</span>
+                                    </div>
+                                    <div class="stats-item">
+                                        <span class="stats-label">تعداد معاملات لانگ:</span>
+                                        <span class="stats-value" id="longTradesCount">0</span>
+                                    </div>
+                                    <div class="stats-item">
+                                        <span class="stats-label">تعداد معاملات شورت:</span>
+                                        <span class="stats-value" id="shortTradesCount">0</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- نمودار رشد حساب -->
+                        <div class="growth-chart-container">
+                            <h3 class="growth-chart-title"><i class="fas fa-chart-line"></i> رشد حساب کلی</h3>
+                            <canvas id="accountGrowthChart"></canvas>
+                            <div class="chart-axis-labels">
+                                <span class="axis-label x-axis">تعداد معاملات</span>
+                                <span class="axis-label y-axis">رشد سرمایه ($)</span>
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <!-- بخش پشتیبان‌گیری (مخفی در ابتدا) -->
+                    <section id="backup-section" class="section">
+                        <h2 class="section-title"><i class="fas fa-cloud-upload-alt"></i> پشتیبان‌گیری</h2>
+                        <div class="backup-container">
+                            <div class="backup-card">
+                                <div class="backup-header">
+                                    <i class="fas fa-download"></i>
+                                    <h3>دریافت پشتیبان</h3>
+                                </div>
+                                <p class="backup-description">
+                                    از تمام اطلاعات و تصاویر خود یک فایل ZIP پشتیبان بگیرید.
+                                </p>
+                                <button class="btn-backup" onclick="exportData()">
+                                    <i class="fas fa-file-export"></i> دانلود پشتیبان (ZIP)
+                                </button>
+                            </div>
+                            
+                            <div class="backup-card">
+                                <div class="backup-header">
+                                    <i class="fas fa-upload"></i>
+                                    <h3>بارگذاری پشتیبان</h3>
+                                </div>
+                                <p class="backup-description">
+                                    اطلاعات قبلی خود را از فایل ZIP بازیابی کنید.
+                                </p>
+                                <input type="file" id="backupFile" class="file-input" accept=".zip">
+                                <button class="btn-backup" onclick="importData()">
+                                    <i class="fas fa-file-import"></i> بارگذاری پشتیبان (ZIP)
+                                </button>
+                            </div>
+                        </div>
+                    </section>
+                </main>
+            </div>
+        </div>
     </div>
 
     <!-- اسکریپت جدا -->
