@@ -47,49 +47,39 @@ body {
     flex-shrink: 0;
 }
 
-/* ===== لوگوی SVG اختصاصی ===== */
-.custom-logo {
+/* ===== لوگوی Journal Me (بدون دور) ===== */
+.journalme-logo {
     display: flex;
     align-items: center;
-    justify-content: center;
-    margin-left: 15px;
+    gap: 5px;
     cursor: pointer;
-    transition: transform 0.2s ease;
+    transition: all 0.3s ease;
 }
 
-.custom-logo:hover {
-    transform: scale(1.02);
+.journalme-logo:hover {
+    transform: scale(1.05);
 }
 
-.custom-logo svg {
-    display: block;
-    width: auto;
-    height: 45px;
-    overflow: visible;
+.journal-text {
+    font-family: 'Poppins', 'Montserrat', 'Segoe UI', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #60a5fa, #3b82f6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 1px;
+    text-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
 }
 
-/* استایل مخصوص متن‌های SVG */
-.custom-logo svg text {
-    font-family: 'Helvetica', 'Arial', sans-serif !important;
-    font-size: 40px !important;
-    font-weight: normal !important;
-    letter-spacing: 12px !important;
-    fill: url(#greenGrad) !important;
-    stroke: none !important;
-}
-
-/* استایل مخصوص مسیرهای SVG */
-.custom-logo svg path {
-    vector-effect: non-scaling-stroke;
-}
-
-/* استایل قدیمی لوگو رو غیرفعال می‌کنیم (دیگه استفاده نمیشه) */
-.journalme-logo {
-    display: none;
-}
-
-.journal-text, .me-text {
-    display: none;
+.me-text {
+    font-family: 'Poppins', 'Montserrat', 'Segoe UI', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 1px;
+    text-shadow: 0 0 10px rgba(251, 191, 36, 0.3);
 }
 
 .toolbar-menu {
@@ -220,8 +210,8 @@ body {
         flex: 1;
     }
     
-    .custom-logo svg {
-        height: 35px;
+    .journal-text, .me-text {
+        font-size: 1.4rem;
     }
     
     .main-wrapper {
