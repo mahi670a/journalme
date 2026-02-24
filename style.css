@@ -47,39 +47,52 @@ body {
     flex-shrink: 0;
 }
 
-/* ===== لوگوی Journal Me (بدون دور) ===== */
-.journalme-logo {
+/* ===== لوگوی SVG اختصاصی ===== */
+.custom-logo {
     display: flex;
     align-items: center;
-    gap: 5px;
+    justify-content: center;
+    margin-left: 15px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: transform 0.2s ease;
 }
 
-.journalme-logo:hover {
-    transform: scale(1.05);
+.custom-logo:hover {
+    transform: scale(1.02);
 }
 
-.journal-text {
-    font-family: 'Poppins', 'Montserrat', 'Segoe UI', sans-serif;
-    font-size: 1.8rem;
-    font-weight: 700;
-    background: linear-gradient(135deg, #60a5fa, #3b82f6);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    letter-spacing: 1px;
-    text-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+.custom-logo svg {
+    display: block;
+    width: auto;
+    height: 45px;
 }
 
-.me-text {
-    font-family: 'Poppins', 'Montserrat', 'Segoe UI', sans-serif;
-    font-size: 1.8rem;
-    font-weight: 800;
-    background: linear-gradient(135deg, #fbbf24, #f59e0b);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    letter-spacing: 1px;
-    text-shadow: 0 0 10px rgba(251, 191, 36, 0.3);
+/* ریست کردن کامل استایل برای المان‌های SVG */
+.custom-logo svg * {
+    all: revert;
+}
+
+.custom-logo svg text {
+    font-family: 'Helvetica', 'Arial', sans-serif !important;
+    font-size: 40px !important;
+    font-weight: normal !important;
+    letter-spacing: 12px !important;
+    text-transform: none !important;
+    fill: url(#greenGrad) !important;
+    stroke: none !important;
+}
+
+.custom-logo svg path {
+    vector-effect: non-scaling-stroke;
+}
+
+/* استایل قدیمی لوگو رو غیرفعال می‌کنیم (دیگه استفاده نمیشه) */
+.journalme-logo {
+    display: none;
+}
+
+.journal-text, .me-text {
+    display: none;
 }
 
 .toolbar-menu {
@@ -210,8 +223,8 @@ body {
         flex: 1;
     }
     
-    .journal-text, .me-text {
-        font-size: 1.4rem;
+    .custom-logo svg {
+        height: 35px;
     }
     
     .main-wrapper {
