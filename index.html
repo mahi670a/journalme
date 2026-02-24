@@ -258,10 +258,16 @@
         <!-- Toolbar بالا -->
         <div class="toolbar">
             <div class="toolbar-header">
-                <!-- لوگوی SVG اختصاصی با انیمیشن شما -->
+                <!-- لوگوی SVG اصلی شما (کاملاً بدون تغییر) -->
                 <div class="custom-logo">
-                    <svg width="180" height="50" viewBox="0 0 760 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg width="200" height="60" viewBox="0 0 760 300" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <defs>
+                            <!-- Background -->
+                            <radialGradient id="bg" cx="50%" cy="50%" r="80%">
+                                <stop offset="0%" stop-color="#0F172A"/>
+                                <stop offset="100%" stop-color="#02040A"/>
+                            </radialGradient>
+
                             <!-- Neon Green -->
                             <linearGradient id="greenGrad" x1="0" y1="0" x2="0" y2="200">
                                 <stop offset="0%" stop-color="#66FF33">
@@ -292,61 +298,76 @@
                             </filter>
                         </defs>
 
+                        <!-- Background -->
+                        <rect width="760" height="300" rx="40" fill="url(#bg)"/>
+
                         <!-- Animated Market Line -->
-                        <path d="M90 130 L150 80 L200 110 L260 60 L320 100 L380 70"
+                        <path d="M90 190 
+                               L150 130 
+                               L200 160 
+                               L260 100 
+                               L320 150 
+                               L380 110"
                             stroke="url(#greenGrad)"
-                            stroke-width="4"
+                            stroke-width="5"
                             stroke-linecap="round"
                             stroke-linejoin="round"
                             filter="url(#glow)"
-                            stroke-dasharray="400"
-                            stroke-dashoffset="400">
+                            stroke-dasharray="500"
+                            stroke-dashoffset="500">
                             <animate attributeName="stroke-dashoffset"
-                                from="400" to="0"
+                                from="500" to="0"
                                 dur="3s"
                                 repeatCount="indefinite"/>
                         </path>
 
                         <!-- J -->
-                        <path d="M130 50 V130 Q130 150 170 150 Q210 150 210 110"
+                        <path d="M130 90 
+                               V200 
+                               Q130 230 170 230 
+                               Q210 230 210 180"
                             stroke="url(#greenGrad)"
-                            stroke-width="12"
+                            stroke-width="16"
                             stroke-linecap="round"
                             stroke-linejoin="round"
                             filter="url(#glow)">
                             <animate attributeName="stroke-width"
-                                values="12;14;12"
+                                values="16;18;16"
                                 dur="2s"
                                 repeatCount="indefinite"/>
                         </path>
 
                         <!-- M -->
-                        <path d="M420 150 L460 50 L500 110 L540 40 L580 150"
+                        <path d="M420 220 
+                               L460 95 
+                               L500 180 
+                               L540 75 
+                               L580 220"
                             stroke="url(#redGrad)"
-                            stroke-width="12"
+                            stroke-width="16"
                             stroke-linecap="round"
                             stroke-linejoin="round"
                             filter="url(#glow)">
                             <animate attributeName="stroke-width"
-                                values="12;14;12"
+                                values="16;18;16"
                                 dur="2s"
                                 repeatCount="indefinite"/>
                         </path>
 
                         <!-- Brand Text -->
-                        <text x="130" y="180"
+                        <text x="130" y="270"
                             font-family="Helvetica, Arial, sans-serif"
-                            font-size="30"
-                            letter-spacing="8"
+                            font-size="40"
+                            letter-spacing="12"
                             fill="url(#greenGrad)"
                             filter="url(#glow)">
                             JOURNAL
                         </text>
 
-                        <text x="470" y="180"
+                        <text x="470" y="270"
                             font-family="Helvetica, Arial, sans-serif"
-                            font-size="30"
-                            letter-spacing="8"
+                            font-size="40"
+                            letter-spacing="12"
                             fill="url(#redGrad)"
                             filter="url(#glow)">
                             ME
