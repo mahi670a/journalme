@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title> Journal Me</title>
+    <title>JournalMe</title>
 
     <!-- Apple Web App Mode -->
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content=" Journal Me ">
+    <meta name="apple-mobile-web-app-title" content="JournalMe">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
     <!-- Apple Touch Icon -->
@@ -20,7 +20,7 @@
     <!-- Safari theme -->
     <meta name="theme-color" content="#0f172a">
 
-    <!-- Font Awesome 6 -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- کتابخانه Chart.js برای نمودار -->
@@ -31,6 +31,10 @@
     
     <!-- استایل جدا -->
     <link rel="stylesheet" href="style.css">
+    
+    <!-- فونت اختصاصی برای لوگو -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&display=swap" rel="stylesheet">
 </head>
 <body>
     <!-- مودال نمایش تصویر بزرگ -->
@@ -258,17 +262,17 @@
         <!-- Toolbar بالا -->
         <div class="toolbar">
             <div class="toolbar-header">
-                <div class="toolbar-logo">
-                    <!-- گزینه ۱: نمودار خطی (پیشنهادی) -->
-                    <i class="fas fa-chart-line" style="color: #60a5fa; font-size: 1.8rem;"></i>
-                    
-                    <!-- گزینه ۲: آیکون سکه (همون قبلی) - اگه خواستی اینو فعال کن و خط بالا رو غیرفعال -->
-                    <!-- <i class="fas fa-coins" style="color: #fbbf24; font-size: 1.8rem;"></i> -->
-                    
-                    <!-- گزینه ۳: آیکون کتاب/ژورنال -->
-                    <!-- <i class="fas fa-book-open" style="color: #60a5fa; font-size: 1.8rem;"></i> -->
+                <!-- لوگوی جدید JournalMe -->
+                <div class="journalme-logo">
+                    <span class="journal-text">JOURNAL</span>
+                    <span class="me-text">ME</span>
                 </div>
-                <div class="toolbar-title"> Journal Me </div>
+                <!-- آیکون اختیاری (میتونی حذف کنی) -->
+                <!-- <div class="toolbar-logo">
+                    <i class="fas fa-pen-to-square"></i>
+                </div> -->
+                <!-- عنوان قدیمی رو حذف کردیم -->
+                <!-- <div class="toolbar-title">Crypto Journal</div> -->
             </div>
             
             <div class="toolbar-menu">
