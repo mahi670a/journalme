@@ -29,9 +29,6 @@
     <!-- کتابخانه JSZip برای کار با فایل‌های ZIP -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     
-    <!-- فونت‌های گوگل برای لوگو -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;800&display=swap" rel="stylesheet">
-    
     <!-- استایل جدا -->
     <link rel="stylesheet" href="style.css">
 </head>
@@ -261,10 +258,100 @@
         <!-- Toolbar بالا -->
         <div class="toolbar">
             <div class="toolbar-header">
-                <!-- لوگوی Journal Me با ترتیب درست -->
-                <div class="journalme-logo">
-                    <span class="journal-text">Journal</span>
-                    <span class="me-text">Me</span>
+                <!-- لوگوی SVG اختصاصی با انیمیشن شما -->
+                <div class="custom-logo">
+                    <svg width="180" height="50" viewBox="0 0 760 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <!-- Neon Green -->
+                            <linearGradient id="greenGrad" x1="0" y1="0" x2="0" y2="200">
+                                <stop offset="0%" stop-color="#66FF33">
+                                    <animate attributeName="stop-color"
+                                        values="#66FF33;#00FF99;#66FF33"
+                                        dur="4s" repeatCount="indefinite"/>
+                                </stop>
+                                <stop offset="100%" stop-color="#00FF99"/>
+                            </linearGradient>
+
+                            <!-- Neon Red -->
+                            <linearGradient id="redGrad" x1="0" y1="0" x2="0" y2="200">
+                                <stop offset="0%" stop-color="#FF4D4D">
+                                    <animate attributeName="stop-color"
+                                        values="#FF4D4D;#FF0033;#FF4D4D"
+                                        dur="4s" repeatCount="indefinite"/>
+                                </stop>
+                                <stop offset="100%" stop-color="#FF0033"/>
+                            </linearGradient>
+
+                            <!-- Strong Glow -->
+                            <filter id="glow" x="-200%" y="-200%" width="400%" height="400%">
+                                <feGaussianBlur stdDeviation="10" result="blur"/>
+                                <feMerge>
+                                    <feMergeNode in="blur"/>
+                                    <feMergeNode in="SourceGraphic"/>
+                                </feMerge>
+                            </filter>
+                        </defs>
+
+                        <!-- Animated Market Line -->
+                        <path d="M90 130 L150 80 L200 110 L260 60 L320 100 L380 70"
+                            stroke="url(#greenGrad)"
+                            stroke-width="4"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            filter="url(#glow)"
+                            stroke-dasharray="400"
+                            stroke-dashoffset="400">
+                            <animate attributeName="stroke-dashoffset"
+                                from="400" to="0"
+                                dur="3s"
+                                repeatCount="indefinite"/>
+                        </path>
+
+                        <!-- J -->
+                        <path d="M130 50 V130 Q130 150 170 150 Q210 150 210 110"
+                            stroke="url(#greenGrad)"
+                            stroke-width="12"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            filter="url(#glow)">
+                            <animate attributeName="stroke-width"
+                                values="12;14;12"
+                                dur="2s"
+                                repeatCount="indefinite"/>
+                        </path>
+
+                        <!-- M -->
+                        <path d="M420 150 L460 50 L500 110 L540 40 L580 150"
+                            stroke="url(#redGrad)"
+                            stroke-width="12"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            filter="url(#glow)">
+                            <animate attributeName="stroke-width"
+                                values="12;14;12"
+                                dur="2s"
+                                repeatCount="indefinite"/>
+                        </path>
+
+                        <!-- Brand Text -->
+                        <text x="130" y="180"
+                            font-family="Helvetica, Arial, sans-serif"
+                            font-size="30"
+                            letter-spacing="8"
+                            fill="url(#greenGrad)"
+                            filter="url(#glow)">
+                            JOURNAL
+                        </text>
+
+                        <text x="470" y="180"
+                            font-family="Helvetica, Arial, sans-serif"
+                            font-size="30"
+                            letter-spacing="8"
+                            fill="url(#redGrad)"
+                            filter="url(#glow)">
+                            ME
+                        </text>
+                    </svg>
                 </div>
             </div>
             
