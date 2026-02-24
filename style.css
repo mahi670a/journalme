@@ -47,105 +47,39 @@ body {
     flex-shrink: 0;
 }
 
-/* ===== لوگوی JournalMe (برند اصلی) ===== */
+/* ===== لوگوی Journal Me (بدون دور) ===== */
 .journalme-logo {
     display: flex;
     align-items: center;
     gap: 5px;
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(139, 92, 246, 0.2));
-    padding: 8px 18px;
-    border-radius: 50px;
-    border: 2px solid;
-    border-image: linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899) 1;
-    box-shadow: 0 0 20px rgba(59, 130, 246, 0.4), 0 0 40px rgba(139, 92, 246, 0.2);
-    animation: logoGlow 3s ease-in-out infinite;
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
 .journalme-logo:hover {
     transform: scale(1.05);
-    box-shadow: 0 0 30px rgba(59, 130, 246, 0.8), 0 0 60px rgba(139, 92, 246, 0.4);
-    border-image: linear-gradient(135deg, #60a5fa, #a78bfa, #f472b6) 1;
-}
-
-@keyframes logoGlow {
-    0%, 100% {
-        box-shadow: 0 0 20px rgba(59, 130, 246, 0.4), 0 0 40px rgba(139, 92, 246, 0.2);
-    }
-    50% {
-        box-shadow: 0 0 35px rgba(59, 130, 246, 0.8), 0 0 70px rgba(139, 92, 246, 0.5);
-    }
 }
 
 .journal-text {
     font-family: 'Poppins', 'Montserrat', 'Segoe UI', sans-serif;
-    font-size: 1.5rem;
-    font-weight: 800;
-    background: linear-gradient(135deg, #60a5fa, #8b5cf6);
+    font-size: 1.8rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #60a5fa, #3b82f6);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     letter-spacing: 1px;
-    text-shadow: 0 0 10px rgba(96, 165, 250, 0.3);
+    text-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
 }
 
 .me-text {
     font-family: 'Poppins', 'Montserrat', 'Segoe UI', sans-serif;
-    font-size: 1.5rem;
-    font-weight: 900;
-    background: linear-gradient(135deg, #fbbf24, #ec4899);
+    font-size: 1.8rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    letter-spacing: 2px;
+    letter-spacing: 1px;
     text-shadow: 0 0 10px rgba(251, 191, 36, 0.3);
-    position: relative;
-}
-
-.me-text::after {
-    content: '';
-    position: absolute;
-    bottom: -2px;
-    left: 0;
-    width: 100%;
-    height: 3px;
-    background: linear-gradient(90deg, #fbbf24, #ec4899);
-    border-radius: 3px;
-    filter: blur(1px);
-    animation: underlineGlow 2s ease-in-out infinite;
-}
-
-@keyframes underlineGlow {
-    0%, 100% {
-        opacity: 0.5;
-        box-shadow: 0 0 5px #fbbf24, 0 0 10px #ec4899;
-    }
-    50% {
-        opacity: 1;
-        box-shadow: 0 0 15px #fbbf24, 0 0 25px #ec4899;
-    }
-}
-
-/* آیکون لوگو (اختیاری - می‌تونی حذف کنی) */
-.toolbar-logo {
-    width: 45px;
-    height: 45px;
-    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.3rem;
-    color: white;
-    box-shadow: 0 5px 10px rgba(59, 130, 246, 0.3);
-}
-
-.toolbar-title {
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: #60a5fa;
-    background: linear-gradient(90deg, #60a5fa, #a78bfa);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
 }
 
 .toolbar-menu {
@@ -277,11 +211,7 @@ body {
     }
     
     .journal-text, .me-text {
-        font-size: 1.2rem;
-    }
-    
-    .journalme-logo {
-        padding: 6px 12px;
+        font-size: 1.4rem;
     }
     
     .main-wrapper {
