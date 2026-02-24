@@ -65,23 +65,20 @@ body {
     display: block;
     width: auto;
     height: 45px;
+    overflow: visible;
 }
 
-/* ریست کردن کامل استایل برای المان‌های SVG */
-.custom-logo svg * {
-    all: revert;
-}
-
+/* استایل مخصوص متن‌های SVG */
 .custom-logo svg text {
     font-family: 'Helvetica', 'Arial', sans-serif !important;
     font-size: 40px !important;
     font-weight: normal !important;
     letter-spacing: 12px !important;
-    text-transform: none !important;
     fill: url(#greenGrad) !important;
     stroke: none !important;
 }
 
+/* استایل مخصوص مسیرهای SVG */
 .custom-logo svg path {
     vector-effect: non-scaling-stroke;
 }
