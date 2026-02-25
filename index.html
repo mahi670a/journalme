@@ -258,15 +258,10 @@
         <!-- Toolbar بالا -->
         <div class="toolbar" style="padding: 0 40px;">
             <div class="toolbar-header" style="min-width: 220px;">
-                <!-- لوگوی SVG جدید با سایز 180x50 -->
+                <!-- لوگوی SVG جدید با پس‌زمینه شفاف -->
                 <div class="custom-logo" style="margin-left: 15px;">
                     <svg width="240" height="70" viewBox="0 0 760 300" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMid meet">
                         <defs>
-                            <radialGradient id="bg" cx="50%" cy="50%" r="80%">
-                                <stop offset="0%" stop-color="#0F172A"/>
-                                <stop offset="100%" stop-color="#02040A"/>
-                            </radialGradient>
-
                             <linearGradient id="greenGrad" x1="0" y1="0" x2="0" y2="200">
                                 <stop offset="0%" stop-color="#66FF33">
                                     <animate attributeName="stop-color"
@@ -294,7 +289,7 @@
                             </filter>
                         </defs>
 
-                        <rect width="760" height="300" rx="40" fill="url(#bg)"/>
+                        <!-- بدون rect پس‌زمینه - کاملاً شفاف -->
 
                         <path d="M90 190 
                                  L150 130 
