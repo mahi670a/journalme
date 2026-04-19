@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-title" content="Crypto Journal">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-    <!-- Apple Touch Icon (اصلی و مهم) -->
+    <!-- Apple Touch Icon -->
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
 
     <!-- Safari macOS favicon -->
@@ -30,7 +30,6 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
-        /* بدنه اصلی */
         body {
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             color: #f1f5f9;
@@ -42,7 +41,6 @@
             padding: 20px;
         }
         
-        /* کانتینر اصلی */
         .container {
             width: 1100px;
             background-color: rgba(30, 41, 59, 0.95);
@@ -52,7 +50,6 @@
             border: 1px solid #334155;
         }
         
-        /* هدر */
         header {
             text-align: center;
             margin-bottom: 30px;
@@ -90,13 +87,11 @@
             font-size: 0.9rem;
         }
         
-        /* محتوای اصلی */
         .main-content {
             display: flex;
             gap: 30px;
         }
         
-        /* بخش ورودی‌ها */
         .inputs-section {
             flex: 1.2;
             background: rgba(15, 23, 42, 0.5);
@@ -105,7 +100,6 @@
             border: 1px solid #475569;
         }
         
-        /* بخش نتایج */
         .results-section {
             flex: 0.9;
             background: rgba(15, 23, 42, 0.5);
@@ -127,7 +121,6 @@
             gap: 10px;
         }
         
-        /* فرم ورودی */
         .input-group {
             margin-bottom: 20px;
         }
@@ -167,7 +160,6 @@
             text-align: right;
         }
         
-        /* ردیف دو ستونی */
         .row {
             display: flex;
             gap: 15px;
@@ -179,7 +171,6 @@
             margin-bottom: 0;
         }
         
-        /* دکمه‌های ریسک */
         .risk-buttons {
             display: flex;
             gap: 8px;
@@ -206,7 +197,6 @@
             transform: translateY(-2px);
         }
         
-        /* دکمه‌های عملیات */
         .action-buttons {
             display: flex;
             gap: 10px;
@@ -262,7 +252,6 @@
             box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
         }
         
-        /* کارت نتایج */
         .result-card {
             background: linear-gradient(145deg, #1e293b, #0f172a);
             border-radius: 12px;
@@ -304,7 +293,6 @@
             letter-spacing: 0.5px;
         }
         
-        /* رنگ‌های مختلف برای نتایج */
         .profit {
             color: #10b981;
             border: 1px solid rgba(16, 185, 129, 0.3);
@@ -315,7 +303,6 @@
             border: 1px solid rgba(239, 68, 68, 0.3);
         }
         
-        /* رنگ آبی الکتریک برای مارجین */
         .margin-blue {
             color: #38bdf8;
             border: 1px solid rgba(56, 189, 248, 0.3);
@@ -323,7 +310,6 @@
             background: rgba(56, 189, 248, 0.05);
         }
         
-        /* رنگ بنفش برای حجم معامله */
         .quantity-purple {
             color: #c084fc;
             border: 1px solid rgba(192, 132, 252, 0.3);
@@ -331,7 +317,6 @@
             background: rgba(192, 132, 252, 0.05);
         }
         
-        /* انیمیشن تغییر اعداد */
         @keyframes fadeChange {
             0% { opacity: 0.5; transform: scale(0.95); }
             50% { opacity: 1; transform: scale(1.05); }
@@ -342,7 +327,6 @@
             animation: fadeChange 0.3s ease;
         }
         
-        /* Glow پویا */
         .glow-profit {
             box-shadow: 0 0 15px #10b981;
         }
@@ -359,12 +343,10 @@
             box-shadow: 0 0 15px #c084fc;
         }
         
-        /* آیکون‌ها */
         .icon {
             font-size: 1.1rem;
         }
         
-        /* فوتر */
         footer {
             text-align: center;
             margin-top: 30px;
@@ -374,7 +356,6 @@
             font-size: 0.85rem;
         }
         
-        /* دکمه برگشت به ژورنال */
         .back-link {
             display: inline-flex;
             align-items: center;
@@ -406,7 +387,6 @@
         </header>
         
         <div class="main-content">
-            <!-- بخش ورودی‌ها -->
             <div class="inputs-section">
                 <h2 class="section-title">
                     <i class="fas fa-sliders-h"></i>
@@ -418,7 +398,7 @@
                         <i class="fas fa-wallet"></i>
                         موجودی حساب ($)
                     </label>
-                    <input type="number" id="capital" value="2000" step="0.01" min="0">
+                    <input type="number" id="capital" value="2000" step="0.01" min="0" inputmode="decimal">
                 </div>
                 
                 <div class="input-group">
@@ -437,7 +417,7 @@
                             <i class="fas fa-microchip"></i> 1%
                         </button>
                     </div>
-                    <input type="number" id="risk" value="10" step="0.01" min="0" style="margin-top: 10px;">
+                    <input type="number" id="risk" value="10" step="0.01" min="0" style="margin-top: 10px;" inputmode="decimal">
                 </div>
                 
                 <div class="row">
@@ -446,7 +426,7 @@
                             <i class="fas fa-shield-alt"></i>
                             حد ضرر (%)
                         </label>
-                        <input type="number" id="stop" value="0.25" step="0.01" min="0">
+                        <input type="number" id="stop" value="0.25" step="0.01" min="0" inputmode="decimal">
                     </div>
                     
                     <div class="input-group">
@@ -454,7 +434,7 @@
                             <i class="fas fa-sign-in-alt"></i>
                             قیمت ورود ($)
                         </label>
-                        <input type="number" id="entry" value="1000" step="0.01" min="0">
+                        <input type="number" id="entry" value="1000" step="0.01" min="0" inputmode="decimal">
                     </div>
                 </div>
                 
@@ -462,9 +442,9 @@
                     <div class="input-group">
                         <label>
                             <i class="fas fa-receipt"></i>
-                            کارمزد (%)
+                            مجموع کارمزد (%)
                         </label>
-                        <input type="number" id="fee" value="0.04" step="0.001" min="0">
+                        <input type="number" id="fee" value="0.04" step="0.001" min="0" inputmode="decimal">
                     </div>
                     
                     <div class="input-group">
@@ -472,7 +452,7 @@
                             <i class="fas fa-chart-line"></i>
                             نسبت ریسک به ریوارد
                         </label>
-                        <input type="number" id="rr" value="3" step="0.1" min="0">
+                        <input type="number" id="rr" value="3" step="0.1" min="0" inputmode="decimal">
                     </div>
                 </div>
                 
@@ -481,7 +461,7 @@
                         <i class="fas fa-layer-group"></i>
                         اهرم (Leverage)
                     </label>
-                    <input type="number" id="leverage" value="5" step="1" min="1">
+                    <input type="number" id="leverage" value="5" step="1" min="1" inputmode="decimal">
                 </div>
                 
                 <div class="action-buttons">
@@ -496,7 +476,6 @@
                 </div>
             </div>
             
-            <!-- بخش نتایج -->
             <div class="results-section">
                 <h2 class="section-title">
                     <i class="fas fa-chart-pie"></i>
@@ -541,11 +520,10 @@
                     </div>
                 </div>
                 
-                <!-- اطلاعات اضافی -->
                 <div style="margin-top: 20px; padding: 15px; background: rgba(16, 185, 129, 0.1); border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.2);">
                     <p style="display: flex; align-items: center; gap: 10px; color: #94a3b8; font-size: 0.9rem;">
                         <i class="fas fa-info-circle" style="color: #3b82f6;"></i>
-                        محاسبات با در نظر گرفتن کارمزد ورود و خروج انجام شده است
+                        مجموع کارمزد = کارمزد ورود + کارمزد خروج
                     </p>
                 </div>
             </div>
@@ -557,28 +535,73 @@
     </div>
 
     <script>
-        // بارگذاری اولیه
+        // تابع برای بردن کرسر به انتهای متن
+        function moveCursorToEnd(element) {
+            // فقط اگه فوکوس روی اون عنصر باشه و مقدار داشته باشه
+            if (element && element.value) {
+                // ذخیره مقدار فعلی
+                const value = element.value;
+                // موقتاً مقدار رو عوض کن تا کرسر بره آخر
+                element.value = '';
+                element.value = value;
+            }
+        }
+        
+        function fixDecimalInput(value) {
+            if (value === '') return '';
+            if (value.startsWith('.')) {
+                return '0' + value;
+            }
+            return value;
+        }
+        
         document.addEventListener('DOMContentLoaded', function() {
-            // بازیابی مقادیر ذخیره شده
             const fields = ['capital', 'risk', 'fee', 'stop', 'entry', 'rr', 'leverage'];
+            
             fields.forEach(id => {
+                const element = document.getElementById(id);
                 const saved = localStorage.getItem('calc_' + id);
+                
                 if (saved !== null) {
-                    document.getElementById(id).value = saved;
+                    element.value = saved;
                 }
                 
-                // ذخیره سازی خودکار هنگام تغییر
-                document.getElementById(id).addEventListener('input', function(e) {
+                // وقتی کاربر کلیک کرد، کرسر بره آخر متن
+                element.addEventListener('click', function(e) {
+                    moveCursorToEnd(this);
+                });
+                
+                // برای تاچ روی iPad هم کار کنه
+                element.addEventListener('touchstart', function(e) {
+                    // یه تاخیر کوچیک بدیم تا فوکوس کامل بشه
+                    setTimeout(() => {
+                        moveCursorToEnd(this);
+                    }, 10);
+                });
+                
+                element.addEventListener('input', function(e) {
+                    let newValue = fixDecimalInput(e.target.value);
+                    if (newValue !== e.target.value) {
+                        e.target.value = newValue;
+                    }
                     localStorage.setItem('calc_' + id, e.target.value);
                     calculate();
                 });
+                
+                element.addEventListener('blur', function(e) {
+                    let val = e.target.value;
+                    if (val !== '' && !isNaN(val) && val !== '-') {
+                        let num = parseFloat(val);
+                        if (!isNaN(num)) {
+                            e.target.value = num.toString();
+                        }
+                    }
+                });
             });
             
-            // محاسبه اولیه
             calculate();
         });
         
-        // تنظیم درصد ریسک
         function setRiskPercent(percent) {
             const capital = parseFloat(document.getElementById('capital').value) || 0;
             const riskDollar = (capital * percent / 100).toFixed(2);
@@ -587,9 +610,7 @@
             calculate();
         }
         
-        // محاسبه اصلی
         function calculate() {
-            // دریافت مقادیر
             const risk_total = parseFloat(document.getElementById('risk').value) || 0;
             const stopPercent = parseFloat(document.getElementById('stop').value) || 0;
             const feePercent = parseFloat(document.getElementById('fee').value) || 0;
@@ -597,7 +618,6 @@
             const leverage = parseFloat(document.getElementById('leverage').value) || 1;
             const entry = parseFloat(document.getElementById('entry').value) || 0;
             
-            // تبدیل درصدها به اعشار
             const stop = stopPercent / 100;
             const fee = feePercent / 100;
             
@@ -609,25 +629,18 @@
                 return;
             }
             
-            // محاسبات
             const position = risk_total / (stop + fee);
             const margin = position / leverage;
             const loss = (position * stop) + (position * fee);
             const win = (position * stop * rr) - (position * fee);
             const quantity = position / entry;
             
-            // نمایش نتایج
             updateValue('margin-value', '$' + margin.toFixed(2), 'margin-blue', 'glow-blue');
             updateValue('quantity-value', quantity.toFixed(6), 'quantity-purple', 'glow-purple');
-            
-            // ضرر با انیمیشن قرمز
             updateLossValue('$' + loss.toFixed(2));
-            
-            // سود با انیمیشن سبز
             updateProfitValue('$' + win.toFixed(2));
         }
         
-        // تابع مخصوص به‌روزرسانی ضرر
         function updateLossValue(value) {
             const lossEl = document.getElementById('loss-value');
             const lossText = '<i class="fas fa-times-circle"></i> ' + value;
@@ -638,7 +651,6 @@
             }
         }
         
-        // تابع مخصوص به‌روزرسانی سود
         function updateProfitValue(value) {
             const profitEl = document.getElementById('profit-value');
             const profitText = '<i class="fas fa-check-circle"></i> ' + value;
@@ -649,7 +661,6 @@
             }
         }
         
-        // به‌روزرسانی مقادیر
         function updateValue(id, value, className, glowClass) {
             const el = document.getElementById(id);
             if (el.textContent !== value) {
@@ -662,9 +673,7 @@
             }
         }
         
-        // ریست کردن همه مقادیر
         function resetAll() {
-            // تنظیم مقادیر پیش‌فرض
             document.getElementById('capital').value = '2000';
             document.getElementById('risk').value = '10';
             document.getElementById('fee').value = '0.04';
@@ -673,30 +682,23 @@
             document.getElementById('rr').value = '3';
             document.getElementById('leverage').value = '5';
             
-            // پاک کردن localStorage
             const fields = ['capital', 'risk', 'fee', 'stop', 'entry', 'rr', 'leverage'];
             fields.forEach(id => {
                 localStorage.removeItem('calc_' + id);
             });
             
-            // ذخیره مقادیر جدید
             fields.forEach(id => {
                 localStorage.setItem('calc_' + id, document.getElementById(id).value);
             });
             
-            // محاسبه مجدد
             calculate();
-            
-            // نمایش پیام
             showNotification('مقادیر به حالت پیش‌فرض بازگشتند', 'success');
         }
         
-        // تابع بازگشت به ژورنال
         function goToJournal() {
             window.location.href = '../index.html';
         }
         
-        // نمایش اعلان
         function showNotification(message, type = 'info') {
             const notification = document.createElement('div');
             notification.textContent = message;
@@ -737,7 +739,6 @@
             }, 3000);
         }
         
-        // محاسبه مجدد هنگام تغییر هر ورودی
         window.addEventListener('load', function() {
             const inputs = document.querySelectorAll('input');
             inputs.forEach(input => {
