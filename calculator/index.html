@@ -42,7 +42,7 @@
         }
         
         .container {
-            width: 1100px;
+            width: 1150px;
             background-color: rgba(30, 41, 59, 0.95);
             border-radius: 16px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
@@ -90,6 +90,7 @@
         .main-content {
             display: flex;
             gap: 30px;
+            flex-wrap: wrap;
         }
         
         .inputs-section {
@@ -135,7 +136,7 @@
             font-size: 0.9rem;
         }
         
-        input {
+        input, select {
             width: 100%;
             padding: 12px;
             background-color: #1e293b;
@@ -147,7 +148,15 @@
             height: 44px;
         }
         
-        input:focus {
+        select {
+            cursor: pointer;
+        }
+        
+        select option {
+            background-color: #1e293b;
+        }
+        
+        input:focus, select:focus {
             outline: none;
             border-color: #3b82f6;
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
@@ -195,6 +204,12 @@
             background: rgba(59, 130, 246, 0.3);
             border-color: #3b82f6;
             transform: translateY(-2px);
+        }
+        
+        .risk-btn-active {
+            background: rgba(59, 130, 246, 0.5);
+            border-color: #3b82f6;
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
         }
         
         .action-buttons {
@@ -317,6 +332,12 @@
             background: rgba(192, 132, 252, 0.05);
         }
         
+        .fee-yellow {
+            color: #fbbf24;
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            background: rgba(251, 191, 36, 0.05);
+        }
+        
         @keyframes fadeChange {
             0% { opacity: 0.5; transform: scale(0.95); }
             50% { opacity: 1; transform: scale(1.05); }
@@ -343,8 +364,13 @@
             box-shadow: 0 0 15px #c084fc;
         }
         
-        .icon {
-            font-size: 1.1rem;
+        .badge {
+            display: inline-block;
+            background: rgba(59, 130, 246, 0.2);
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            margin-left: 8px;
         }
         
         footer {
@@ -355,25 +381,6 @@
             color: #94a3b8;
             font-size: 0.85rem;
         }
-        
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            color: #94a3b8;
-            text-decoration: none;
-            font-size: 0.9rem;
-            transition: color 0.2s;
-            margin-bottom: 20px;
-        }
-        
-        .back-link:hover {
-            color: #60a5fa;
-        }
-        
-        .back-link i {
-            font-size: 1rem;
-        }
     </style>
 </head>
 <body>
@@ -383,7 +390,7 @@
                 <i class="fas fa-calculator"></i>
                 Crypto Calculator
             </h1>
-            <p class="subtitle">محاسبه گر ریسک و حجم معامله</p>
+            <p class="subtitle">محاسبه گر ریسک و حجم معامله | تفکیک کارمزد ورود و خروج</p>
         </header>
         
         <div class="main-content">
@@ -404,20 +411,21 @@
                 <div class="input-group">
                     <label>
                         <i class="fas fa-percentage"></i>
-                        ریسک (دلار)
+                        ریسک (درصد از کل سرمایه)
                     </label>
                     <div class="risk-buttons">
-                        <button class="risk-btn" onclick="setRiskPercent(0.25)">
+                        <button class="risk-btn" data-risk="0.25" onclick="setRiskPercent(0.25)">
                             <i class="fas fa-microchip"></i> 0.25%
                         </button>
-                        <button class="risk-btn" onclick="setRiskPercent(0.5)">
+                        <button class="risk-btn" data-risk="0.5" onclick="setRiskPercent(0.5)">
                             <i class="fas fa-microchip"></i> 0.5%
                         </button>
-                        <button class="risk-btn" onclick="setRiskPercent(1)">
+                        <button class="risk-btn" data-risk="1" onclick="setRiskPercent(1)">
                             <i class="fas fa-microchip"></i> 1%
                         </button>
                     </div>
-                    <input type="number" id="risk" value="10" step="0.01" min="0" style="margin-top: 10px;" inputmode="decimal">
+                    <input type="number" id="riskPercent" value="0.5" step="0.1" min="0" style="margin-top: 10px;" inputmode="decimal">
+                    <small style="color:#94a3b8; display:block; margin-top:5px;">⚠️ ضرر کل (با احتساب کارمزد) دقیقاً همین درصد از سرمایه خواهد بود</small>
                 </div>
                 
                 <div class="row">
@@ -441,27 +449,69 @@
                 <div class="row">
                     <div class="input-group">
                         <label>
-                            <i class="fas fa-receipt"></i>
-                            مجموع کارمزد (%)
-                        </label>
-                        <input type="number" id="fee" value="0.04" step="0.001" min="0" inputmode="decimal">
-                    </div>
-                    
-                    <div class="input-group">
-                        <label>
                             <i class="fas fa-chart-line"></i>
                             نسبت ریسک به ریوارد
                         </label>
                         <input type="number" id="rr" value="3" step="0.1" min="0" inputmode="decimal">
                     </div>
+                    
+                    <div class="input-group">
+                        <label>
+                            <i class="fas fa-layer-group"></i>
+                            اهرم (Leverage)
+                        </label>
+                        <input type="number" id="leverage" value="5" step="1" min="1" inputmode="decimal">
+                    </div>
                 </div>
                 
-                <div class="input-group">
-                    <label>
-                        <i class="fas fa-layer-group"></i>
-                        اهرم (Leverage)
-                    </label>
-                    <input type="number" id="leverage" value="5" step="1" min="1" inputmode="decimal">
+                <div class="row">
+                    <div class="input-group">
+                        <label>
+                            <i class="fas fa-crown"></i>
+                            سطح VIP (Bitunix)
+                        </label>
+                        <select id="vipLevel">
+                            <option value="vip0">VIP 0</option>
+                            <option value="vip1">VIP 1</option>
+                            <option value="vip2">VIP 2</option>
+                            <option value="vip3">VIP 3</option>
+                            <option value="vip4">VIP 4</option>
+                            <option value="vip5">VIP 5</option>
+                            <option value="vip6">VIP 6</option>
+                            <option value="vip7">VIP 7</option>
+                        </select>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>
+                            <i class="fas fa-arrow-right"></i>
+                            نوع سفارش ورود
+                        </label>
+                        <select id="entryOrderType">
+                            <option value="maker" selected>میکر (Limit) - کارمزد کم</option>
+                            <option value="taker">تیکر (Market) - کارمزد زیاد</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="input-group">
+                        <label>
+                            <i class="fas fa-arrow-left"></i>
+                            نوع سفارش خروج
+                        </label>
+                        <select id="exitOrderType">
+                            <option value="maker">میکر (Limit) - حد سود لیمیت</option>
+                            <option value="taker" selected>تیکر (Market) - حد ضرر مارکت</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>
+                            <i class="fas fa-info-circle"></i>
+                            <span id="exitHint" style="color:#fbbf24; font-size:0.75rem;">⚠️ حد ضرر معمولاً تیکر است</span>
+                        </label>
+                        <div style="height:44px;"></div>
+                    </div>
                 </div>
                 
                 <div class="action-buttons">
@@ -501,8 +551,36 @@
                     
                     <div class="result-item">
                         <span class="result-label">
+                            <i class="fas fa-sign-in-alt" style="color: #fbbf24;"></i>
+                            کارمزد ورود (Entry Fee)
+                            <span class="badge" id="entryFeeBadge">میکر 0.02%</span>
+                        </span>
+                        <span class="result-value fee-yellow" id="entry-fee">$0.00</span>
+                    </div>
+                    
+                    <div class="result-item">
+                        <span class="result-label">
+                            <i class="fas fa-sign-out-alt" style="color: #fbbf24;"></i>
+                            کارمزد خروج (Exit Fee)
+                            <span class="badge" id="exitFeeBadge">تیکر 0.06%</span>
+                        </span>
+                        <span class="result-value fee-yellow" id="exit-fee">$0.00</span>
+                    </div>
+                    
+                    <div class="result-item">
+                        <span class="result-label">
                             <i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i>
-                            ضرر واقعی
+                            ضرر ناخالص (بدون کارمزد)
+                        </span>
+                        <span class="result-value loss" id="gross-loss">
+                            <i class="fas fa-chart-line"></i> $0.00
+                        </span>
+                    </div>
+                    
+                    <div class="result-item">
+                        <span class="result-label">
+                            <i class="fas fa-times-circle" style="color: #ef4444;"></i>
+                            ضرر واقعی (با کارمزد)
                         </span>
                         <span class="result-value loss" id="loss-value">
                             <i class="fas fa-times-circle"></i> $0.00
@@ -512,7 +590,7 @@
                     <div class="result-item">
                         <span class="result-label">
                             <i class="fas fa-trophy" style="color: #10b981;"></i>
-                            سود واقعی
+                            سود واقعی (با کارمزد)
                         </span>
                         <span class="result-value profit" id="profit-value">
                             <i class="fas fa-check-circle"></i> $0.00
@@ -520,28 +598,77 @@
                     </div>
                 </div>
                 
-                <div style="margin-top: 20px; padding: 15px; background: rgba(16, 185, 129, 0.1); border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.2);">
-                    <p style="display: flex; align-items: center; gap: 10px; color: #94a3b8; font-size: 0.9rem;">
+                <div style="margin-top: 20px; padding: 15px; background: rgba(59, 130, 246, 0.1); border-radius: 8px; border: 1px solid rgba(59, 130, 246, 0.2);">
+                    <p style="display: flex; align-items: center; gap: 10px; color: #94a3b8; font-size: 0.85rem;">
                         <i class="fas fa-info-circle" style="color: #3b82f6;"></i>
                         مجموع کارمزد = کارمزد ورود + کارمزد خروج
+                    </p>
+                    <p style="display: flex; align-items: center; gap: 10px; color: #10b981; font-size: 0.85rem; margin-top: 8px;">
+                        <i class="fas fa-check-circle" style="color: #10b981;"></i>
+                        ✅ ضرر واقعی شما دقیقاً برابر (سرمایه × درصد ریسک) خواهد بود
                     </p>
                 </div>
             </div>
         </div>
         
         <footer>
-            <p>R-NIKER | Crypto Risk Management Calculator</p>
+            <p>R-NIKER | Crypto Risk Management Calculator | تفکیک کارمزد ورود (لیمیت) و خروج (مارکت)</p>
         </footer>
     </div>
 
     <script>
-        // تابع برای بردن کرسر به انتهای متن
+        // دریافت کارمزد بر اساس سطح VIP و نوع سفارش (Bitunix Futures)
+        function getFeeRate(vipLevel, orderType) {
+            const feeRates = {
+                'vip0': { maker: 0.0002, taker: 0.0006 },
+                'vip1': { maker: 0.0002, taker: 0.0005 },
+                'vip2': { maker: 0.00016, taker: 0.0005 },
+                'vip3': { maker: 0.00014, taker: 0.0004 },
+                'vip4': { maker: 0.00012, taker: 0.000375 },
+                'vip5': { maker: 0.0001, taker: 0.00035 },
+                'vip6': { maker: 0.00008, taker: 0.000315 },
+                'vip7': { maker: 0.00006, taker: 0.0003 }
+            };
+            
+            const rates = feeRates[vipLevel] || feeRates['vip0'];
+            return orderType === 'maker' ? rates.maker : rates.taker;
+        }
+        
+        function getFeePercentDisplay(vipLevel, orderType) {
+            const rate = getFeeRate(vipLevel, orderType) * 100;
+            return rate.toFixed(3) + '%';
+        }
+        
+        function updateRiskButtonsActive(percent) {
+            const buttons = document.querySelectorAll('.risk-btn');
+            buttons.forEach(btn => {
+                const btnRisk = parseFloat(btn.getAttribute('data-risk'));
+                if (Math.abs(btnRisk - percent) < 0.01) {
+                    btn.classList.add('risk-btn-active');
+                } else {
+                    btn.classList.remove('risk-btn-active');
+                }
+            });
+        }
+        
+        function updateBadges() {
+            const vipLevel = document.getElementById('vipLevel').value;
+            const entryType = document.getElementById('entryOrderType').value;
+            const exitType = document.getElementById('exitOrderType').value;
+            
+            const entryFeePercent = getFeePercentDisplay(vipLevel, entryType);
+            const exitFeePercent = getFeePercentDisplay(vipLevel, exitType);
+            
+            const entryBadge = document.getElementById('entryFeeBadge');
+            const exitBadge = document.getElementById('exitFeeBadge');
+            
+            entryBadge.innerHTML = (entryType === 'maker' ? 'میکر' : 'تیکر') + ' ' + entryFeePercent;
+            exitBadge.innerHTML = (exitType === 'maker' ? 'میکر' : 'تیکر') + ' ' + exitFeePercent;
+        }
+        
         function moveCursorToEnd(element) {
-            // فقط اگه فوکوس روی اون عنصر باشه و مقدار داشته باشه
             if (element && element.value) {
-                // ذخیره مقدار فعلی
                 const value = element.value;
-                // موقتاً مقدار رو عوض کن تا کرسر بره آخر
                 element.value = '';
                 element.value = value;
             }
@@ -556,89 +683,148 @@
         }
         
         document.addEventListener('DOMContentLoaded', function() {
-            const fields = ['capital', 'risk', 'fee', 'stop', 'entry', 'rr', 'leverage'];
+            const fields = ['capital', 'riskPercent', 'stop', 'entry', 'rr', 'leverage', 'vipLevel', 'entryOrderType', 'exitOrderType'];
             
             fields.forEach(id => {
                 const element = document.getElementById(id);
                 const saved = localStorage.getItem('calc_' + id);
                 
-                if (saved !== null) {
+                if (saved !== null && element.tagName !== 'SELECT') {
+                    element.value = saved;
+                } else if (saved !== null && element.tagName === 'SELECT') {
                     element.value = saved;
                 }
                 
-                // وقتی کاربر کلیک کرد، کرسر بره آخر متن
-                element.addEventListener('click', function(e) {
-                    moveCursorToEnd(this);
-                });
-                
-                // برای تاچ روی iPad هم کار کنه
-                element.addEventListener('touchstart', function(e) {
-                    // یه تاخیر کوچیک بدیم تا فوکوس کامل بشه
-                    setTimeout(() => {
+                if (element.tagName !== 'SELECT') {
+                    element.addEventListener('click', function(e) {
                         moveCursorToEnd(this);
-                    }, 10);
-                });
+                    });
+                    
+                    element.addEventListener('touchstart', function(e) {
+                        setTimeout(() => {
+                            moveCursorToEnd(this);
+                        }, 10);
+                    });
+                }
                 
                 element.addEventListener('input', function(e) {
-                    let newValue = fixDecimalInput(e.target.value);
-                    if (newValue !== e.target.value) {
-                        e.target.value = newValue;
+                    if (element.tagName !== 'SELECT') {
+                        let newValue = fixDecimalInput(e.target.value);
+                        if (newValue !== e.target.value) {
+                            e.target.value = newValue;
+                        }
+                        localStorage.setItem('calc_' + id, e.target.value);
+                    } else {
+                        localStorage.setItem('calc_' + id, e.target.value);
                     }
-                    localStorage.setItem('calc_' + id, e.target.value);
+                    updateBadges();
+                    calculate();
+                });
+                
+                element.addEventListener('change', function(e) {
+                    if (element.tagName === 'SELECT') {
+                        localStorage.setItem('calc_' + id, e.target.value);
+                    }
+                    updateBadges();
                     calculate();
                 });
                 
                 element.addEventListener('blur', function(e) {
-                    let val = e.target.value;
-                    if (val !== '' && !isNaN(val) && val !== '-') {
-                        let num = parseFloat(val);
-                        if (!isNaN(num)) {
-                            e.target.value = num.toString();
+                    if (element.tagName !== 'SELECT') {
+                        let val = e.target.value;
+                        if (val !== '' && !isNaN(val) && val !== '-') {
+                            let num = parseFloat(val);
+                            if (!isNaN(num)) {
+                                e.target.value = num.toString();
+                            }
                         }
                     }
                 });
             });
             
+            const riskPercentInput = document.getElementById('riskPercent');
+            if (riskPercentInput) {
+                riskPercentInput.addEventListener('input', function() {
+                    const val = parseFloat(this.value) || 0;
+                    updateRiskButtonsActive(val);
+                });
+            }
+            
+            updateBadges();
             calculate();
         });
         
         function setRiskPercent(percent) {
-            const capital = parseFloat(document.getElementById('capital').value) || 0;
-            const riskDollar = (capital * percent / 100).toFixed(2);
-            document.getElementById('risk').value = riskDollar;
-            localStorage.setItem('calc_risk', riskDollar);
+            document.getElementById('riskPercent').value = percent;
+            localStorage.setItem('calc_riskPercent', percent);
+            updateRiskButtonsActive(percent);
             calculate();
         }
         
         function calculate() {
-            const risk_total = parseFloat(document.getElementById('risk').value) || 0;
+            const capital = parseFloat(document.getElementById('capital').value) || 0;
+            const riskPercent = parseFloat(document.getElementById('riskPercent').value) || 0;
             const stopPercent = parseFloat(document.getElementById('stop').value) || 0;
-            const feePercent = parseFloat(document.getElementById('fee').value) || 0;
             const rr = parseFloat(document.getElementById('rr').value) || 0;
             const leverage = parseFloat(document.getElementById('leverage').value) || 1;
             const entry = parseFloat(document.getElementById('entry').value) || 0;
+            const vipLevel = document.getElementById('vipLevel').value;
+            const entryOrderType = document.getElementById('entryOrderType').value;
+            const exitOrderType = document.getElementById('exitOrderType').value;
             
             const stop = stopPercent / 100;
-            const fee = feePercent / 100;
+            const entryFee = getFeeRate(vipLevel, entryOrderType);
+            const exitFee = getFeeRate(vipLevel, exitOrderType);
+            const totalFees = entryFee + exitFee;
             
-            if (risk_total <= 0 || stop <= 0 || entry <= 0) {
+            if (capital <= 0 || riskPercent <= 0 || stop <= 0 || entry <= 0) {
                 updateValue('margin-value', '$0.00', 'margin-blue', 'glow-blue');
                 updateValue('quantity-value', '0.000000', 'quantity-purple', 'glow-purple');
+                updateElementText('entry-fee', '$0.00');
+                updateElementText('exit-fee', '$0.00');
+                updateElementText('gross-loss', '$0.00');
                 updateLossValue('$0.00');
                 updateProfitValue('$0.00');
                 return;
             }
             
-            const position = risk_total / (stop + fee);
+            // ریسک کل به دلار
+            const riskAmount = capital * (riskPercent / 100);
+            
+            // محاسبه حجم معامله: riskAmount = position × stop + position × (entryFee + exitFee)
+            // position = riskAmount / (stop + entryFee + exitFee)
+            const position = riskAmount / (stop + totalFees);
             const margin = position / leverage;
-            const loss = (position * stop) + (position * fee);
-            const win = (position * stop * rr) - (position * fee);
+            const entryFeeAmount = position * entryFee;
+            const exitFeeAmount = position * exitFee;
+            const grossLoss = position * stop;
+            const totalLoss = grossLoss + entryFeeAmount + exitFeeAmount;
+            const grossProfit = position * stop * rr;
+            const netProfit = grossProfit - (entryFeeAmount + exitFeeAmount);
             const quantity = position / entry;
             
             updateValue('margin-value', '$' + margin.toFixed(2), 'margin-blue', 'glow-blue');
             updateValue('quantity-value', quantity.toFixed(6), 'quantity-purple', 'glow-purple');
-            updateLossValue('$' + loss.toFixed(2));
-            updateProfitValue('$' + win.toFixed(2));
+            updateElementText('entry-fee', '$' + entryFeeAmount.toFixed(2));
+            updateElementText('exit-fee', '$' + exitFeeAmount.toFixed(2));
+            updateElementText('gross-loss', '$' + grossLoss.toFixed(2));
+            updateLossValue('$' + totalLoss.toFixed(2));
+            updateProfitValue('$' + netProfit.toFixed(2));
+        }
+        
+        function updateElementText(id, value) {
+            const el = document.getElementById(id);
+            if (el) {
+                let displayValue = value;
+                if (el.id === 'gross-loss') {
+                    displayValue = '<i class="fas fa-chart-line"></i> ' + value;
+                }
+                if (el.innerHTML !== displayValue) {
+                    el.innerHTML = displayValue;
+                    el.classList.add('value-animate');
+                    setTimeout(() => el.classList.remove('value-animate'), 400);
+                }
+            }
         }
         
         function updateLossValue(value) {
@@ -663,7 +849,7 @@
         
         function updateValue(id, value, className, glowClass) {
             const el = document.getElementById(id);
-            if (el.textContent !== value) {
+            if (el && el.textContent !== value) {
                 el.textContent = value;
                 el.className = 'result-value ' + className;
                 el.classList.add('value-animate', glowClass);
@@ -675,14 +861,16 @@
         
         function resetAll() {
             document.getElementById('capital').value = '2000';
-            document.getElementById('risk').value = '10';
-            document.getElementById('fee').value = '0.04';
+            document.getElementById('riskPercent').value = '0.5';
             document.getElementById('stop').value = '0.25';
             document.getElementById('entry').value = '1000';
             document.getElementById('rr').value = '3';
             document.getElementById('leverage').value = '5';
+            document.getElementById('vipLevel').value = 'vip0';
+            document.getElementById('entryOrderType').value = 'maker';
+            document.getElementById('exitOrderType').value = 'taker';
             
-            const fields = ['capital', 'risk', 'fee', 'stop', 'entry', 'rr', 'leverage'];
+            const fields = ['capital', 'riskPercent', 'stop', 'entry', 'rr', 'leverage', 'vipLevel', 'entryOrderType', 'exitOrderType'];
             fields.forEach(id => {
                 localStorage.removeItem('calc_' + id);
             });
@@ -691,6 +879,8 @@
                 localStorage.setItem('calc_' + id, document.getElementById(id).value);
             });
             
+            updateRiskButtonsActive(0.5);
+            updateBadges();
             calculate();
             showNotification('مقادیر به حالت پیش‌فرض بازگشتند', 'success');
         }
@@ -740,10 +930,14 @@
         }
         
         window.addEventListener('load', function() {
-            const inputs = document.querySelectorAll('input');
+            const inputs = document.querySelectorAll('input, select');
             inputs.forEach(input => {
                 input.addEventListener('input', calculate);
+                if (input.tagName === 'SELECT') {
+                    input.addEventListener('change', calculate);
+                }
             });
+            updateRiskButtonsActive(0.5);
         });
     </script>
 </body>
