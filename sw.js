@@ -1,5 +1,5 @@
 // نسخه را با هر انتشار تغییر بده تا کش قدیمی پاک شود
-const VERSION = 'journalme-v6';
+const VERSION = 'journalme-v7';
 const CORE = [
   './', 'index.html', 'style.css', 'script.js', 'fees.js', 'manifest.json',
   'calculator/', 'calculator/index.html',
@@ -46,6 +46,6 @@ self.addEventListener('fetch', e => {
         caches.open(VERSION).then(c => c.put(req, copy));
       }
       return res;
-    }).catch(() => caches.match(req).then(hit => hit || caches.match('index.html')))
+    }).catch(() => caches.match(req, { ignoreSearch: true }).then(hit => hit || caches.match('index.html')))
   );
 });

@@ -466,6 +466,12 @@ class TradingJournalDB {
                     trade.uid = `trade_${trade.id}`;
                     changed = true;
                 }
+                if (trade.entryScreenshot && !String(trade.entryScreenshot).startsWith('data:image')) {
+                    trade.entryScreenshot = null; trade.entryScreenshotName = null; changed = true;
+                }
+                if (trade.exitScreenshot && !String(trade.exitScreenshot).startsWith('data:image')) {
+                    trade.exitScreenshot = null; trade.exitScreenshotName = null; changed = true;
+                }
                 if (trade.entryScreenshot && !trade.entryScreenshotName) {
                     trade.entryScreenshotName = `entry_${trade.uid}.png`;
                     changed = true;
@@ -1382,7 +1388,8 @@ function calculateRisk() {
     
     document.getElementById('riskAmount').textContent = formatCurrency(totalRiskAmount);
     document.getElementById('potentialProfit').textContent = formatCurrency(potentialProfit);
-    document.getElementById('riskRewardRatio').textContent = '1:' + riskRewardRatio;
+    const netRR = totalRiskAmount > 0 ? ((potentialProfit - totalFee) / totalRiskAmount).toFixed(2) : '0';
+    document.getElementById('riskRewardRatio').textContent = '1:' + riskRewardRatio + ' (خالص 1:' + netRR + ')';
     
     document.getElementById('feeEntryAmount').textContent = formatCurrency(feeEntry);
     document.getElementById('feeExitAmount').textContent = formatCurrency(feeExit);
@@ -1462,7 +1469,7 @@ document.getElementById('tradeForm').addEventListener('submit', async function(e
     let entryScreenshot = null;
     let entryScreenshotName = null;
     
-    if (entryScreenshotPreview.src) {
+    if (entryScreenshotPreview.getAttribute('src') && entryScreenshotPreview.src.startsWith('data:image')) {
         entryScreenshot = entryScreenshotPreview.src;
         entryScreenshotName = `entry_${tradeUID}.png`;
     }
@@ -1682,7 +1689,8 @@ async function showTradeDetails(tradeId) {
     document.getElementById('detail-risk-percent').textContent = trade.riskPercent.toFixed(2) + '%';
     document.getElementById('detail-risk-amount').textContent = formatCurrency(trade.totalRiskAmount || 0);
     document.getElementById('detail-position-size').textContent = formatNumber(trade.positionSize || 0);
-    document.getElementById('detail-rr').textContent = '1:' + (trade.riskRewardRatio || 0);
+    document.getElementById('detail-rr').textContent = '1:' + (trade.riskRewardRatio || 0) +
+        (trade.netProfit != null && trade.totalRiskAmount > 0 ? ' (خالص 1:' + (trade.netProfit / trade.totalRiskAmount).toFixed(2) + ')' : '');
     
     document.getElementById('detail-fee-entry').textContent = formatCurrency(trade.feeEntry || 0);
     document.getElementById('detail-fee-exit').textContent = formatCurrency(trade.feeExit || 0);
