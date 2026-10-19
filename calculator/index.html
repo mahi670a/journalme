@@ -2,13 +2,15 @@
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crypto Calculator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>ماشین‌حساب | JournalMe</title>
 
     <!-- Apple Web App Mode -->
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content="Crypto Journal">
+    <meta name="apple-mobile-web-app-title" content="JournalMe">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css">
 
     <!-- Apple Touch Icon -->
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -22,922 +24,456 @@
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- همان استایل ژورنال: نوار بالا، کارت‌ها، فرم‌ها و رنگ‌ها -->
+    <link rel="stylesheet" href="../style.css?v=6">
+
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        /* فقط چیزهایی که مخصوص ماشین‌حساب است */
+        .calc-grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.95fr); gap: 28px; align-items: start; }
+        .calc-grid .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .calc-grid .span-2 { grid-column: 1 / -1; }
+        .calc-grid input[type="number"] { direction: ltr; text-align: left; font-variant-numeric: tabular-nums; font-weight: 600; -moz-appearance: textfield; appearance: textfield; }
+        .calc-grid input[type="number"]::-webkit-outer-spin-button,
+        .calc-grid input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .toolbar-header { min-width: 220px; }
+        @media (min-width: 901px) { .toolbar { padding-left: 40px; padding-right: 40px; } }
+        @media (max-width: 900px) { .toolbar-header { min-width: 0; } }
+        .quick-risk-btn { min-width: 0; }
+        .toolbar-calculator .calculator-btn { white-space: nowrap; }
+        .calc-results .fee-total + .fee-row { margin-top: 12px; }
+        .quick-risk-btn.is-active { background: rgba(122, 162, 255, 0.18); border-color: var(--accent); color: #fff; box-shadow: 0 0 0 1px rgba(122, 162, 255, 0.35) inset; }
+        .calc-hint { color: var(--muted); font-size: 0.8rem; margin-top: 8px; display: flex; gap: 8px; align-items: center; }
+
+        .calc-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        .calc-tiles .risk-summary-value { direction: ltr; unicode-bidi: isolate; font-variant-numeric: tabular-nums; font-size: 1.05rem; word-break: break-all; text-align: center; }
+        .calc-results .fee-info-box { margin-top: 16px; background: var(--raised); border: 1px solid var(--line); }
+        .calc-results .fee-row, .calc-results .fee-total { align-items: center; gap: 10px; }
+        .calc-results .fee-row > span:first-child, .calc-results .fee-total > span:first-child { color: var(--muted); }
+        .calc-results .fee-total { border-top: 1px solid var(--line); }
+        .calc-results .fee-row .val, .calc-results .fee-total .val, .calc-tiles .val { direction: ltr; unicode-bidi: isolate; font-weight: 800; font-variant-numeric: tabular-nums; }
+        .calc-results .fee-row .val-fee, .calc-results .fee-total .val-fee { color: var(--open); }
+        .calc-results .fee-row .val-loss { color: var(--loss); }
+        .calc-results .fee-row .val-profit { color: var(--profit); }
+        .calc-results .fee-row .mini-badge { display: inline-block; margin-inline-start: 8px; padding: 1px 9px; border-radius: 999px; font-size: 0.72rem; font-weight: 700; background: rgba(245, 184, 75, 0.14); color: var(--open); }
+        .val-blue { color: #7dd3fc; } .val-purple { color: #c4b5fd; } .val-gold { color: var(--open); }
+        .calc-note { margin-top: 14px; padding: 12px 14px; border-radius: 12px; background: rgba(52, 211, 153, 0.08); border: 1px solid rgba(52, 211, 153, 0.25); color: var(--profit); font-size: 0.85rem; display: flex; gap: 8px; align-items: flex-start; }
+        .value-animate { animation: calcPop 0.3s ease; }
+        @keyframes calcPop { 0% { opacity: 0.5; transform: scale(0.96); } 100% { opacity: 1; transform: scale(1); } }
+        .calc-toast { position: fixed; top: calc(var(--safe-t) + 78px); left: 50%; transform: translateX(-50%); padding: 12px 20px; border-radius: 12px; z-index: 10000; font-weight: 700; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4); background: var(--profit); color: #06281d; transition: opacity 0.5s; }
+
+        @media (max-width: 900px) {
+            .main-wrapper { margin-top: calc(70px + var(--safe-t)); padding: 12px; }
+            .calc-grid { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+            .toolbar-calculator .calculator-btn span { display: inline; }
         }
-        
-        body {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            color: #f1f5f9;
-            line-height: 1.6;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        
-        .container {
-            width: 1150px;
-            background-color: rgba(30, 41, 59, 0.95);
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-            padding: 30px;
-            border: 1px solid #334155;
-        }
-        
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #3b82f6;
-            position: relative;
-        }
-        
-        header::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 30%;
-            width: 40%;
-            height: 4px;
-            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
-            border-radius: 2px;
-        }
-        
-        h1 {
-            color: #60a5fa;
-            font-size: 2rem;
-            margin-bottom: 10px;
-            background: linear-gradient(90deg, #60a5fa, #a78bfa);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-        
-        .subtitle {
-            color: #94a3b8;
-            font-size: 0.9rem;
-        }
-        
-        .main-content {
-            display: flex;
-            gap: 30px;
-            flex-wrap: wrap;
-        }
-        
-        .inputs-section {
-            flex: 1.2;
-            background: rgba(15, 23, 42, 0.5);
-            border-radius: 12px;
-            padding: 25px;
-            border: 1px solid #475569;
-        }
-        
-        .results-section {
-            flex: 0.9;
-            background: rgba(15, 23, 42, 0.5);
-            border-radius: 12px;
-            padding: 25px;
-            border: 1px solid #475569;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .section-title {
-            color: #60a5fa;
-            font-size: 1.3rem;
-            margin-bottom: 25px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #475569;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .input-group {
-            margin-bottom: 20px;
-        }
-        
-        label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 8px;
-            color: #cbd5e1;
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-        
-        input, select {
-            width: 100%;
-            padding: 12px;
-            background-color: #1e293b;
-            border: 1px solid #475569;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            color: #f1f5f9;
-            transition: all 0.3s;
-            height: 44px;
-        }
-        
-        select {
-            cursor: pointer;
-        }
-        
-        select option {
-            background-color: #1e293b;
-        }
-        
-        input:focus, select:focus {
-            outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-        }
-        
-        input[type="number"] {
-            font-family: 'Courier New', monospace;
-            font-weight: 600;
-            direction: ltr;
-            text-align: right;
-        }
-        
-        .row {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        
-        .row .input-group {
-            flex: 1;
-            margin-bottom: 0;
-        }
-        
-        .risk-buttons {
-            display: flex;
-            gap: 8px;
-            margin-top: 8px;
-        }
-        
-        .risk-btn {
-            flex: 1;
-            padding: 10px;
-            background: rgba(71, 85, 105, 0.3);
-            border: 1px solid #475569;
-            border-radius: 6px;
-            color: #e2e8f0;
-            cursor: pointer;
-            font-size: 0.85rem;
-            font-weight: 600;
-            transition: all 0.2s;
-            height: 40px;
-        }
-        
-        .risk-btn:hover {
-            background: rgba(59, 130, 246, 0.3);
-            border-color: #3b82f6;
-            transform: translateY(-2px);
-        }
-        
-        .risk-btn-active {
-            background: rgba(59, 130, 246, 0.5);
-            border-color: #3b82f6;
-            box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
-        }
-        
-        .action-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 25px;
-        }
-        
-        .btn {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            height: 44px;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #3b82f6, #6366f1);
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #2563eb, #4f46e5);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
-        }
-        
-        .btn-danger {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            color: white;
-        }
-        
-        .btn-danger:hover {
-            background: linear-gradient(135deg, #dc2626, #b91c1c);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(239, 68, 68, 0.3);
-        }
-        
-        .btn-success {
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: white;
-        }
-        
-        .btn-success:hover {
-            background: linear-gradient(135deg, #059669, #047857);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
-        }
-        
-        .result-card {
-            background: linear-gradient(145deg, #1e293b, #0f172a);
-            border-radius: 12px;
-            padding: 20px;
-            border: 1px solid #475569;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        }
-        
-        .result-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px;
-            border-bottom: 1px solid rgba(71, 85, 105, 0.5);
-        }
-        
-        .result-item:last-child {
-            border-bottom: none;
-        }
-        
-        .result-label {
-            color: #cbd5e1;
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .result-value {
-            font-family: 'Courier New', monospace;
-            font-weight: 800;
-            font-size: 1.2rem;
-            direction: ltr;
-            text-align: left;
-            transition: all 0.3s ease;
-            padding: 5px 12px;
-            border-radius: 6px;
-            background: rgba(15, 23, 42, 0.5);
-            letter-spacing: 0.5px;
-        }
-        
-        .profit {
-            color: #10b981;
-            border: 1px solid rgba(16, 185, 129, 0.3);
-        }
-        
-        .loss {
-            color: #ef4444;
-            border: 1px solid rgba(239, 68, 68, 0.3);
-        }
-        
-        .margin-blue {
-            color: #38bdf8;
-            border: 1px solid rgba(56, 189, 248, 0.3);
-            text-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
-            background: rgba(56, 189, 248, 0.05);
-        }
-        
-        .quantity-purple {
-            color: #c084fc;
-            border: 1px solid rgba(192, 132, 252, 0.3);
-            text-shadow: 0 0 10px rgba(192, 132, 252, 0.3);
-            background: rgba(192, 132, 252, 0.05);
-        }
-        
-        .fee-yellow {
-            color: #fbbf24;
-            border: 1px solid rgba(251, 191, 36, 0.3);
-            background: rgba(251, 191, 36, 0.05);
-        }
-        
-        @keyframes fadeChange {
-            0% { opacity: 0.5; transform: scale(0.95); }
-            50% { opacity: 1; transform: scale(1.05); }
-            100% { opacity: 1; transform: scale(1); }
-        }
-        
-        .value-animate {
-            animation: fadeChange 0.3s ease;
-        }
-        
-        .glow-profit {
-            box-shadow: 0 0 15px #10b981;
-        }
-        
-        .glow-loss {
-            box-shadow: 0 0 15px #ef4444;
-        }
-        
-        .glow-blue {
-            box-shadow: 0 0 15px #38bdf8;
-        }
-        
-        .glow-purple {
-            box-shadow: 0 0 15px #c084fc;
-        }
-        
-        .badge {
-            display: inline-block;
-            background: rgba(59, 130, 246, 0.2);
-            padding: 2px 8px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            margin-left: 8px;
-        }
-        
-        footer {
-            text-align: center;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #475569;
-            color: #94a3b8;
-            font-size: 0.85rem;
+        @media (max-width: 440px) {
+            .calc-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+            .calc-tiles .risk-summary-item:first-child { grid-column: 1 / -1; }
+            .calc-tiles .risk-summary-item { padding: 12px 8px; }
+            .calc-grid .form-grid { gap: 14px; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>
-                <i class="fas fa-calculator"></i>
-                Crypto Calculator
-            </h1>
-            <p class="subtitle">محاسبه گر ریسک و حجم معامله | تفکیک کارمزد ورود و خروج</p>
-        </header>
-        
-        <div class="main-content">
-            <div class="inputs-section">
-                <h2 class="section-title">
-                    <i class="fas fa-sliders-h"></i>
-                    تنظیمات ورودی
-                </h2>
-                
-                <div class="input-group">
-                    <label>
-                        <i class="fas fa-wallet"></i>
-                        موجودی حساب ($)
-                    </label>
-                    <input type="number" id="capital" value="2000" step="0.01" min="0" inputmode="decimal">
+    <div class="app-wrapper">
+        <!-- نوار بالا: همان نوار ژورنال -->
+        <div class="toolbar">
+            <div class="toolbar-header">
+                <a href="../index.html" aria-label="بازگشت به ژورنال" style="display:block; text-decoration:none;">
+                    <div class="custom-logo" style="margin-left: 15px;">
+                    <svg width="240" height="70" viewBox="0 0 760 300" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMid meet">
+                        <defs>
+                            <linearGradient id="greenGrad" x1="0" y1="0" x2="0" y2="200">
+                                <stop offset="0%" stop-color="#66FF33">
+                                    <animate attributeName="stop-color"
+                                        values="#66FF33;#00FF99;#66FF33"
+                                        dur="4s" repeatCount="indefinite"/>
+                                </stop>
+                                <stop offset="100%" stop-color="#00FF99"/>
+                            </linearGradient>
+
+                            <linearGradient id="redGrad" x1="0" y1="0" x2="0" y2="200">
+                                <stop offset="0%" stop-color="#FF4D4D">
+                                    <animate attributeName="stop-color"
+                                        values="#FF4D4D;#FF0033;#FF4D4D"
+                                        dur="4s" repeatCount="indefinite"/>
+                                </stop>
+                                <stop offset="100%" stop-color="#FF0033"/>
+                            </linearGradient>
+
+                            <filter id="glow" x="-200%" y="-200%" width="400%" height="400%">
+                                <feGaussianBlur stdDeviation="10" result="blur"/>
+                                <feMerge>
+                                    <feMergeNode in="blur"/>
+                                    <feMergeNode in="SourceGraphic"/>
+                                </feMerge>
+                            </filter>
+                        </defs>
+
+                        <!-- بدون rect پس‌زمینه - کاملاً شفاف -->
+
+                        <path d="M90 190 
+                                 L150 130 
+                                 L200 160 
+                                 L260 100 
+                                 L320 150 
+                                 L380 110"
+                            stroke="url(#greenGrad)"
+                            stroke-width="5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            filter="url(#glow)"
+                            stroke-dasharray="500"
+                            stroke-dashoffset="500">
+                            <animate attributeName="stroke-dashoffset"
+                                from="500" to="0"
+                                dur="3s"
+                                repeatCount="indefinite"/>
+                        </path>
+
+                        <!-- J -->
+                        <path d="M130 90 
+                                 V200 
+                                 Q130 230 170 230 
+                                 Q210 230 210 180"
+                            stroke="url(#greenGrad)"
+                            stroke-width="16"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            filter="url(#glow)">
+                            <animate attributeName="stroke-width"
+                                values="16;18;16"
+                                dur="2s"
+                                repeatCount="indefinite"/>
+                        </path>
+
+                        <!-- M -->
+                        <path d="M420 220 
+                                 L460 95 
+                                 L500 180 
+                                 L540 75 
+                                 L580 220"
+                            stroke="url(#redGrad)"
+                            stroke-width="16"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            filter="url(#glow)">
+                            <animate attributeName="stroke-width"
+                                values="16;18;16"
+                                dur="2s"
+                                repeatCount="indefinite"/>
+                        </path>
+
+                        <!-- Brand Text -->
+                        <text x="170" y="270"
+                            text-anchor="middle"
+                            font-family="Helvetica, Arial, sans-serif"
+                            font-size="40"
+                            letter-spacing="12"
+                            fill="url(#greenGrad)"
+                            filter="url(#glow)">
+                            JOURNAL
+                        </text>
+
+                        <text x="520" y="270"
+                            text-anchor="middle"
+                            font-family="Helvetica, Arial, sans-serif"
+                            font-size="40"
+                            letter-spacing="12"
+                            fill="url(#redGrad)"
+                            filter="url(#glow)">
+                            ME
+                        </text>
+                    </svg>
                 </div>
-                
-                <div class="input-group">
-                    <label>
-                        <i class="fas fa-percentage"></i>
-                        ریسک (درصد از کل سرمایه)
-                    </label>
-                    <div class="risk-buttons">
-                        <button class="risk-btn" data-risk="0.25" onclick="setRiskPercent(0.25)">
-                            <i class="fas fa-microchip"></i> 0.25%
-                        </button>
-                        <button class="risk-btn" data-risk="0.5" onclick="setRiskPercent(0.5)">
-                            <i class="fas fa-microchip"></i> 0.5%
-                        </button>
-                        <button class="risk-btn" data-risk="1" onclick="setRiskPercent(1)">
-                            <i class="fas fa-microchip"></i> 1%
-                        </button>
-                    </div>
-                    <input type="number" id="riskPercent" value="0.5" step="0.1" min="0" style="margin-top: 10px;" inputmode="decimal">
-                    <small style="color:#94a3b8; display:block; margin-top:5px;">⚠️ ضرر کل (با احتساب کارمزد) دقیقاً همین درصد از سرمایه خواهد بود</small>
-                </div>
-                
-                <div class="row">
-                    <div class="input-group">
-                        <label>
-                            <i class="fas fa-shield-alt"></i>
-                            حد ضرر (%)
-                        </label>
-                        <input type="number" id="stop" value="0.25" step="0.01" min="0" inputmode="decimal">
-                    </div>
-                    
-                    <div class="input-group">
-                        <label>
-                            <i class="fas fa-sign-in-alt"></i>
-                            قیمت ورود ($)
-                        </label>
-                        <input type="number" id="entry" value="1000" step="0.01" min="0" inputmode="decimal">
-                    </div>
-                </div>
-                
-                <div class="row">
-                    <div class="input-group">
-                        <label>
-                            <i class="fas fa-chart-line"></i>
-                            نسبت ریسک به ریوارد
-                        </label>
-                        <input type="number" id="rr" value="3" step="0.1" min="0" inputmode="decimal">
-                    </div>
-                    
-                    <div class="input-group">
-                        <label>
-                            <i class="fas fa-layer-group"></i>
-                            اهرم (Leverage)
-                        </label>
-                        <input type="number" id="leverage" value="5" step="1" min="1" inputmode="decimal">
-                    </div>
-                </div>
-                
-                <div class="row">
-                    <div class="input-group">
-                        <label>
-                            <i class="fas fa-crown"></i>
-                            سطح VIP (Bitunix)
-                        </label>
-                        <select id="vipLevel">
-                            <option value="vip0">VIP 0</option>
-                            <option value="vip1">VIP 1</option>
-                            <option value="vip2">VIP 2</option>
-                            <option value="vip3">VIP 3</option>
-                            <option value="vip4">VIP 4</option>
-                            <option value="vip5">VIP 5</option>
-                            <option value="vip6">VIP 6</option>
-                            <option value="vip7">VIP 7</option>
-                        </select>
-                    </div>
-                    
-                    <div class="input-group">
-                        <label>
-                            <i class="fas fa-arrow-right"></i>
-                            نوع سفارش ورود
-                        </label>
-                        <select id="entryOrderType">
-                            <option value="maker" selected>میکر (Limit) - کارمزد کم</option>
-                            <option value="taker">تیکر (Market) - کارمزد زیاد</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="row">
-                    <div class="input-group">
-                        <label>
-                            <i class="fas fa-arrow-left"></i>
-                            نوع سفارش خروج
-                        </label>
-                        <select id="exitOrderType">
-                            <option value="maker">میکر (Limit) - حد سود لیمیت</option>
-                            <option value="taker" selected>تیکر (Market) - حد ضرر مارکت</option>
-                        </select>
-                    </div>
-                    <div class="input-group">
-                        <label>
-                            <i class="fas fa-info-circle"></i>
-                            <span id="exitHint" style="color:#fbbf24; font-size:0.75rem;">⚠️ حد ضرر معمولاً تیکر است</span>
-                        </label>
-                        <div style="height:44px;"></div>
-                    </div>
-                </div>
-                
-                <div class="action-buttons">
-                    <button class="btn btn-danger" onclick="resetAll()">
-                        <i class="fas fa-undo-alt"></i>
-                        پاک کردن
-                    </button>
-                    <button class="btn btn-success" onclick="goToJournal()">
-                        <i class="fas fa-arrow-right"></i>
-                        بازگشت به ژورنال
-                    </button>
-                </div>
+                </a>
             </div>
-            
-            <div class="results-section">
-                <h2 class="section-title">
-                    <i class="fas fa-chart-pie"></i>
-                    نتایج محاسبات
-                </h2>
-                
-                <div class="result-card">
-                    <div class="result-item">
-                        <span class="result-label">
-                            <i class="fas fa-coins" style="color: #38bdf8;"></i>
-                            مارجین مورد نیاز
-                        </span>
-                        <span class="result-value margin-blue" id="margin-value">$0.00</span>
-                    </div>
-                    
-                    <div class="result-item">
-                        <span class="result-label">
-                            <i class="fas fa-cubes" style="color: #c084fc;"></i>
-                            حجم معامله (Quantity)
-                        </span>
-                        <span class="result-value quantity-purple" id="quantity-value">0.000000</span>
-                    </div>
-                    
-                    <div class="result-item">
-                        <span class="result-label">
-                            <i class="fas fa-sign-in-alt" style="color: #fbbf24;"></i>
-                            کارمزد ورود (Entry Fee)
-                            <span class="badge" id="entryFeeBadge">میکر 0.02%</span>
-                        </span>
-                        <span class="result-value fee-yellow" id="entry-fee">$0.00</span>
-                    </div>
-                    
-                    <div class="result-item">
-                        <span class="result-label">
-                            <i class="fas fa-sign-out-alt" style="color: #fbbf24;"></i>
-                            کارمزد خروج (Exit Fee)
-                            <span class="badge" id="exitFeeBadge">تیکر 0.06%</span>
-                        </span>
-                        <span class="result-value fee-yellow" id="exit-fee">$0.00</span>
-                    </div>
-                    
-                    <div class="result-item">
-                        <span class="result-label">
-                            <i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i>
-                            ضرر ناخالص (بدون کارمزد)
-                        </span>
-                        <span class="result-value loss" id="gross-loss">
-                            <i class="fas fa-chart-line"></i> $0.00
-                        </span>
-                    </div>
-                    
-                    <div class="result-item">
-                        <span class="result-label">
-                            <i class="fas fa-times-circle" style="color: #ef4444;"></i>
-                            ضرر واقعی (با کارمزد)
-                        </span>
-                        <span class="result-value loss" id="loss-value">
-                            <i class="fas fa-times-circle"></i> $0.00
-                        </span>
-                    </div>
-                    
-                    <div class="result-item">
-                        <span class="result-label">
-                            <i class="fas fa-trophy" style="color: #10b981;"></i>
-                            سود واقعی (با کارمزد)
-                        </span>
-                        <span class="result-value profit" id="profit-value">
-                            <i class="fas fa-check-circle"></i> $0.00
-                        </span>
-                    </div>
-                </div>
-                
-                <div style="margin-top: 20px; padding: 15px; background: rgba(59, 130, 246, 0.1); border-radius: 8px; border: 1px solid rgba(59, 130, 246, 0.2);">
-                    <p style="display: flex; align-items: center; gap: 10px; color: #94a3b8; font-size: 0.85rem;">
-                        <i class="fas fa-info-circle" style="color: #3b82f6;"></i>
-                        مجموع کارمزد = کارمزد ورود + کارمزد خروج
-                    </p>
-                    <p style="display: flex; align-items: center; gap: 10px; color: #10b981; font-size: 0.85rem; margin-top: 8px;">
-                        <i class="fas fa-check-circle" style="color: #10b981;"></i>
-                        ✅ ضرر واقعی شما دقیقاً برابر (سرمایه × درصد ریسک) خواهد بود
-                    </p>
+
+            <div class="toolbar-calculator">
+                <button class="calculator-btn" onclick="goToJournal()" title="بازگشت به ژورنال">
+                    <i class="fas fa-book-open"></i>
+                    <span>بازگشت به ژورنال</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="main-wrapper">
+            <div class="container">
+                <div class="calc-grid">
+                    <!-- ورودی‌ها -->
+                    <section class="section active-section">
+                        <h2 class="section-title"><i class="fas fa-sliders-h"></i> ماشین‌حساب ریسک و حجم معامله</h2>
+
+                        <div class="trade-form">
+                            <div class="form-grid">
+                                <div class="form-group span-2">
+                                    <label for="capital"><i class="fas fa-wallet"></i> موجودی حساب ($)</label>
+                                    <input type="number" id="capital" value="2000" step="0.01" min="0" inputmode="decimal">
+                                </div>
+
+                                <div class="form-group span-2">
+                                    <label for="riskPercent"><i class="fas fa-percentage"></i> ریسک (% از کل سرمایه)</label>
+                                    <input type="number" id="riskPercent" value="0.5" step="0.1" min="0" inputmode="decimal">
+                                    <div class="quick-risk-buttons">
+                                        <button type="button" class="quick-risk-btn" data-risk="0.25" onclick="setRiskPercent(0.25)">0.25%</button>
+                                        <button type="button" class="quick-risk-btn" data-risk="0.5" onclick="setRiskPercent(0.5)">0.5%</button>
+                                        <button type="button" class="quick-risk-btn" data-risk="1" onclick="setRiskPercent(1)">1%</button>
+                                    </div>
+                                    <div class="calc-hint"><i class="fas fa-info-circle"></i> ضرر کل (با احتساب کارمزد) دقیقاً همین درصد از سرمایه خواهد بود</div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="stop"><i class="fas fa-shield-alt"></i> حد ضرر (%)</label>
+                                    <input type="number" id="stop" value="0.25" step="0.01" min="0" inputmode="decimal">
+                                </div>
+                                <div class="form-group">
+                                    <label for="entry"><i class="fas fa-sign-in-alt"></i> قیمت ورود ($)</label>
+                                    <input type="number" id="entry" value="1000" step="0.01" min="0" inputmode="decimal">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="rr"><i class="fas fa-chart-line"></i> نسبت ریسک به ریوارد</label>
+                                    <input type="number" id="rr" value="3" step="0.1" min="0" inputmode="decimal">
+                                </div>
+                                <div class="form-group">
+                                    <label for="leverage"><i class="fas fa-layer-group"></i> اهرم (Leverage)</label>
+                                    <input type="number" id="leverage" value="5" step="1" min="1" inputmode="decimal">
+                                </div>
+
+                                <div class="form-group span-2">
+                                    <label for="vipLevel"><i class="fas fa-crown"></i> سطح VIP (Bitunix)</label>
+                                    <select id="vipLevel"></select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="entryOrderType"><i class="fas fa-arrow-right"></i> نوع سفارش ورود</label>
+                                    <select id="entryOrderType">
+                                        <option value="taker" selected>تیکر (Market)</option>
+                                        <option value="maker">میکر (Limit)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="exitOrderType"><i class="fas fa-arrow-left"></i> نوع سفارش خروج</label>
+                                    <select id="exitOrderType">
+                                        <option value="taker" selected>تیکر (Market)</option>
+                                        <option value="maker">میکر (Limit)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="button" class="btn-secondary" onclick="resetAll()">
+                                    <i class="fas fa-undo-alt"></i> پاک کردن
+                                </button>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- نتایج -->
+                    <section class="section active-section calc-results">
+                        <h2 class="section-title"><i class="fas fa-chart-pie"></i> نتایج محاسبات</h2>
+
+                        <div class="risk-summary calc-tiles">
+                            <div class="risk-summary-item">
+                                <span class="risk-summary-label">حجم پوزیشن</span>
+                                <span class="risk-summary-value val val-gold" id="position-value">$0.00</span>
+                            </div>
+                            <div class="risk-summary-item">
+                                <span class="risk-summary-label">مارجین لازم</span>
+                                <span class="risk-summary-value val val-blue" id="margin-value">$0.00</span>
+                            </div>
+                            <div class="risk-summary-item">
+                                <span class="risk-summary-label">تعداد (Quantity)</span>
+                                <span class="risk-summary-value val val-purple" id="quantity-value">0.000000</span>
+                            </div>
+                        </div>
+
+                        <div class="fee-info-box">
+                            <div class="fee-row">
+                                <span>کارمزد ورود <span class="mini-badge" id="entryFeeBadge">تیکر 0.060%</span></span>
+                                <span class="val val-fee" id="entry-fee">$0.00</span>
+                            </div>
+                            <div class="fee-row">
+                                <span>کارمزد خروج <span class="mini-badge" id="exitFeeBadge">تیکر 0.060%</span></span>
+                                <span class="val val-fee" id="exit-fee">$0.00</span>
+                            </div>
+                            <div class="fee-total">
+                                <span>کل کارمزد <span class="mini-badge" id="totalFeeBadge" style="margin-inline-start:8px;">0.120%</span></span>
+                                <span class="val val-fee" id="total-fee">$0.00</span>
+                            </div>
+                            <div class="fee-row">
+                                <span>ضرر ناخالص (بدون کارمزد)</span>
+                                <span class="val val-loss" id="gross-loss">$0.00</span>
+                            </div>
+                            <div class="fee-row">
+                                <span>ضرر واقعی (با کارمزد)</span>
+                                <span class="val val-loss" id="loss-value">$0.00</span>
+                            </div>
+                            <div class="fee-row">
+                                <span>سود واقعی (با کارمزد)</span>
+                                <span class="val val-profit" id="profit-value">$0.00</span>
+                            </div>
+                        </div>
+
+                        <div class="calc-note">
+                            <i class="fas fa-check-circle" style="margin-top:3px;"></i>
+                            <span>ضرر واقعی شما دقیقاً برابر (سرمایه × درصد ریسک) خواهد بود؛ کارمزد ورود و خروج داخل همین ریسک حساب شده است.</span>
+                        </div>
+                    </section>
                 </div>
             </div>
         </div>
-        
-        <footer>
-            <p>R-NIKER | Crypto Risk Management Calculator | تفکیک کارمزد ورود (لیمیت) و خروج (مارکت)</p>
-        </footer>
     </div>
 
+    <script src="../fees.js?v=6"></script>
     <script>
-        // دریافت کارمزد بر اساس سطح VIP و نوع سفارش (Bitunix Futures)
-        function getFeeRate(vipLevel, orderType) {
-            const feeRates = {
-                'vip0': { maker: 0.0002, taker: 0.0006 },
-                'vip1': { maker: 0.0002, taker: 0.0005 },
-                'vip2': { maker: 0.00016, taker: 0.0005 },
-                'vip3': { maker: 0.00014, taker: 0.0004 },
-                'vip4': { maker: 0.00012, taker: 0.000375 },
-                'vip5': { maker: 0.0001, taker: 0.00035 },
-                'vip6': { maker: 0.00008, taker: 0.000315 },
-                'vip7': { maker: 0.00006, taker: 0.0003 }
-            };
-            
-            const rates = feeRates[vipLevel] || feeRates['vip0'];
-            return orderType === 'maker' ? rates.maker : rates.taker;
-        }
-        
-        function getFeePercentDisplay(vipLevel, orderType) {
-            const rate = getFeeRate(vipLevel, orderType) * 100;
-            return rate.toFixed(3) + '%';
-        }
-        
+        const FIELDS = ['capital', 'riskPercent', 'stop', 'entry', 'rr', 'leverage', 'vipLevel', 'entryOrderType', 'exitOrderType'];
+        const DEFAULTS = { capital: '2000', riskPercent: '0.5', stop: '0.25', entry: '1000', rr: '3', leverage: '5', vipLevel: 'vip0', entryOrderType: DEFAULT_ENTRY_ORDER, exitOrderType: DEFAULT_EXIT_ORDER };
+        const $ = id => document.getElementById(id);
+
+        function store(key, val) { try { localStorage.setItem(key, val); } catch (e) {} }
+        function load(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
+
+        function orderLabel(t) { return t === 'maker' ? 'میکر' : 'تیکر'; }
+        function pct(rate) { return (rate * 100).toFixed(3) + '%'; }
+
         function updateRiskButtonsActive(percent) {
-            const buttons = document.querySelectorAll('.risk-btn');
-            buttons.forEach(btn => {
-                const btnRisk = parseFloat(btn.getAttribute('data-risk'));
-                if (Math.abs(btnRisk - percent) < 0.01) {
-                    btn.classList.add('risk-btn-active');
-                } else {
-                    btn.classList.remove('risk-btn-active');
-                }
+            document.querySelectorAll('.quick-risk-btn').forEach(btn => {
+                const r = parseFloat(btn.getAttribute('data-risk'));
+                btn.classList.toggle('is-active', Math.abs(r - percent) < 0.01);
             });
         }
-        
+
         function updateBadges() {
-            const vipLevel = document.getElementById('vipLevel').value;
-            const entryType = document.getElementById('entryOrderType').value;
-            const exitType = document.getElementById('exitOrderType').value;
-            
-            const entryFeePercent = getFeePercentDisplay(vipLevel, entryType);
-            const exitFeePercent = getFeePercentDisplay(vipLevel, exitType);
-            
-            const entryBadge = document.getElementById('entryFeeBadge');
-            const exitBadge = document.getElementById('exitFeeBadge');
-            
-            entryBadge.innerHTML = (entryType === 'maker' ? 'میکر' : 'تیکر') + ' ' + entryFeePercent;
-            exitBadge.innerHTML = (exitType === 'maker' ? 'میکر' : 'تیکر') + ' ' + exitFeePercent;
+            const vip = $('vipLevel').value;
+            const et = $('entryOrderType').value, xt = $('exitOrderType').value;
+            const ltr = t => '\u2066' + t + '\u2069';   // درصد همیشه چپ‌به‌راست دیده شود
+            $('entryFeeBadge').textContent = orderLabel(et) + ' ' + ltr(pct(getFeeRate(vip, et)));
+            $('exitFeeBadge').textContent = orderLabel(xt) + ' ' + ltr(pct(getFeeRate(vip, xt)));
+            $('totalFeeBadge').textContent = ltr(getTotalFeePercent(vip, et, xt).toFixed(3) + '%');
         }
-        
-        function moveCursorToEnd(element) {
-            if (element && element.value) {
-                const value = element.value;
-                element.value = '';
-                element.value = value;
+
+        function moveCursorToEnd(el) {
+            if (el && el.value) { const v = el.value; el.value = ''; el.value = v; }
+        }
+        function fixDecimalInput(v) { return (v !== '' && v.startsWith('.')) ? '0' + v : v; }
+
+        function setText(id, value) {
+            const el = $(id);
+            if (el && el.textContent !== value) {
+                el.textContent = value;
+                el.classList.remove('value-animate');
+                void el.offsetWidth;
+                el.classList.add('value-animate');
             }
         }
-        
-        function fixDecimalInput(value) {
-            if (value === '') return '';
-            if (value.startsWith('.')) {
-                return '0' + value;
-            }
-            return value;
-        }
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            const fields = ['capital', 'riskPercent', 'stop', 'entry', 'rr', 'leverage', 'vipLevel', 'entryOrderType', 'exitOrderType'];
-            
-            fields.forEach(id => {
-                const element = document.getElementById(id);
-                const saved = localStorage.getItem('calc_' + id);
-                
-                if (saved !== null && element.tagName !== 'SELECT') {
-                    element.value = saved;
-                } else if (saved !== null && element.tagName === 'SELECT') {
-                    element.value = saved;
-                }
-                
-                if (element.tagName !== 'SELECT') {
-                    element.addEventListener('click', function(e) {
-                        moveCursorToEnd(this);
-                    });
-                    
-                    element.addEventListener('touchstart', function(e) {
-                        setTimeout(() => {
-                            moveCursorToEnd(this);
-                        }, 10);
-                    });
-                }
-                
-                element.addEventListener('input', function(e) {
-                    if (element.tagName !== 'SELECT') {
-                        let newValue = fixDecimalInput(e.target.value);
-                        if (newValue !== e.target.value) {
-                            e.target.value = newValue;
-                        }
-                        localStorage.setItem('calc_' + id, e.target.value);
-                    } else {
-                        localStorage.setItem('calc_' + id, e.target.value);
-                    }
-                    updateBadges();
-                    calculate();
-                });
-                
-                element.addEventListener('change', function(e) {
-                    if (element.tagName === 'SELECT') {
-                        localStorage.setItem('calc_' + id, e.target.value);
-                    }
-                    updateBadges();
-                    calculate();
-                });
-                
-                element.addEventListener('blur', function(e) {
-                    if (element.tagName !== 'SELECT') {
-                        let val = e.target.value;
-                        if (val !== '' && !isNaN(val) && val !== '-') {
-                            let num = parseFloat(val);
-                            if (!isNaN(num)) {
-                                e.target.value = num.toString();
-                            }
-                        }
-                    }
-                });
-            });
-            
-            const riskPercentInput = document.getElementById('riskPercent');
-            if (riskPercentInput) {
-                riskPercentInput.addEventListener('input', function() {
-                    const val = parseFloat(this.value) || 0;
-                    updateRiskButtonsActive(val);
-                });
-            }
-            
-            updateBadges();
-            calculate();
-        });
-        
+
         function setRiskPercent(percent) {
-            document.getElementById('riskPercent').value = percent;
-            localStorage.setItem('calc_riskPercent', percent);
+            $('riskPercent').value = percent;
+            store('calc_riskPercent', percent);
             updateRiskButtonsActive(percent);
             calculate();
         }
-        
+
         function calculate() {
-            const capital = parseFloat(document.getElementById('capital').value) || 0;
-            const riskPercent = parseFloat(document.getElementById('riskPercent').value) || 0;
-            const stopPercent = parseFloat(document.getElementById('stop').value) || 0;
-            const rr = parseFloat(document.getElementById('rr').value) || 0;
-            const leverage = parseFloat(document.getElementById('leverage').value) || 1;
-            const entry = parseFloat(document.getElementById('entry').value) || 0;
-            const vipLevel = document.getElementById('vipLevel').value;
-            const entryOrderType = document.getElementById('entryOrderType').value;
-            const exitOrderType = document.getElementById('exitOrderType').value;
-            
-            const stop = stopPercent / 100;
-            const entryFee = getFeeRate(vipLevel, entryOrderType);
-            const exitFee = getFeeRate(vipLevel, exitOrderType);
-            const totalFees = entryFee + exitFee;
-            
+            const capital = parseFloat($('capital').value) || 0;
+            const riskPercent = parseFloat($('riskPercent').value) || 0;
+            const stop = (parseFloat($('stop').value) || 0) / 100;
+            const rr = parseFloat($('rr').value) || 0;
+            const leverage = parseFloat($('leverage').value) || 1;
+            const entry = parseFloat($('entry').value) || 0;
+            const vip = $('vipLevel').value;
+            const entryFee = getFeeRate(vip, $('entryOrderType').value);
+            const exitFee = getFeeRate(vip, $('exitOrderType').value);
+
             if (capital <= 0 || riskPercent <= 0 || stop <= 0 || entry <= 0) {
-                updateValue('margin-value', '$0.00', 'margin-blue', 'glow-blue');
-                updateValue('quantity-value', '0.000000', 'quantity-purple', 'glow-purple');
-                updateElementText('entry-fee', '$0.00');
-                updateElementText('exit-fee', '$0.00');
-                updateElementText('gross-loss', '$0.00');
-                updateLossValue('$0.00');
-                updateProfitValue('$0.00');
+                ['position-value', 'margin-value', 'entry-fee', 'exit-fee', 'total-fee', 'gross-loss', 'loss-value', 'profit-value']
+                    .forEach(id => setText(id, '$0.00'));
+                setText('quantity-value', '0.000000');
                 return;
             }
-            
-            // ریسک کل به دلار
+
+            // ریسک کل به دلار، شامل کارمزد ورود و خروج:
+            // riskAmount = position × stop + position × (entryFee + exitFee)
             const riskAmount = capital * (riskPercent / 100);
-            
-            // محاسبه حجم معامله: riskAmount = position × stop + position × (entryFee + exitFee)
-            // position = riskAmount / (stop + entryFee + exitFee)
-            const position = riskAmount / (stop + totalFees);
-            const margin = position / leverage;
+            const position = riskAmount / (stop + entryFee + exitFee);
             const entryFeeAmount = position * entryFee;
             const exitFeeAmount = position * exitFee;
             const grossLoss = position * stop;
             const totalLoss = grossLoss + entryFeeAmount + exitFeeAmount;
-            const grossProfit = position * stop * rr;
-            const netProfit = grossProfit - (entryFeeAmount + exitFeeAmount);
-            const quantity = position / entry;
-            
-            updateValue('margin-value', '$' + margin.toFixed(2), 'margin-blue', 'glow-blue');
-            updateValue('quantity-value', quantity.toFixed(6), 'quantity-purple', 'glow-purple');
-            updateElementText('entry-fee', '$' + entryFeeAmount.toFixed(2));
-            updateElementText('exit-fee', '$' + exitFeeAmount.toFixed(2));
-            updateElementText('gross-loss', '$' + grossLoss.toFixed(2));
-            updateLossValue('$' + totalLoss.toFixed(2));
-            updateProfitValue('$' + netProfit.toFixed(2));
+            const netProfit = position * stop * rr - (entryFeeAmount + exitFeeAmount);
+
+            setText('position-value', '$' + position.toFixed(2));
+            setText('margin-value', '$' + (position / leverage).toFixed(2));
+            setText('quantity-value', (position / entry).toFixed(6));
+            setText('entry-fee', '$' + entryFeeAmount.toFixed(2));
+            setText('exit-fee', '$' + exitFeeAmount.toFixed(2));
+            setText('total-fee', '$' + (entryFeeAmount + exitFeeAmount).toFixed(2));
+            setText('gross-loss', '$' + grossLoss.toFixed(2));
+            setText('loss-value', '$' + totalLoss.toFixed(2));
+            setText('profit-value', '$' + netProfit.toFixed(2));
         }
-        
-        function updateElementText(id, value) {
-            const el = document.getElementById(id);
-            if (el) {
-                let displayValue = value;
-                if (el.id === 'gross-loss') {
-                    displayValue = '<i class="fas fa-chart-line"></i> ' + value;
-                }
-                if (el.innerHTML !== displayValue) {
-                    el.innerHTML = displayValue;
-                    el.classList.add('value-animate');
-                    setTimeout(() => el.classList.remove('value-animate'), 400);
-                }
-            }
-        }
-        
-        function updateLossValue(value) {
-            const lossEl = document.getElementById('loss-value');
-            const lossText = '<i class="fas fa-times-circle"></i> ' + value;
-            if (lossEl.innerHTML !== lossText) {
-                lossEl.innerHTML = lossText;
-                lossEl.classList.add('value-animate', 'glow-loss');
-                setTimeout(() => lossEl.classList.remove('value-animate', 'glow-loss'), 400);
-            }
-        }
-        
-        function updateProfitValue(value) {
-            const profitEl = document.getElementById('profit-value');
-            const profitText = '<i class="fas fa-check-circle"></i> ' + value;
-            if (profitEl.innerHTML !== profitText) {
-                profitEl.innerHTML = profitText;
-                profitEl.classList.add('value-animate', 'glow-profit');
-                setTimeout(() => profitEl.classList.remove('value-animate', 'glow-profit'), 400);
-            }
-        }
-        
-        function updateValue(id, value, className, glowClass) {
-            const el = document.getElementById(id);
-            if (el && el.textContent !== value) {
-                el.textContent = value;
-                el.className = 'result-value ' + className;
-                el.classList.add('value-animate', glowClass);
-                setTimeout(() => {
-                    el.classList.remove('value-animate', glowClass);
-                }, 400);
-            }
-        }
-        
+
         function resetAll() {
-            document.getElementById('capital').value = '2000';
-            document.getElementById('riskPercent').value = '0.5';
-            document.getElementById('stop').value = '0.25';
-            document.getElementById('entry').value = '1000';
-            document.getElementById('rr').value = '3';
-            document.getElementById('leverage').value = '5';
-            document.getElementById('vipLevel').value = 'vip0';
-            document.getElementById('entryOrderType').value = 'maker';
-            document.getElementById('exitOrderType').value = 'taker';
-            
-            const fields = ['capital', 'riskPercent', 'stop', 'entry', 'rr', 'leverage', 'vipLevel', 'entryOrderType', 'exitOrderType'];
-            fields.forEach(id => {
-                localStorage.removeItem('calc_' + id);
-            });
-            
-            fields.forEach(id => {
-                localStorage.setItem('calc_' + id, document.getElementById(id).value);
-            });
-            
-            updateRiskButtonsActive(0.5);
+            FIELDS.forEach(id => { $(id).value = DEFAULTS[id]; store('calc_' + id, DEFAULTS[id]); });
+            updateRiskButtonsActive(parseFloat(DEFAULTS.riskPercent));
             updateBadges();
             calculate();
-            showNotification('مقادیر به حالت پیش‌فرض بازگشتند', 'success');
+            showNotification('مقادیر به حالت پیش‌فرض بازگشتند');
         }
-        
-        function goToJournal() {
-            window.location.href = '../index.html';
+
+        function goToJournal() { window.location.href = '../index.html'; }
+
+        function showNotification(message) {
+            const n = document.createElement('div');
+            n.className = 'calc-toast';
+            n.textContent = message;
+            document.body.appendChild(n);
+            setTimeout(() => { n.style.opacity = '0'; setTimeout(() => n.remove(), 500); }, 2500);
         }
-        
-        function showNotification(message, type = 'info') {
-            const notification = document.createElement('div');
-            notification.textContent = message;
-            notification.style.position = 'fixed';
-            notification.style.top = '20px';
-            notification.style.left = '50%';
-            notification.style.transform = 'translateX(-50%)';
-            notification.style.padding = '12px 20px';
-            notification.style.borderRadius = '8px';
-            notification.style.zIndex = '10000';
-            notification.style.fontWeight = '600';
-            notification.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.3)';
-            
-            if (type === 'success') {
-                notification.style.backgroundColor = '#10b981';
-                notification.style.color = 'white';
-            } else if (type === 'warning') {
-                notification.style.backgroundColor = '#f59e0b';
-                notification.style.color = '#78350f';
-            } else if (type === 'error') {
-                notification.style.backgroundColor = '#ef4444';
-                notification.style.color = 'white';
-            } else {
-                notification.style.backgroundColor = '#3b82f6';
-                notification.style.color = 'white';
+
+        document.addEventListener('DOMContentLoaded', function () {
+            $('vipLevel').innerHTML = vipOptionsHTML('vip0');
+
+            // یک‌بار: انتخاب‌های قدیمی میکر/تیکر پاک شود تا پیش‌فرض جدید (تیکر/تیکر) اعمال شود
+            if (load('calc_ver') !== '2') {
+                ['calc_entryOrderType', 'calc_exitOrderType'].forEach(k => { try { localStorage.removeItem(k); } catch (e) {} });
+                store('calc_ver', '2');
             }
-            
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.style.opacity = '0';
-                notification.style.transition = 'opacity 0.5s';
-                setTimeout(() => {
-                    if (notification.parentNode) {
-                        notification.parentNode.removeChild(notification);
-                    }
-                }, 500);
-            }, 3000);
-        }
-        
-        window.addEventListener('load', function() {
-            const inputs = document.querySelectorAll('input, select');
-            inputs.forEach(input => {
-                input.addEventListener('input', calculate);
-                if (input.tagName === 'SELECT') {
-                    input.addEventListener('change', calculate);
+
+            FIELDS.forEach(id => {
+                const el = $(id);
+                const saved = load('calc_' + id);
+                if (saved !== null) el.value = saved;
+                if (el.tagName === 'SELECT' && !el.value) el.value = DEFAULTS[id];
+
+                if (el.tagName !== 'SELECT') {
+                    el.addEventListener('click', function () { moveCursorToEnd(this); });
+                    el.addEventListener('touchstart', function () { setTimeout(() => moveCursorToEnd(this), 10); });
+                    el.addEventListener('blur', function (e) {
+                        const v = e.target.value;
+                        if (v !== '' && !isNaN(v) && v !== '-') { const n = parseFloat(v); if (!isNaN(n)) e.target.value = n.toString(); }
+                    });
                 }
+
+                const onChange = function (e) {
+                    if (el.tagName !== 'SELECT') {
+                        const nv = fixDecimalInput(e.target.value);
+                        if (nv !== e.target.value) e.target.value = nv;
+                    }
+                    store('calc_' + id, e.target.value);
+                    if (id === 'riskPercent') updateRiskButtonsActive(parseFloat(e.target.value) || 0);
+                    updateBadges();
+                    calculate();
+                };
+                el.addEventListener('input', onChange);
+                el.addEventListener('change', onChange);
             });
-            updateRiskButtonsActive(0.5);
+
+            updateRiskButtonsActive(parseFloat($('riskPercent').value) || 0);
+            updateBadges();
+            calculate();
         });
     </script>
 </body>
