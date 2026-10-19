@@ -26,7 +26,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- همان استایل ژورنال: نوار بالا، کارت‌ها، فرم‌ها و رنگ‌ها -->
-    <link rel="stylesheet" href="../style.css?v=6">
+    <link rel="stylesheet" href="../style.css?v=7">
 
     <style>
         /* فقط چیزهایی که مخصوص ماشین‌حساب است */
@@ -66,6 +66,7 @@
             .main-wrapper { margin-top: calc(70px + var(--safe-t)); padding: 12px; }
             .calc-grid { grid-template-columns: minmax(0, 1fr); gap: 18px; }
             .toolbar-calculator .calculator-btn span { display: inline; }
+            .toolbar-calculator .calculator-btn { width: auto; min-width: 0; padding: 0 14px; }
         }
         @media (max-width: 440px) {
             .calc-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
@@ -326,7 +327,7 @@
         </div>
     </div>
 
-    <script src="../fees.js?v=6"></script>
+    <script src="../fees.js?v=7"></script>
     <script>
         const FIELDS = ['capital', 'riskPercent', 'stop', 'entry', 'rr', 'leverage', 'vipLevel', 'entryOrderType', 'exitOrderType'];
         const DEFAULTS = { capital: '2000', riskPercent: '0.5', stop: '0.25', entry: '1000', rr: '3', leverage: '5', vipLevel: 'vip0', entryOrderType: DEFAULT_ENTRY_ORDER, exitOrderType: DEFAULT_EXIT_ORDER };
