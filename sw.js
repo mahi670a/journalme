@@ -1,5 +1,5 @@
 // نسخه را با هر انتشار تغییر بده تا کش قدیمی پاک شود
-const VERSION = 'journalme-v2';
+const VERSION = 'journalme-v3';
 const CORE = [
   './', 'index.html', 'style.css', 'script.js', 'manifest.json',
   'calculator/', 'calculator/index.html',

@@ -146,6 +146,9 @@ function getMimeType(fileName) {
 // متغیرهای سراسری برای مدیریت آپلود
 // ============================
 let editingTradeId = null;
+let editBaseBalance = null;
+const PRESET_STRATEGIES = ['SL', 'Breakout', 'Candle Setup'];
+let customStrategies = [];
 function escapeHTML(v) {
     return String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
@@ -937,6 +940,8 @@ async function initialize() {
             updateMonthlyGrowthChart();
         }, 500);
         
+        try { customStrategies = JSON.parse((await db.getSetting('customStrategies')) || '[]'); } catch (e) { customStrategies = []; }
+        refreshStrategyList();
         console.log('✅ برنامه با موفقیت راه‌اندازی شد');
         if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
         if (trades.length > 0) {
@@ -1271,6 +1276,7 @@ async function updateBalance() {
 
 function resetForm() {
     editingTradeId = null;
+    editBaseBalance = null;
     document.getElementById('tradeForm').reset();
     document.getElementById('type').value = '';
     document.getElementById('feeDetails').style.display = 'none';
@@ -1304,7 +1310,7 @@ function calculateRisk() {
         return;
     }
     
-    const totalRiskAmount = (getEquity() * riskPercent) / 100;
+    const totalRiskAmount = ((editingTradeId !== null && editBaseBalance ? editBaseBalance : getEquity()) * riskPercent) / 100;
     
     let stopLossPoints, takeProfitPoints;
     
@@ -1447,13 +1453,12 @@ document.getElementById('tradeForm').addEventListener('submit', async function(e
         netProfit: riskData.netProfit,
         riskRewardRatio: riskData.riskRewardRatio,
         strategy: document.getElementById('strategy').value.trim(),
-        emotion: document.getElementById('emotion').value,
-        mistake: document.getElementById('mistake').value,
         notes: document.getElementById('notes').value.trim(),
         accountId: activeAccountId
     };
     
     const isEditing = editingTradeId !== null;
+    let exitFollowed = false;
     if (isEditing) {
         const orig = await db.getTradeById(editingTradeId);
         if (orig) {
@@ -1461,6 +1466,16 @@ document.getElementById('tradeForm').addEventListener('submit', async function(e
             trade.uid = orig.uid;
             trade.status = orig.status;
             trade.closedPrice = orig.closedPrice;
+            if (orig.status === 'closed') {
+                const cp = Number(orig.closedPrice);
+                const same = (x, y) => Math.abs(x - y) <= 1e-9 * Math.max(1, Math.abs(y));
+                if (same(cp, orig.takeProfit) && !same(trade.takeProfit, orig.takeProfit)) { trade.closedPrice = trade.takeProfit; exitFollowed = true; }
+                else if (same(cp, orig.stopLoss) && !same(trade.stopLoss, orig.stopLoss)) { trade.closedPrice = trade.stopLoss; exitFollowed = true; }
+            }
+            if (orig.actualFee != null) {
+                trade.actualFee = orig.actualFee; trade.totalFee = orig.actualFee;
+                trade.feeEntry = orig.actualFee / 2; trade.feeExit = orig.actualFee / 2;
+            }
             trade.closedDate = orig.closedDate;
             trade.exitScreenshot = orig.exitScreenshot;
             trade.exitScreenshotName = orig.exitScreenshotName;
@@ -1477,6 +1492,7 @@ document.getElementById('tradeForm').addEventListener('submit', async function(e
     const saved = await saveTradeToDB(trade);
     if (!saved) return;
     editingTradeId = null;
+    editBaseBalance = null;
     
     loadTrades();
     updateStats();
@@ -1500,7 +1516,7 @@ document.getElementById('tradeForm').addEventListener('submit', async function(e
     
     removeEntryScreenshot();
     
-    showNotification(isEditing ? 'ویرایش معامله ذخیره شد.' : 'معامله با موفقیت ثبت شد!', 'success');
+    showNotification(isEditing ? (exitFollowed ? 'ویرایش ذخیره شد و قیمت خروج هم با حد جدید به‌روز شد.' : 'ویرایش معامله ذخیره شد.') : 'معامله با موفقیت ثبت شد!', 'success');
 });
 
 function calculateTradeRisk(trade) {
@@ -1648,7 +1664,7 @@ async function showTradeDetails(tradeId) {
     }
     
     const jr = document.getElementById('detail-journal-section');
-    const jItems = [['استراتژی', trade.strategy], ['احساس', trade.emotion], ['اشتباه', trade.mistake], ['یادداشت', trade.notes]].filter(i => i[1]);
+    const jItems = [['استراتژی', trade.strategy], ['یادداشت', trade.notes]].filter(i => i[1]);
     jr.style.display = jItems.length ? 'block' : 'none';
     jr.innerHTML = jItems.length ? '<div class="detail-section-title"><i class="fas fa-book"></i> ژورنال</div><div class="details-grid">' +
         jItems.map(([l, v]) => `<div class="detail-item"><span class="detail-label">${l}</span><div class="detail-value">${escapeHTML(v)}</div></div>`).join('') + '</div>' : '';
@@ -1881,11 +1897,10 @@ async function editTrade(id) {
     document.getElementById('takeProfit').value = trade.takeProfitStr || trade.takeProfit;
     document.getElementById('riskPercent').value = trade.riskPercent;
     document.getElementById('feePercent').value = trade.totalFeePercent ?? '';
-    document.getElementById('strategy').value = trade.strategy || '';
-    document.getElementById('emotion').value = trade.emotion || '';
-    document.getElementById('mistake').value = trade.mistake || '';
+    refreshStrategyList(trade.strategy || '');
     document.getElementById('notes').value = trade.notes || '';
     
+    editBaseBalance = (trade.riskPercent > 0 && trade.totalRiskAmount > 0) ? trade.totalRiskAmount * 100 / trade.riskPercent : null;
     editingTradeId = id;
     
     calculateRisk();
@@ -2705,7 +2720,7 @@ function applyHistoryFilters(list) {
     const q = val('histSearch').trim().toLowerCase();
     const st = val('histStatus') || 'all', rs = val('histResult') || 'all', ty = val('histType') || 'all';
     return list.filter(t => {
-        if (q && !`${t.symbol} ${t.strategy || ''} ${t.emotion || ''} ${t.mistake || ''} ${t.notes || ''}`.toLowerCase().includes(q)) return false;
+        if (q && !`${t.symbol} ${t.strategy || ''} ${t.notes || ''}`.toLowerCase().includes(q)) return false;
         if (st !== 'all' && t.status !== st) return false;
         if (ty !== 'all' && t.type !== ty) return false;
         if (rs !== 'all') {
@@ -2731,11 +2746,38 @@ function compressImage(dataUrl, cb) {
     img.src = dataUrl;
 }
 
-function refreshStrategyList() {
-    const dl = document.getElementById('strategyList');
-    if (!dl) return;
-    const names = [...new Set(trades.map(t => (t.strategy || '').trim()).filter(Boolean))];
-    dl.innerHTML = names.map(n => `<option value="${escapeHTML(n)}">`).join('');
+function strategyNames() {
+    return [...new Set([...PRESET_STRATEGIES, ...customStrategies, ...trades.map(t => (t.strategy || '').trim()).filter(Boolean)])];
+}
+
+function refreshStrategyList(selected) {
+    const sel = document.getElementById('strategy');
+    if (!sel) return;
+    const cur = selected !== undefined ? selected : sel.value;
+    const names = strategyNames();
+    if (cur && !names.includes(cur)) names.push(cur);
+    sel.innerHTML = '<option value="">بدون استراتژی</option>' + names.map(n => `<option value="${escapeHTML(n)}">${escapeHTML(n)}</option>`).join('');
+    sel.value = cur || '';
+}
+
+async function addStrategy() {
+    const name = (prompt('نام استراتژی جدید:') || '').trim();
+    if (!name) return;
+    if (!strategyNames().includes(name)) {
+        customStrategies.push(name);
+        await db.saveSetting('customStrategies', JSON.stringify(customStrategies));
+    }
+    refreshStrategyList(name);
+}
+
+async function removeStrategy() {
+    const name = document.getElementById('strategy').value;
+    if (!name) return;
+    if (PRESET_STRATEGIES.includes(name)) { showNotification('استراتژی‌های پیش‌فرض قابل حذف نیستند.', 'warning'); return; }
+    if (trades.some(t => t.strategy === name)) { showNotification('این استراتژی در معامله‌های ثبت‌شده استفاده شده و از لیست حذف نمی‌شود.', 'warning'); return; }
+    customStrategies = customStrategies.filter(n => n !== name);
+    await db.saveSetting('customStrategies', JSON.stringify(customStrategies));
+    refreshStrategyList('');
 }
 
 function renderAdvancedStats() {
@@ -2784,6 +2826,5 @@ function renderAdvancedStats() {
         tile('حداکثر دراودان', `${formatCurrency(mdd)} (${mddP.toFixed(1)}%)`, mdd > 0 ? 'loss' : '') +
         tile('بیشترین برد پیاپی', maxW) + tile('بیشترین باخت پیاپی', maxL) + tile('رگه‌ی فعلی', cur) + '</div>' +
         table('بر اساس نماد', group(t => t.symbol)) + table('بر اساس استراتژی', group(t => t.strategy)) +
-        table('بر اساس احساس', group(t => t.emotion)) + table('بر اساس اشتباه', group(t => t.mistake || 'بدون اشتباه')) +
         table('بر اساس روز هفته', group(t => { const d = new Date(t.date); return isNaN(d) ? '' : days[d.getDay()]; }));
 }

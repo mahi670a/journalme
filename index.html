@@ -676,18 +676,13 @@
                             </div>
                             
                             <div class="form-grid journal-fields">
-                                <div class="form-group">
+                                <div class="form-group" style="grid-column: 1 / -1;">
                                     <label for="strategy"><i class="fas fa-chess"></i> استراتژی / ستاپ</label>
-                                    <input type="text" id="strategy" list="strategyList" autocomplete="off" placeholder="مثلاً بریک‌اوت">
-                                    <datalist id="strategyList"></datalist>
-                                </div>
-                                <div class="form-group">
-                                    <label for="emotion"><i class="fas fa-face-smile"></i> احساس موقع ورود</label>
-                                    <select id="emotion"><option value="">انتخاب کنید</option><option>آرام</option><option>مطمئن</option><option>ترس</option><option>طمع</option><option>FOMO</option><option>انتقام</option><option>خسته</option></select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="mistake"><i class="fas fa-triangle-exclamation"></i> اشتباه انجام‌شده</label>
-                                    <select id="mistake"><option value="">بدون اشتباه</option><option>ورود زودهنگام</option><option>ورود دیرهنگام</option><option>رعایت نکردن حد ضرر</option><option>حجم زیاد</option><option>خروج زودهنگام</option><option>خلاف پلن معاملاتی</option><option>معامله‌ی هیجانی</option></select>
+                                    <div class="strategy-row">
+                                        <select id="strategy"></select>
+                                        <button type="button" class="strategy-btn" onclick="addStrategy()">+ جدید</button>
+                                        <button type="button" class="strategy-btn danger" onclick="removeStrategy()">حذف</button>
+                                    </div>
                                 </div>
                                 <div class="form-group" style="grid-column: 1 / -1;">
                                     <label for="notes"><i class="fas fa-pen"></i> یادداشت</label>

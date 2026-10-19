@@ -2210,3 +2210,11 @@ textarea { width: 100%; padding: 12px; background: rgba(15, 23, 42, 0.8); border
 .adv-table th, .adv-table td { padding: 10px 12px; text-align: center; border-bottom: 1px solid #334155; font-size: 0.88rem; }
 .adv-table th { background: rgba(30, 64, 175, 0.5); }
 .adv-empty { color: #94a3b8; text-align: center; padding: 20px; }
+
+.strategy-row { display: flex; gap: 8px; align-items: stretch; }
+.strategy-row select { flex: 1; min-width: 0; }
+.strategy-btn { padding: 0 14px; min-height: 44px; border-radius: 8px; border: 1px solid #3b82f6; background: rgba(59, 130, 246, 0.15); color: #93c5fd; font-family: inherit; cursor: pointer; white-space: nowrap; }
+.strategy-btn.danger { border-color: #ef4444; background: rgba(239, 68, 68, 0.12); color: #fca5a5; }
+.form-grid > .form-group, .form-grid > * { min-width: 0; }
+.strategy-row select { flex: 1 1 0; width: 0; min-width: 0; }
+textarea { box-sizing: border-box; min-width: 0; }
