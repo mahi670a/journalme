@@ -2,13 +2,15 @@
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>JournalMe</title>
 
     <!-- Apple Web App Mode -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="JournalMe">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <link rel="manifest" href="manifest.json">
 
     <!-- Apple Touch Icon -->
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -120,6 +122,7 @@
                 </div>
             </div>
             
+            <div class="detail-section" id="detail-journal-section" style="display:none"></div>
             <div class="detail-section" id="detail-fee-section">
                 <div class="detail-section-title">
                     <i class="fas fa-receipt"></i>
@@ -210,6 +213,10 @@
                     قیمت بسته شدن
                 </label>
                 <input type="text" id="closePriceInput" class="modal-input">
+            </div>
+            <div class="modal-input-group">
+                <label class="modal-label"><i class="fas fa-receipt"></i> کارمزد واقعی ($) - اختیاری</label>
+                <input type="text" inputmode="decimal" id="closeFeeInput" class="modal-input" placeholder="خالی = کارمزد محاسبه‌شده">
             </div>
             
             <div class="screenshot-upload" id="closeScreenshotUpload" onclick="document.getElementById('closeScreenshotFile').click()">
@@ -475,7 +482,7 @@
                     </div>
                     
                     <div class="current-balance-display">
-                        <span class="current-balance-label">موجودی فعلی:</span>
+                        <span class="current-balance-label">موجودی اولیه (مبنای محاسبه):</span>
                         <span class="current-balance-value" id="currentBalanceDisplay">$0</span>
                     </div>
                     
@@ -668,6 +675,26 @@
                                 </div>
                             </div>
                             
+                            <div class="form-grid journal-fields">
+                                <div class="form-group">
+                                    <label for="strategy"><i class="fas fa-chess"></i> استراتژی / ستاپ</label>
+                                    <input type="text" id="strategy" list="strategyList" autocomplete="off" placeholder="مثلاً بریک‌اوت">
+                                    <datalist id="strategyList"></datalist>
+                                </div>
+                                <div class="form-group">
+                                    <label for="emotion"><i class="fas fa-face-smile"></i> احساس موقع ورود</label>
+                                    <select id="emotion"><option value="">انتخاب کنید</option><option>آرام</option><option>مطمئن</option><option>ترس</option><option>طمع</option><option>FOMO</option><option>انتقام</option><option>خسته</option></select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="mistake"><i class="fas fa-triangle-exclamation"></i> اشتباه انجام‌شده</label>
+                                    <select id="mistake"><option value="">بدون اشتباه</option><option>ورود زودهنگام</option><option>ورود دیرهنگام</option><option>رعایت نکردن حد ضرر</option><option>حجم زیاد</option><option>خروج زودهنگام</option><option>خلاف پلن معاملاتی</option><option>معامله‌ی هیجانی</option></select>
+                                </div>
+                                <div class="form-group" style="grid-column: 1 / -1;">
+                                    <label for="notes"><i class="fas fa-pen"></i> یادداشت</label>
+                                    <textarea id="notes" rows="3" placeholder="دلیل ورود، درس‌ها، ..."></textarea>
+                                </div>
+                            </div>
+                            
                             <div class="form-actions">
                                 <button type="submit" class="btn-primary">
                                     <i class="fas fa-save"></i> ثبت معامله
@@ -691,6 +718,13 @@
                     <!-- بخش تاریخچه معاملات (مخفی در ابتدا) -->
                     <section id="history-section" class="section">
                         <h2 class="section-title"><i class="fas fa-history"></i> تاریخچه معاملات</h2>
+                        <div class="hist-filters">
+                            <input type="search" id="histSearch" placeholder="جستجو: نماد، استراتژی، یادداشت..." oninput="loadTrades()">
+                            <select id="histStatus" onchange="loadTrades()"><option value="all">همه وضعیت‌ها</option><option value="open">باز</option><option value="closed">بسته</option></select>
+                            <select id="histResult" onchange="loadTrades()"><option value="all">سود و ضرر</option><option value="win">فقط سودده</option><option value="loss">فقط ضررده</option></select>
+                            <select id="histType" onchange="loadTrades()"><option value="all">لانگ و شورت</option><option value="buy">لانگ</option><option value="sell">شورت</option></select>
+                            <span id="histCount" class="hist-count"></span>
+                        </div>
                         <div class="trades-table-container">
                             <table class="trades-table">
                                 <thead>
@@ -892,6 +926,7 @@
                                 <span class="axis-label y-axis">رشد سرمایه ($)</span>
                             </div>
                         </div>
+                    <div id="advancedStats" class="adv-stats"></div>
                     </section>
                     
                     <!-- بخش پشتیبان‌گیری (مخفی در ابتدا) -->
@@ -933,5 +968,10 @@
 
     <!-- اسکریپت جدا -->
     <script src="script.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+        }
+    </script>
 </body>
 </html>

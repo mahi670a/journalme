@@ -2065,3 +2065,148 @@ button {
         height: 250px;
     }
 }
+
+
+/* ================= Responsive: همه‌ی اندازه‌ها ================= */
+:root { --safe-t: env(safe-area-inset-top, 0px); --safe-b: env(safe-area-inset-bottom, 0px); }
+html { -webkit-text-size-adjust: 100%; }
+body { -webkit-tap-highlight-color: transparent; }
+button, .toolbar-btn, .btn-icon { touch-action: manipulation; }
+input, select, textarea { font-size: max(16px, 1em); max-width: 100%; }
+img, svg, canvas { max-width: 100%; }
+
+/* نوار بالا زیر status bar آیپد نرود */
+.toolbar { padding-top: var(--safe-t); height: calc(70px + var(--safe-t)); }
+.main-wrapper { margin-top: calc(90px + var(--safe-t)); }
+
+@media (min-width: 1800px) { .container { max-width: 1700px; } }
+
+/* تبلت عمودی و موبایل: نوار بالای فشرده + تب‌بار پایین */
+@media (max-width: 900px) {
+    .toolbar {
+        height: calc(56px + var(--safe-t));
+        flex-direction: row;
+        padding: var(--safe-t) 14px 0;
+        gap: 10px;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        background: rgba(15, 23, 42, 0.98);
+    }
+    .toolbar-header { flex: 1; min-width: 0; }
+    .custom-logo { width: auto; }
+    .custom-logo svg { width: 112px; height: 44px; }
+    .toolbar-calculator .calculator-btn { min-width: 0; height: 40px; padding: 0 14px; }
+
+    .toolbar-menu {
+        position: fixed;
+        left: 0; right: 0; bottom: 0;
+        z-index: 1001;
+        width: 100%;
+        height: calc(62px + var(--safe-b));
+        padding: 4px 6px var(--safe-b);
+        gap: 2px;
+        flex: none;
+        justify-content: space-around;
+        align-items: stretch;
+        background: rgba(15, 23, 42, 0.98);
+        border-top: 1px solid #334155;
+        flex-wrap: nowrap;
+    }
+    .toolbar-btn {
+        flex: 1 1 0;
+        min-width: 0;
+        height: auto;
+        padding: 4px 2px;
+        flex-direction: column;
+        gap: 3px;
+        font-size: 0.68rem;
+        line-height: 1.2;
+        border-radius: 10px;
+        white-space: normal;
+        text-align: center;
+    }
+    .toolbar-btn i { font-size: 1.15rem; }
+    .toolbar-btn:hover { transform: none; }
+    .toolbar-btn.active { border-bottom: 0; box-shadow: inset 0 2px 0 #3b82f6; }
+
+    .main-wrapper {
+        margin-top: calc(56px + var(--safe-t));
+        padding: 10px 10px calc(76px + var(--safe-b));
+    }
+    .container { padding: 14px; border-radius: 12px; }
+
+    .form-grid, .prices-grid, .risk-summary, .stats-container, .backup-container,
+    .dashboard-stats, .modal-grid, .stats-row { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .preset-buttons { grid-template-columns: repeat(2, 1fr); }
+    .toolbar-btn, .calculator-btn, .btn-icon, .balance-btn, .preset-btn, .modal-btn { min-height: 44px; }
+}
+
+/* موبایل */
+@media (max-width: 600px) {
+    .toolbar-calculator .calculator-btn span { display: none; }
+    .toolbar-calculator .calculator-btn { width: 44px; padding: 0; }
+    .container { padding: 12px; }
+    .section-title { font-size: 1.1rem; }
+
+    .form-grid, .prices-grid, .risk-summary, .stats-container, .backup-container,
+    .modal-grid, .stats-row, .screenshot-gallery, .details-grid { grid-template-columns: 1fr; }
+    .dashboard-stats { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+
+    .balance-container { padding: 14px; flex-direction: column; align-items: stretch; }
+    .balance-main { gap: 12px; }
+    .balance-icon { width: 48px; height: 48px; }
+    .balance-details, .balance-actions { width: 100%; flex-wrap: wrap; gap: 8px; }
+    .balance-actions .balance-btn { flex: 1 1 100%; }
+
+    .details-modal-content, .modal-box.active { padding: 16px; }
+    .details-modal-content { width: 96%; margin: 12px auto; max-height: calc(100dvh - 24px); overflow-y: auto; }
+
+    /* جدول‌ها به کارت تبدیل می‌شوند */
+    .trades-table-container, .monthly-trades-container { max-height: none; border: 0; overflow: visible; }
+    .trades-table, .monthly-trades-table { min-width: 0; width: 100%; display: block; direction: rtl; }
+    .trades-table thead, .monthly-trades-table thead { display: none; }
+    .trades-table tbody, .monthly-trades-table tbody { display: block; }
+    .trades-table tr, .monthly-trades-table tr {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 4px 14px;
+        padding: 12px; margin: 10px 0;
+        border: 1px solid #475569; border-radius: 12px;
+        background: rgba(15, 23, 42, 0.6);
+    }
+    .trades-table td, .monthly-trades-table td {
+        display: flex; justify-content: space-between; align-items: center; gap: 8px;
+        padding: 4px 0; border: 0; text-align: left; font-size: 0.88rem;
+    }
+    .trades-table td[data-label]::before, .monthly-trades-table td[data-label]::before {
+        content: attr(data-label); color: #94a3b8; font-size: 0.75rem; flex-shrink: 0;
+    }
+    .trades-table td:first-child, .trades-table td.actions { grid-column: 1 / -1; }
+    .trades-table td.actions { justify-content: flex-end; gap: 10px; padding-top: 8px; border-top: 1px solid #334155; }
+    .monthly-trades-table td[colspan] { grid-column: 1 / -1; display: block; text-align: center; }
+}
+
+/* موبایل در حالت افقی: کم‌ارتفاع */
+@media (max-height: 480px) and (max-width: 900px) {
+    .toolbar { height: calc(44px + var(--safe-t)); }
+    .main-wrapper { margin-top: calc(44px + var(--safe-t)); }
+    .toolbar-menu { height: calc(46px + var(--safe-b)); }
+    .toolbar-btn span { display: none; }
+}
+
+/* ===== ژورنال، فیلتر تاریخچه، تحلیل پیشرفته ===== */
+textarea { width: 100%; padding: 12px; background: rgba(15, 23, 42, 0.8); border: 1px solid #475569; border-radius: 8px; color: #f1f5f9; font-family: inherit; resize: vertical; }
+.journal-fields { margin: 20px 0; }
+.hist-filters { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 12px 0; }
+.hist-filters input, .hist-filters select { flex: 1 1 160px; padding: 10px 12px; background: rgba(15, 23, 42, 0.8); border: 1px solid #475569; border-radius: 8px; color: #f1f5f9; font-family: inherit; }
+.hist-count { color: #94a3b8; font-size: 0.85rem; white-space: nowrap; }
+.adv-stats { margin-top: 30px; }
+.adv-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin: 15px 0; }
+.adv-tile { background: rgba(15, 23, 42, 0.7); border: 1px solid #475569; border-radius: 12px; padding: 14px; text-align: center; }
+.adv-label { color: #94a3b8; font-size: 0.8rem; margin-bottom: 6px; }
+.adv-value { font-size: 1.15rem; font-weight: 700; direction: ltr; }
+.adv-block { margin-top: 20px; }
+.adv-block h3 { font-size: 1rem; color: #60a5fa; margin-bottom: 8px; }
+.adv-table-wrap { overflow-x: auto; border: 1px solid #475569; border-radius: 10px; }
+.adv-table { width: 100%; border-collapse: collapse; min-width: 420px; }
+.adv-table th, .adv-table td { padding: 10px 12px; text-align: center; border-bottom: 1px solid #334155; font-size: 0.88rem; }
+.adv-table th { background: rgba(30, 64, 175, 0.5); }
+.adv-empty { color: #94a3b8; text-align: center; padding: 20px; }

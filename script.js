@@ -145,6 +145,10 @@ function getMimeType(fileName) {
 // ============================
 // متغیرهای سراسری برای مدیریت آپلود
 // ============================
+let editingTradeId = null;
+function escapeHTML(v) {
+    return String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
 let isImportCancelled = false;
 let importStartTime = 0;
 let accountGrowthChart = null;
@@ -616,7 +620,7 @@ function updateGrowthChart() {
     // مرتب‌سازی معاملات بر اساس تاریخ
     const sortedTrades = [...trades]
         .filter(t => t.status === 'closed')
-        .sort((a, b) => new Date(a.date) - new Date(b.date));
+        .sort((a, b) => new Date(a.closedDate || a.date) - new Date(b.closedDate || b.date));
     
     // محاسبه رشد حساب
     let balance = initialAccountBalance;
@@ -869,7 +873,7 @@ function loadOpenTrades() {
         html += `
         <div class="open-trade-item">
             <div class="open-trade-info">
-                <span class="open-trade-symbol">${trade.symbol}</span>
+                <span class="open-trade-symbol">${escapeHTML(trade.symbol)}</span>
                 <div class="open-trade-detail">
                     <i class="fas ${typeIcon}" style="color: ${typeColor}"></i>
                     <span>${typeText}</span>
@@ -934,6 +938,14 @@ async function initialize() {
         }, 500);
         
         console.log('✅ برنامه با موفقیت راه‌اندازی شد');
+        if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
+        if (trades.length > 0) {
+            const last = parseInt(await db.getSetting('lastBackupAt')) || 0;
+            const days = last ? Math.floor((Date.now() - last) / 86400000) : null;
+            if (days === null || days >= 7) {
+                setTimeout(() => showNotification(days === null ? 'هنوز بکاپ نگرفته‌اید. از بخش «بکاپ» یک نسخه‌ی پشتیبان بگیرید.' : `${days} روز از آخرین بکاپ گذشته است.`, 'warning'), 1500);
+            }
+        }
     } catch (error) {
         console.error('❌ خطا در راه‌اندازی:', error);
         showNotification('خطا در راه‌اندازی دیتابیس', 'error');
@@ -1124,8 +1136,10 @@ function previewEntryScreenshot(input) {
         const reader = new FileReader();
         reader.onload = function(e) {
             const preview = document.getElementById('entryScreenshotPreview');
-            preview.src = e.target.result;
-            document.getElementById('entryScreenshotPreviewContainer').classList.add('active');
+            compressImage(e.target.result, function(data) {
+                preview.src = data;
+                document.getElementById('entryScreenshotPreviewContainer').classList.add('active');
+            });
         };
         reader.readAsDataURL(input.files[0]);
     }
@@ -1136,10 +1150,12 @@ function previewCloseScreenshot(input) {
         const reader = new FileReader();
         reader.onload = function(e) {
             const preview = document.getElementById('closeScreenshotPreview');
-            preview.src = e.target.result;
-            preview.classList.add('active');
-            document.getElementById('closeScreenshotRemove').style.display = 'inline';
-            closeScreenshotData = e.target.result;
+            compressImage(e.target.result, function(data) {
+                preview.src = data;
+                preview.classList.add('active');
+                document.getElementById('closeScreenshotRemove').style.display = 'inline';
+                closeScreenshotData = data;
+            });
         };
         reader.readAsDataURL(input.files[0]);
     }
@@ -1166,7 +1182,7 @@ function setBalancePreset(amount) {
 }
 
 function updateBalanceDisplay() {
-    document.getElementById('currentBalance').textContent = '$' + formatNumber(accountBalance);
+    document.getElementById('currentBalance').textContent = '$' + formatNumber(Math.round(getEquity() * 100) / 100);
     document.getElementById('currentBalanceDisplay').textContent = '$' + formatNumber(accountBalance);
     document.getElementById('currentAccountName').textContent = activeAccount ? activeAccount.name : 'حساب اصلی';
     
@@ -1177,6 +1193,10 @@ function updateBalanceDisplay() {
     const totalPnLElement = document.getElementById('totalPnL');
     totalPnLElement.textContent = (totalPnL >= 0 ? '+' : '') + formatCurrency(Math.abs(totalPnL));
     totalPnLElement.style.color = totalPnL >= 0 ? '#10b981' : '#ef4444';
+}
+
+function getEquity() {
+    return (initialAccountBalance || 0) + calculateTotalPnL();
 }
 
 function formatCurrency(num) {
@@ -1204,13 +1224,11 @@ function updateTotalRisk() {
     let totalRiskAmount = 0;
     
     openTrades.forEach(trade => {
-        const riskData = calculateTradeRisk(trade);
-        if (riskData && riskData.totalRiskAmount) {
-            totalRiskAmount += riskData.totalRiskAmount;
-        }
+        totalRiskAmount += trade.totalRiskAmount || calculateTradeRisk(trade).totalRiskAmount || 0;
     });
     
-    const totalRiskPercent = accountBalance > 0 ? (totalRiskAmount / accountBalance) * 100 : 0;
+    const eqNow = getEquity();
+    const totalRiskPercent = eqNow > 0 ? (totalRiskAmount / eqNow) * 100 : 0;
     document.getElementById('totalRiskPercent').textContent = totalRiskPercent.toFixed(2) + '%';
 }
 
@@ -1252,6 +1270,7 @@ async function updateBalance() {
 }
 
 function resetForm() {
+    editingTradeId = null;
     document.getElementById('tradeForm').reset();
     document.getElementById('type').value = '';
     document.getElementById('feeDetails').style.display = 'none';
@@ -1285,7 +1304,7 @@ function calculateRisk() {
         return;
     }
     
-    const totalRiskAmount = (accountBalance * riskPercent) / 100;
+    const totalRiskAmount = (getEquity() * riskPercent) / 100;
     
     let stopLossPoints, takeProfitPoints;
     
@@ -1371,6 +1390,15 @@ document.getElementById('tradeForm').addEventListener('submit', async function(e
         return;
     }
     
+    if (type === 'buy' && takeProfit <= entryPrice) {
+        showNotification('برای لانگ، حد سود باید بیشتر از قیمت ورود باشد.', 'error');
+        return;
+    }
+    if (type === 'sell' && takeProfit >= entryPrice) {
+        showNotification('برای شورت، حد سود باید کمتر از قیمت ورود باشد.', 'error');
+        return;
+    }
+
     const riskData = calculateRisk();
     if (!riskData) {
         showNotification('خطا در محاسبات ریسک.', 'error');
@@ -1418,11 +1446,37 @@ document.getElementById('tradeForm').addEventListener('submit', async function(e
         potentialProfit: riskData.potentialProfit,
         netProfit: riskData.netProfit,
         riskRewardRatio: riskData.riskRewardRatio,
+        strategy: document.getElementById('strategy').value.trim(),
+        emotion: document.getElementById('emotion').value,
+        mistake: document.getElementById('mistake').value,
+        notes: document.getElementById('notes').value.trim(),
         accountId: activeAccountId
     };
     
+    const isEditing = editingTradeId !== null;
+    if (isEditing) {
+        const orig = await db.getTradeById(editingTradeId);
+        if (orig) {
+            trade.id = orig.id;
+            trade.uid = orig.uid;
+            trade.status = orig.status;
+            trade.closedPrice = orig.closedPrice;
+            trade.closedDate = orig.closedDate;
+            trade.exitScreenshot = orig.exitScreenshot;
+            trade.exitScreenshotName = orig.exitScreenshotName;
+            trade.accountId = orig.accountId;
+            if (!trade.entryScreenshot) {
+                trade.entryScreenshot = orig.entryScreenshot;
+                trade.entryScreenshotName = orig.entryScreenshotName;
+            } else {
+                trade.entryScreenshotName = `entry_${orig.uid}.png`;
+            }
+        }
+    }
+
     const saved = await saveTradeToDB(trade);
     if (!saved) return;
+    editingTradeId = null;
     
     loadTrades();
     updateStats();
@@ -1446,7 +1500,7 @@ document.getElementById('tradeForm').addEventListener('submit', async function(e
     
     removeEntryScreenshot();
     
-    showNotification('معامله با موفقیت ثبت شد!', 'success');
+    showNotification(isEditing ? 'ویرایش معامله ذخیره شد.' : 'معامله با موفقیت ثبت شد!', 'success');
 });
 
 function calculateTradeRisk(trade) {
@@ -1458,7 +1512,7 @@ function calculateTradeRisk(trade) {
         stopLossPoints = Math.abs(trade.stopLoss - trade.entryPrice);
     }
     
-    const totalRiskAmount = (accountBalance * trade.riskPercent) / 100;
+    const totalRiskAmount = (getEquity() * trade.riskPercent) / 100;
     const feePerUnit = (trade.entryPrice * (trade.totalFeePercent || 0)) / 100;
     const denominator = stopLossPoints + feePerUnit;
     const positionSize = denominator > 0 ? totalRiskAmount / denominator : 0;
@@ -1470,7 +1524,10 @@ function loadTrades() {
     const tbody = document.getElementById('tradesTableBody');
     const noTradesMessage = document.getElementById('noTradesMessage');
     
-    const accountTrades = trades.filter(trade => trade.accountId === activeAccountId);
+    const allAccountTrades = trades.filter(trade => trade.accountId === activeAccountId);
+    const accountTrades = applyHistoryFilters(allAccountTrades);
+    const countEl = document.getElementById('histCount');
+    if (countEl) countEl.textContent = accountTrades.length === allAccountTrades.length ? `${allAccountTrades.length} معامله` : `${accountTrades.length} از ${allAccountTrades.length} معامله`;
     
     if (accountTrades.length === 0) {
         tbody.innerHTML = '';
@@ -1502,21 +1559,21 @@ function loadTrades() {
         
         html += `
         <tr>
-            <td>
+            <td data-label="ارز">
                 <div class="crypto-badge">
                     <i class="fas fa-coins"></i>
-                    ${trade.symbol} ${screenshotIcon}
+                    ${escapeHTML(trade.symbol)} ${screenshotIcon}
                 </div>
             </td>
-            <td>${dateText}</td>
-            <td>${typeText}</td>
-            <td class="price-display">${trade.entryPriceStr || trade.entryPrice}</td>
-            <td class="price-display">${trade.stopLossStr || trade.stopLoss}</td>
-            <td class="price-display">${trade.takeProfitStr || trade.takeProfit}</td>
-            <td>${trade.riskPercent.toFixed(2)}%</td>
-            <td>${feeText}</td>
-            <td><span class="${statusClass}">${statusText}</span></td>
-            <td><span class="${pnlClass}">${pnlText}</span></td>
+            <td data-label="تاریخ">${dateText}</td>
+            <td data-label="نوع">${typeText}</td>
+            <td class="price-display" data-label="ورود">${trade.entryPriceStr || trade.entryPrice}</td>
+            <td class="price-display" data-label="حد ضرر">${trade.stopLossStr || trade.stopLoss}</td>
+            <td class="price-display" data-label="حد سود">${trade.takeProfitStr || trade.takeProfit}</td>
+            <td data-label="ریسک">${trade.riskPercent.toFixed(2)}%</td>
+            <td data-label="کارمزد">${feeText}</td>
+            <td data-label="وضعیت"><span class="${statusClass}">${statusText}</span></td>
+            <td data-label="سود/ضرر"><span class="${pnlClass}">${pnlText}</span></td>
             <td class="actions">
                 <button class="btn-icon" onclick="showTradeDetails(${trade.id})" style="background-color: rgba(14, 165, 233, 0.1); color: #0ea5e9; border: 1px solid rgba(14, 165, 233, 0.3);" title="مشاهده جزئیات">
                     <i class="fas fa-eye"></i>
@@ -1524,6 +1581,7 @@ function loadTrades() {
                 <button class="btn-icon" onclick="editTrade(${trade.id})" style="background-color: rgba(245, 158, 11, 0.1); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3);" title="ویرایش معامله">
                     <i class="fas fa-edit"></i>
                 </button>
+                ${trade.status === 'closed' ? `<button class="btn-icon" onclick="openCloseModal(${trade.id})" style="background-color: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3);" title="ویرایش خروج"><i class="fas fa-flag-checkered"></i></button>` : ''}
                 <button class="btn-icon" onclick="deleteTrade(${trade.id})" style="background-color: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3);" title="حذف معامله">
                     <i class="fas fa-trash"></i>
                 </button>
@@ -1589,6 +1647,12 @@ async function showTradeDetails(tradeId) {
         exitPlaceholder.style.display = 'block';
     }
     
+    const jr = document.getElementById('detail-journal-section');
+    const jItems = [['استراتژی', trade.strategy], ['احساس', trade.emotion], ['اشتباه', trade.mistake], ['یادداشت', trade.notes]].filter(i => i[1]);
+    jr.style.display = jItems.length ? 'block' : 'none';
+    jr.innerHTML = jItems.length ? '<div class="detail-section-title"><i class="fas fa-book"></i> ژورنال</div><div class="details-grid">' +
+        jItems.map(([l, v]) => `<div class="detail-item"><span class="detail-label">${l}</span><div class="detail-value">${escapeHTML(v)}</div></div>`).join('') + '</div>' : '';
+    
     if (trade.status === 'closed') {
         document.getElementById('detail-closed-price-container').style.display = 'block';
         document.getElementById('detail-result-section').style.display = 'block';
@@ -1635,7 +1699,9 @@ function closeDetailsModal() {
 
 function openCloseModal(tradeId) {
     currentTradeIdForClose = tradeId;
-    document.getElementById('closePriceInput').value = '';
+    const tClose = trades.find(x => x.id === tradeId);
+    document.getElementById('closePriceInput').value = tClose && tClose.status === 'closed' ? tClose.closedPrice : '';
+    document.getElementById('closeFeeInput').value = tClose && tClose.actualFee != null ? tClose.actualFee : '';
     removeCloseScreenshot();
     document.getElementById('closeTradeModal').style.display = 'flex';
     document.body.style.overflow = 'hidden';
@@ -1651,7 +1717,7 @@ function closeCloseModal() {
 async function confirmCloseTrade() {
     const closePrice = document.getElementById('closePriceInput').value.trim();
     
-    if (!closePrice || isNaN(parseFloat(closePrice))) {
+    if (!closePrice || isNaN(parseFloat(closePrice)) || parseFloat(closePrice) <= 0) {
         showNotification('لطفاً قیمت معتبر وارد کنید.', 'error');
         return;
     }
@@ -1664,7 +1730,12 @@ async function confirmCloseTrade() {
         
         trades[tradeIndex].status = 'closed';
         trades[tradeIndex].closedPrice = parseFloat(closePrice);
-        trades[tradeIndex].closedDate = new Date().toISOString();
+        trades[tradeIndex].closedDate = trades[tradeIndex].closedDate && trade.status === 'closed' ? trades[tradeIndex].closedDate : new Date().toISOString();
+        const feeStr = document.getElementById('closeFeeInput').value.trim();
+        if (feeStr !== '' && !isNaN(parseFloat(feeStr)) && parseFloat(feeStr) >= 0) {
+            const f = parseFloat(feeStr);
+            trades[tradeIndex].totalFee = f; trades[tradeIndex].feeEntry = f / 2; trades[tradeIndex].feeExit = f / 2; trades[tradeIndex].actualFee = f;
+        }
         
         if (closeScreenshotData) {
             const exitScreenshotName = `exit_${trade.uid}.png`;
@@ -1746,6 +1817,9 @@ function calculateTotalFees() {
 }
 
 function updateStats() {
+    updateBalanceDisplay();
+    renderAdvancedStats();
+    refreshStrategyList();
     if (trades.length === 0) {
         resetStats();
         return;
@@ -1806,12 +1880,16 @@ async function editTrade(id) {
     document.getElementById('stopLoss').value = trade.stopLossStr || trade.stopLoss;
     document.getElementById('takeProfit').value = trade.takeProfitStr || trade.takeProfit;
     document.getElementById('riskPercent').value = trade.riskPercent;
-    document.getElementById('feePercent').value = trade.totalFeePercent || '';
+    document.getElementById('feePercent').value = trade.totalFeePercent ?? '';
+    document.getElementById('strategy').value = trade.strategy || '';
+    document.getElementById('emotion').value = trade.emotion || '';
+    document.getElementById('mistake').value = trade.mistake || '';
+    document.getElementById('notes').value = trade.notes || '';
     
-    await deleteTradeFromDB(id);
+    editingTradeId = id;
     
     calculateRisk();
-    showNotification('معامله برای ویرایش آماده است.', 'info');
+    showNotification('در حال ویرایش معامله. با ثبت فرم، تغییرات ذخیره می‌شود.', 'info');
     
     switchSection('trade-form');
     loadOpenTrades();
@@ -1856,7 +1934,7 @@ function updateAccountsList() {
         html += `
             <div class="account-item ${isActive ? 'active-account' : ''}">
                 <div class="account-info">
-                    <div class="account-name">${account.name}</div>
+                    <div class="account-name">${escapeHTML(account.name)}</div>
                     <div class="account-balance">${formatCurrency(account.balance)}</div>
                     ${isActive ? '<div class="active-badge">فعال</div>' : ''}
                 </div>
@@ -1929,11 +2007,11 @@ async function deleteAccount(accountId) {
     if (confirm('آیا از حذف این حساب اطمینان دارید؟ تمام معاملات مربوط به این حساب نیز حذف خواهند شد.')) {
         accounts = accounts.filter(acc => acc.id !== accountId);
         
-        const tradesToDelete = trades.filter(t => t.accountId === accountId).map(t => t.id);
+        const accountTrades = await db.getTradesByAccount(accountId);
+        const tradesToDelete = accountTrades.map(t => t.id);
         if (tradesToDelete.length > 0) {
             await db.deleteTrades(tradesToDelete);
         }
-        trades = trades.filter(t => t.accountId !== accountId);
         
         if (accountId === activeAccountId) {
             activeAccountId = 1;
@@ -1941,6 +2019,7 @@ async function deleteAccount(accountId) {
             accountBalance = activeAccount ? activeAccount.balance : 0;
             initialAccountBalance = accountBalance;
         }
+        trades = await db.getTradesByAccount(activeAccountId);
         
         await saveAccountsToDB();
         
@@ -2095,13 +2174,13 @@ function updateMonthlyDashboard() {
         
         html += `
             <tr onclick="showTradeDetails(${trade.id})">
-                <td>${dateText}</td>
-                <td><span class="crypto-badge" style="font-size: 0.8rem;">${trade.symbol}</span></td>
-                <td>${typeText}</td>
-                <td class="price-display">${trade.entryPriceStr || trade.entryPrice}</td>
-                <td class="price-display">${trade.status === 'closed' ? trade.closedPrice : '-'}</td>
-                <td><span class="${pnlClass}">${pnlText}</span></td>
-                <td><span class="${trade.status === 'open' ? 'profit' : 'neutral'}">${statusText}</span></td>
+                <td data-label="تاریخ">${dateText}</td>
+                <td data-label="ارز"><span class="crypto-badge" style="font-size: 0.8rem;">${escapeHTML(trade.symbol)}</span></td>
+                <td data-label="نوع">${typeText}</td>
+                <td class="price-display" data-label="ورود">${trade.entryPriceStr || trade.entryPrice}</td>
+                <td class="price-display" data-label="خروج">${trade.status === 'closed' ? trade.closedPrice : '-'}</td>
+                <td data-label="سود/ضرر"><span class="${pnlClass}">${pnlText}</span></td>
+                <td data-label="وضعیت"><span class="${trade.status === 'open' ? 'profit' : 'neutral'}">${statusText}</span></td>
             </tr>
         `;
     });
@@ -2217,12 +2296,27 @@ async function exportData() {
         
         showProgress('در حال دانلود فایل...', 100);
         
+        await db.saveSetting('lastBackupAt', String(Date.now()));
+        if (window.navigator.standalone && navigator.canShare) {
+            const shareFile = new File([content], fileName, { type: 'application/zip' });
+            if (navigator.canShare({ files: [shareFile] })) {
+                try {
+                    await navigator.share({ files: [shareFile], title: fileName });
+                    hideProgress();
+                    showNotification('پشتیبان آماده ذخیره شد.', 'success');
+                    return;
+                } catch (shareErr) {
+                    if (shareErr && shareErr.name === 'AbortError') { hideProgress(); return; }
+                }
+            }
+        }
+        
         const url = URL.createObjectURL(content);
         const link = document.createElement('a');
         link.href = url;
         link.download = fileName;
         link.click();
-        URL.revokeObjectURL(url);
+        setTimeout(() => URL.revokeObjectURL(url), 30000);
         
         setTimeout(hideProgress, 2000);
         showNotification('پشتیبان با موفقیت دانلود شد.', 'success');
@@ -2258,6 +2352,24 @@ async function importData() {
     
     isImportCancelled = false;
     importStartTime = Date.now();
+    let snapshot = null;
+    let wiped = false;
+    const restoreSnapshot = async () => {
+        if (!wiped || !snapshot) return;
+        try {
+            await db.clearAll();
+            await db.saveAccounts(snapshot.accounts || []);
+            await db.saveTrades(snapshot.trades || []);
+            if (snapshot.activeId) await db.saveSetting('activeAccountId', snapshot.activeId);
+            await loadAccountsFromDB();
+            await loadTradesFromDB();
+            updateBalanceDisplay();
+            updateStats();
+        } catch (restoreErr) {
+            console.error('خطا در بازگردانی اطلاعات قبلی:', restoreErr);
+        }
+        wiped = false;
+    };
     
     try {
         showProgress('در حال خواندن فایل ZIP...', 10);
@@ -2363,7 +2475,10 @@ async function importData() {
         
         showProgress('در حال ذخیره در دیتابیس...', 70);
         
+        snapshot = await db.backup();
+        snapshot.activeId = await db.getSetting('activeAccountId');
         await db.clearAll();
+        wiped = true;
         
         if (backupData.accounts && Array.isArray(backupData.accounts)) {
             await db.saveAccounts(backupData.accounts);
@@ -2374,33 +2489,14 @@ async function importData() {
             const batchSize = 5;
             const totalTrades = backupData.trades.length;
             
-            let startFrom = 0;
-            try {
-                const checkpoint = localStorage.getItem('restoreCheckpoint');
-                if (checkpoint) {
-                    const cp = JSON.parse(checkpoint);
-                    if (cp.totalTrades === totalTrades) {
-                        startFrom = cp.lastIndex;
-                        showNotification(`ادامه از معامله ${startFrom}`, 'info');
-                    }
-                }
-            } catch (e) {
-                console.warn('خطا در خواندن checkpoint:', e);
-            }
+            const startFrom = 0;
             
             trades = [];
             
             for (let i = startFrom; i < totalTrades; i += batchSize) {
                 if (isImportCancelled) {
-                    try {
-                        localStorage.setItem('restoreCheckpoint', JSON.stringify({
-                            lastIndex: i,
-                            totalTrades: totalTrades
-                        }));
-                    } catch (e) {
-                        console.warn('خطا در ذخیره checkpoint:', e);
-                    }
-                    showNotification('عملیات لغو شد - می‌توانید بعداً ادامه دهید', 'warning');
+                    await restoreSnapshot();
+                    showNotification('عملیات لغو شد - اطلاعات قبلی بازگردانده شد.', 'warning');
                     hideProgress();
                     return;
                 }
@@ -2415,6 +2511,7 @@ async function importData() {
                         if (tradeError.message.includes('فضای ذخیره‌سازی')) {
                             showNotification(tradeError.message, 'error');
                             isImportCancelled = true;
+                            await restoreSnapshot();
                             hideProgress();
                             return;
                         }
@@ -2433,11 +2530,6 @@ async function importData() {
                 await new Promise(resolve => setTimeout(resolve, 5));
             }
             
-            try {
-                localStorage.removeItem('restoreCheckpoint');
-            } catch (e) {
-                console.warn('خطا در پاک کردن checkpoint:', e);
-            }
         }
         
         if (accounts.length > 0) {
@@ -2469,6 +2561,7 @@ async function importData() {
         
     } catch (error) {
         console.error('خطا در خواندن فایل:', error);
+        await restoreSnapshot();
         hideProgress();
         
         let errorMessage = 'خطا در خواندن فایل';
@@ -2602,3 +2695,95 @@ document.addEventListener('keydown', function(e) {
         });
     }
 });
+
+
+// ============================
+// توابع جدید: فیلتر، فشرده‌سازی تصویر، تحلیل پیشرفته
+// ============================
+function applyHistoryFilters(list) {
+    const val = id => (document.getElementById(id) || {}).value || '';
+    const q = val('histSearch').trim().toLowerCase();
+    const st = val('histStatus') || 'all', rs = val('histResult') || 'all', ty = val('histType') || 'all';
+    return list.filter(t => {
+        if (q && !`${t.symbol} ${t.strategy || ''} ${t.emotion || ''} ${t.mistake || ''} ${t.notes || ''}`.toLowerCase().includes(q)) return false;
+        if (st !== 'all' && t.status !== st) return false;
+        if (ty !== 'all' && t.type !== ty) return false;
+        if (rs !== 'all') {
+            if (t.status !== 'closed') return false;
+            const p = calculateTradePnL(t);
+            if (rs === 'win' && !(p > 0)) return false;
+            if (rs === 'loss' && !(p < 0)) return false;
+        }
+        return true;
+    });
+}
+
+function compressImage(dataUrl, cb) {
+    const img = new Image();
+    img.onload = () => {
+        const max = 1400, s = Math.min(1, max / Math.max(img.width, img.height));
+        const c = document.createElement('canvas');
+        c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        cb(c.toDataURL('image/jpeg', 0.82));
+    };
+    img.onerror = () => cb(dataUrl);
+    img.src = dataUrl;
+}
+
+function refreshStrategyList() {
+    const dl = document.getElementById('strategyList');
+    if (!dl) return;
+    const names = [...new Set(trades.map(t => (t.strategy || '').trim()).filter(Boolean))];
+    dl.innerHTML = names.map(n => `<option value="${escapeHTML(n)}">`).join('');
+}
+
+function renderAdvancedStats() {
+    const box = document.getElementById('advancedStats');
+    if (!box) return;
+    const rows = trades.filter(t => t.status === 'closed')
+        .sort((a, b) => new Date(a.closedDate || a.date) - new Date(b.closedDate || b.date))
+        .map(t => { const pnl = calculateTradePnL(t); return { t, pnl, r: t.totalRiskAmount > 0 ? pnl / t.totalRiskAmount : 0 }; });
+    if (!rows.length) {
+        box.innerHTML = '<h2 class="section-title"><i class="fas fa-microscope"></i> تحلیل پیشرفته</h2><p class="adv-empty">بعد از بستن اولین معامله، تحلیل پیشرفته اینجا نمایش داده می‌شود.</p>';
+        return;
+    }
+    const n = rows.length, wins = rows.filter(x => x.pnl > 0), losses = rows.filter(x => x.pnl < 0);
+    const gp = wins.reduce((s, x) => s + x.pnl, 0), gl = Math.abs(losses.reduce((s, x) => s + x.pnl, 0));
+    const pf = gl > 0 ? (gp / gl).toFixed(2) : (gp > 0 ? '∞' : '-');
+    const avgR = rows.reduce((s, x) => s + x.r, 0) / n;
+    const avgWin = wins.length ? gp / wins.length : 0, avgLoss = losses.length ? gl / losses.length : 0;
+    const payoff = avgLoss > 0 ? (avgWin / avgLoss).toFixed(2) : '-';
+    let eq = initialAccountBalance, peak = eq, mdd = 0, mddP = 0;
+    rows.forEach(x => { eq += x.pnl; if (eq > peak) peak = eq; const d = peak - eq; if (d > mdd) { mdd = d; mddP = peak > 0 ? d / peak * 100 : 0; } });
+    let maxW = 0, maxL = 0, cw = 0, cl = 0;
+    rows.forEach(x => {
+        if (x.pnl > 0) { cw++; cl = 0; } else if (x.pnl < 0) { cl++; cw = 0; } else { cw = 0; cl = 0; }
+        maxW = Math.max(maxW, cw); maxL = Math.max(maxL, cl);
+    });
+    const cur = cw > 0 ? `${cw} برد` : (cl > 0 ? `${cl} باخت` : '-');
+    const sgn = v => (v >= 0 ? '+' : '-') + formatCurrency(Math.abs(v));
+    const tile = (l, v, c) => `<div class="adv-tile"><div class="adv-label">${l}</div><div class="adv-value ${c || ''}">${v}</div></div>`;
+    const days = ['یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنجشنبه', 'جمعه', 'شنبه'];
+    const group = keyFn => {
+        const m = new Map();
+        rows.forEach(x => {
+            const k = keyFn(x.t) || 'نامشخص', g = m.get(k) || { n: 0, w: 0, pnl: 0, r: 0 };
+            g.n++; if (x.pnl > 0) g.w++; g.pnl += x.pnl; g.r += x.r; m.set(k, g);
+        });
+        return [...m.entries()].sort((a, b) => b[1].pnl - a[1].pnl);
+    };
+    const table = (title, list) => `<div class="adv-block"><h3>${title}</h3><div class="adv-table-wrap"><table class="adv-table"><thead><tr><th>مورد</th><th>تعداد</th><th>وین‌ریت</th><th>میانگین R</th><th>سود/زیان</th></tr></thead><tbody>` +
+        list.map(([k, g]) => `<tr><td>${escapeHTML(k)}</td><td>${g.n}</td><td>${Math.round(g.w / g.n * 100)}%</td><td>${(g.r / g.n).toFixed(2)}</td><td class="${g.pnl >= 0 ? 'profit' : 'loss'}">${sgn(g.pnl)}</td></tr>`).join('') + '</tbody></table></div></div>';
+    box.innerHTML = '<h2 class="section-title"><i class="fas fa-microscope"></i> تحلیل پیشرفته</h2><div class="adv-grid">' +
+        tile('ضریب سود (Profit Factor)', pf, parseFloat(pf) >= 1 || pf === '∞' ? 'profit' : 'loss') +
+        tile('میانگین R هر معامله', avgR.toFixed(2) + 'R', avgR >= 0 ? 'profit' : 'loss') +
+        tile('امید ریاضی (هر معامله)', sgn((gp - gl) / n), gp - gl >= 0 ? 'profit' : 'loss') +
+        tile('میانگین سود / میانگین ضرر', `${formatCurrency(avgWin)} / ${formatCurrency(avgLoss)}`) +
+        tile('نسبت سود به ضرر (Payoff)', payoff) +
+        tile('حداکثر دراودان', `${formatCurrency(mdd)} (${mddP.toFixed(1)}%)`, mdd > 0 ? 'loss' : '') +
+        tile('بیشترین برد پیاپی', maxW) + tile('بیشترین باخت پیاپی', maxL) + tile('رگه‌ی فعلی', cur) + '</div>' +
+        table('بر اساس نماد', group(t => t.symbol)) + table('بر اساس استراتژی', group(t => t.strategy)) +
+        table('بر اساس احساس', group(t => t.emotion)) + table('بر اساس اشتباه', group(t => t.mistake || 'بدون اشتباه')) +
+        table('بر اساس روز هفته', group(t => { const d = new Date(t.date); return isNaN(d) ? '' : days[d.getDay()]; }));
+}
