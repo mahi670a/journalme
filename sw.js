@@ -1,7 +1,7 @@
 // نسخه را با هر انتشار تغییر بده تا کش قدیمی پاک شود
-const VERSION = 'journalme-v3';
+const VERSION = 'journalme-v6';
 const CORE = [
-  './', 'index.html', 'style.css', 'script.js', 'manifest.json',
+  './', 'index.html', 'style.css', 'script.js', 'fees.js', 'manifest.json',
   'calculator/', 'calculator/index.html',
   'apple-touch-icon.png', 'icons/favicon-96x96.png'
 ];
@@ -40,7 +40,7 @@ self.addEventListener('fetch', e => {
 
   // فایل‌های خود برنامه: اول شبکه (تا آپدیت‌ها سریع برسند)، اگر آفلاین بود از کش
   e.respondWith(
-    fetch(req).then(res => {
+    fetch(req, { cache: 'no-cache' }).then(res => {
       if (res.ok) {
         const copy = res.clone();
         caches.open(VERSION).then(c => c.put(req, copy));

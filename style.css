@@ -2218,3 +2218,120 @@ textarea { width: 100%; padding: 12px; background: rgba(15, 23, 42, 0.8); border
 .form-grid > .form-group, .form-grid > * { min-width: 0; }
 .strategy-row select { flex: 1 1 0; width: 0; min-width: 0; }
 textarea { box-sizing: border-box; min-width: 0; }
+
+
+/* =====================================================
+   لایه‌ی ظاهر (Polish): سطوح آرام، فونت وزیرمتن، نوار نتیجه‌ی معامله
+   ===================================================== */
+:root {
+    --ink: #0b1220; --panel: #111a2c; --raised: #17223a; --line: #243049;
+    --text: #e8edf6; --muted: #8c9bb5;
+    --profit: #34d399; --loss: #fb7185; --open: #f5b84b; --accent: #7aa2ff;
+    --font: 'Vazirmatn', 'Segoe UI', Tahoma, sans-serif;
+}
+* { font-family: var(--font); }
+body {
+    background: radial-gradient(1100px 480px at 85% -8%, rgba(122, 162, 255, 0.09), transparent 62%), var(--ink);
+    color: var(--text); line-height: 1.75;
+}
+::selection { background: rgba(122, 162, 255, 0.35); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* نوار ناوبری */
+.toolbar { background: rgba(11, 18, 32, 0.94); border-bottom: 1px solid var(--line); box-shadow: none; }
+.toolbar-btn { color: var(--muted); background: transparent; border: 0; border-radius: 12px; font-weight: 600; }
+.toolbar-btn:hover { color: var(--text); background: rgba(255, 255, 255, 0.05); transform: none; }
+.toolbar-btn.active { color: #fff; background: rgba(122, 162, 255, 0.14); box-shadow: inset 0 0 0 1px rgba(122, 162, 255, 0.35); border-bottom: 0; }
+@media (max-width: 900px) {
+    .toolbar-menu { background: rgba(11, 18, 32, 0.86); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); }
+}
+
+/* سطوح */
+.container { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 14px 34px rgba(0, 0, 0, 0.28); }
+.section-title { color: var(--text); font-weight: 800; font-size: 1.25rem; border-bottom: 1px solid var(--line); padding-bottom: 14px; }
+.section-title i { color: var(--muted); }
+.balance-container { background: linear-gradient(160deg, #16223b, #111a2c); border: 1px solid var(--line); border-radius: 18px; }
+.stat-card, .dashboard-stat-card, .adv-tile { background: var(--raised); border: 1px solid var(--line); border-radius: 14px; box-shadow: none; }
+.stat-card::before { display: none; }
+.stat-card:hover { transform: none; box-shadow: none; border-color: #33425f; }
+.risk-summary-section { background: var(--raised); border: 1px solid var(--line); border-radius: 14px; }
+
+/* فرم‌ها */
+.form-group label { color: var(--muted); font-weight: 600; font-size: 0.9rem; }
+input, select, textarea { background: var(--raised); border: 1px solid var(--line); border-radius: 12px; color: var(--text); }
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(122, 162, 255, 0.22); }
+input::placeholder, textarea::placeholder { color: #5d6d89; }
+button { border-radius: 12px; transition: background 0.18s, box-shadow 0.18s, border-color 0.18s, transform 0.12s; }
+button:active { transform: scale(0.98); }
+.btn-primary { background: var(--accent); color: #0b1220; }
+.btn-primary:hover { background: #93b3ff; transform: none; box-shadow: 0 6px 18px rgba(122, 162, 255, 0.25); }
+.btn-secondary { background: var(--raised); color: var(--text); border: 1px solid var(--line); }
+.btn-secondary:hover { background: #1d2a47; transform: none; box-shadow: none; }
+
+/* مرور معاملات: جدول و کارت */
+.hist-filters input, .hist-filters select { background: var(--raised); border: 1px solid var(--line); }
+.trades-table-container { background: transparent; border: 1px solid var(--line); border-radius: 14px; }
+.trades-table th { background: #0f1830; color: var(--muted); font-weight: 700; font-size: 0.82rem; padding: 14px 12px; border-bottom: 1px solid var(--line); }
+.trades-table td { padding: 16px 12px; border-bottom: 1px solid rgba(36, 48, 73, 0.7); font-size: 0.93rem; vertical-align: middle; }
+.trades-table tbody tr:hover { background: rgba(122, 162, 255, 0.05); }
+.trades-table tr.row-win { --c: var(--profit); } .trades-table tr.row-loss { --c: var(--loss); }
+.trades-table tr.row-open { --c: var(--open); } .trades-table tr.row-flat { --c: var(--muted); }
+.trades-table tbody tr td:first-child { box-shadow: inset 3px 0 0 var(--c, transparent); }
+.price-display { font-family: var(--font); font-variant-numeric: tabular-nums; direction: ltr; unicode-bidi: isolate; color: #cbd5e6; }
+.profit, .loss, .neutral { font-family: var(--font); font-variant-numeric: tabular-nums; }
+.profit { color: var(--profit); } .loss { color: var(--loss); }
+.trades-table td:nth-child(10) span { font-size: 1.02rem; font-weight: 800; direction: ltr; display: inline-block; }
+.crypto-badge { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--line); color: var(--text); border-radius: 10px; padding: 4px 10px; font-weight: 700; }
+.crypto-badge i { color: var(--muted); }
+.chip { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 0.8rem; font-weight: 700; line-height: 1.7; }
+.chip-long { background: rgba(52, 211, 153, 0.12); color: var(--profit); }
+.chip-short { background: rgba(251, 113, 133, 0.12); color: var(--loss); }
+.chip-open { background: rgba(245, 184, 75, 0.14); color: var(--open); }
+.chip-closed { background: rgba(140, 155, 181, 0.14); color: var(--muted); }
+.btn-icon { min-width: 38px; width: 38px; height: 38px; padding: 0; border-radius: 10px; }
+
+/* کارت معامله روی گوشی: نماد و سود/ضرر در سرخط، بقیه‌ی جزئیات زیرش */
+@media (max-width: 600px) {
+    .trades-table tr { border-inline-start: 4px solid var(--c, var(--line)); border-radius: 14px; background: var(--raised); }
+    .trades-table tbody tr td:first-child { box-shadow: none; }
+    .trades-table td:nth-child(1) { order: 1; grid-column: 1; }
+    .trades-table td:nth-child(10) { order: 2; grid-column: 2; justify-content: flex-end; }
+    .trades-table td:nth-child(1)::before, .trades-table td:nth-child(10)::before { display: none; }
+    .trades-table td:nth-child(10) span { font-size: 1.2rem; }
+    .trades-table td:nth-child(2) { order: 3; } .trades-table td:nth-child(9) { order: 4; }
+    .trades-table td:nth-child(3) { order: 5; } .trades-table td:nth-child(4) { order: 6; }
+    .trades-table td:nth-child(5) { order: 7; } .trades-table td:nth-child(6) { order: 8; }
+    .trades-table td:nth-child(7) { order: 9; } .trades-table td:nth-child(8) { order: 10; }
+    .trades-table td.actions { order: 11; }
+}
+
+/* مودال‌ها */
+.details-modal, .close-modal, .image-modal { background-color: rgba(5, 9, 18, 0.72); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+.details-modal-content, .close-modal-content { background: var(--panel); border: 1px solid var(--line); border-radius: 20px; box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55); }
+.close-modal-content h3 { color: var(--text); }
+
+/* اسکرول‌بار ظریف */
+* { scrollbar-width: thin; scrollbar-color: #2a3956 transparent; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+
+/* قاب تو در تو را تخت کن تا عرض هدر نرود */
+.container .container { background: transparent; border: 0; box-shadow: none; border-radius: 0; padding: 0; margin: 0; }
+@media (max-width: 600px) {
+    .hist-filters { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .hist-filters #histSearch { grid-column: 1 / -1; }
+    .hist-filters .hist-count { grid-column: 1 / -1; }
+    .hist-filters input, .hist-filters select { flex: none; min-width: 0; padding: 10px 12px; }
+    .trades-table td { padding: 5px 0; border: 0; }
+    .trades-table td.actions { border-top: 1px solid var(--line); padding-top: 10px; }
+    .trades-table tr { padding: 14px 14px 12px; }
+}
+.section { background: transparent; border: 0; box-shadow: none; border-radius: 0; padding: 4px 0; }
+
+
+/* ===== کارمزد خودکار و VIP حساب‌ها ===== */
+.auto-chip { display: inline-block; margin-inline-start: 6px; padding: 1px 8px; border-radius: 999px; font-size: 0.7rem; font-weight: 700; background: rgba(122, 162, 255, 0.14); color: var(--accent); }
+#feePercent[readonly] { cursor: default; opacity: 0.9; }
+.account-item { flex-wrap: wrap; gap: 10px; }
+.account-vip { margin-inline-start: auto; }
+.account-vip-select { height: 36px; min-width: 92px; padding: 0 10px; font-size: 0.85rem; }
+.account-action-btn { min-width: 40px; width: 40px; height: 40px; padding: 5px; }

@@ -990,7 +990,7 @@ async function loadAccountsFromDB() {
             accounts = dbAccounts;
         } else {
             accounts = [
-                { id: 1, name: 'حساب اصلی', balance: 0 }
+                { id: 1, name: 'حساب اصلی', balance: 0, vipLevel: 'vip0' }
             ];
             await db.saveAccounts(accounts);
         }
@@ -1002,6 +1002,7 @@ async function loadAccountsFromDB() {
         initialAccountBalance = accountBalance; // ذخیره موجودی اولیه
         
         updateAccountsList();
+        syncAutoFee();
         
     } catch (error) {
         console.error('خطا در بارگذاری حساب‌ها:', error);
@@ -1286,9 +1287,50 @@ function resetForm() {
     const timezoneOffset = now.getTimezoneOffset() * 60000;
     const localISOTime = new Date(now - timezoneOffset).toISOString().slice(0, 16);
     document.getElementById('date').value = localISOTime;
+    syncAutoFee();
+}
+
+// ============================
+// کارمزد خودکار (بر اساس VIP حساب فعال، ورود و خروج هر دو تیکر)
+// ============================
+function getAccountVip(account) {
+    return normalizeVip(account && account.vipLevel);
+}
+
+function syncAutoFee() {
+    const input = document.getElementById('feePercent');
+    const text = document.getElementById('feeAutoText');
+    if (!input) return;
+    
+    // موقع ویرایش، کارمزد ثبت‌شدهٔ خود معامله حفظ می‌شود
+    if (editingTradeId !== null) {
+        if (text) text.textContent = 'کارمزد ثبت‌شدهٔ همین معامله حفظ می‌شود';
+        return;
+    }
+    
+    const vip = getAccountVip(activeAccount);
+    input.value = String(getTotalFeePercent(vip));
+    if (text) {
+        const e = (getFeeRate(vip, DEFAULT_ENTRY_ORDER) * 100).toFixed(3);
+        const x = (getFeeRate(vip, DEFAULT_EXIT_ORDER) * 100).toFixed(3);
+        text.textContent = `${vipLabel(vip)} · ورود تیکر ${e}٪ + خروج تیکر ${x}٪`;
+    }
+}
+
+async function setAccountVip(accountId, vipLevel) {
+    const acc = accounts.find(a => a.id === accountId);
+    if (!acc) return;
+    acc.vipLevel = normalizeVip(vipLevel);
+    if (activeAccount && activeAccount.id === acc.id) activeAccount = acc;
+    await saveAccountsToDB();
+    updateAccountsList();
+    syncAutoFee();
+    calculateRisk();
+    showNotification(`سطح ${vipLabel(acc.vipLevel)} برای حساب «${acc.name}» ثبت شد.`, 'success');
 }
 
 function calculateRisk() {
+    syncAutoFee();
     const entryPriceStr = document.getElementById('entryPrice').value.trim();
     const stopLossStr = document.getElementById('stopLoss').value.trim();
     const takeProfitStr = document.getElementById('takeProfit').value.trim();
@@ -1345,6 +1387,8 @@ function calculateRisk() {
     document.getElementById('feeEntryAmount').textContent = formatCurrency(feeEntry);
     document.getElementById('feeExitAmount').textContent = formatCurrency(feeExit);
     document.getElementById('totalFeeAmount').textContent = formatCurrency(totalFee);
+    document.getElementById('grossLossAmount').textContent = formatCurrency(positionSize * stopLossPoints);
+    document.getElementById('totalLossAmount').textContent = formatCurrency(positionSize * stopLossPoints + totalFee);
     document.getElementById('netProfitAmount').textContent = formatCurrency(netProfit);
     document.getElementById('feeDetails').style.display = 'block';
     
@@ -1360,6 +1404,7 @@ function calculateRisk() {
 // ============================
 document.getElementById('tradeForm').addEventListener('submit', async function(e) {
     e.preventDefault();
+    syncAutoFee();
     
     const entryPriceStr = document.getElementById('entryPrice').value.trim();
     const stopLossStr = document.getElementById('stopLoss').value.trim();
@@ -1513,6 +1558,7 @@ document.getElementById('tradeForm').addEventListener('submit', async function(e
     document.getElementById('date').value = localISOTime;
     document.getElementById('type').value = '';
     document.getElementById('feeDetails').style.display = 'none';
+    syncAutoFee();
     
     removeEntryScreenshot();
     
@@ -1560,12 +1606,14 @@ function loadTrades() {
         const pnl = calculateTradePnL(trade);
         const pnlClass = pnl > 0 ? 'profit' : (pnl < 0 ? 'loss' : 'neutral');
         const pnlText = trade.status === 'closed' ? 
-            (pnl >= 0 ? '+' : '') + formatCurrency(Math.abs(pnl)) : 
+            (pnl >= 0 ? '+' : '−') + formatCurrency(Math.abs(pnl)) : 
             'باز';
         
         const typeText = trade.type === 'buy' ? 'لانگ' : 'شورت';
         const statusText = trade.status === 'open' ? 'باز' : 'بسته';
-        const statusClass = trade.status === 'open' ? 'profit' : 'neutral';
+        const statusClass = trade.status === 'open' ? 'chip chip-open' : 'chip chip-closed';
+        const rowClass = trade.status === 'open' ? 'row-open' : (pnl > 0 ? 'row-win' : (pnl < 0 ? 'row-loss' : 'row-flat'));
+        const typeChip = `<span class="chip ${trade.type === 'buy' ? 'chip-long' : 'chip-short'}">${typeText}</span>`;
         const feeText = trade.totalFeePercent > 0 ? `${trade.totalFeePercent}%` : '-';
         
         const dateText = formatPersianDate(trade.date, true);
@@ -1574,7 +1622,7 @@ function loadTrades() {
             '<i class="fas fa-camera" style="color: #3b82f6; margin-right: 5px;" title="اسکرین‌شات موجود است"></i>' : '';
         
         html += `
-        <tr>
+        <tr class="${rowClass}">
             <td data-label="ارز">
                 <div class="crypto-badge">
                     <i class="fas fa-coins"></i>
@@ -1582,7 +1630,7 @@ function loadTrades() {
                 </div>
             </td>
             <td data-label="تاریخ">${dateText}</td>
-            <td data-label="نوع">${typeText}</td>
+            <td data-label="نوع">${typeChip}</td>
             <td class="price-display" data-label="ورود">${trade.entryPriceStr || trade.entryPrice}</td>
             <td class="price-display" data-label="حد ضرر">${trade.stopLossStr || trade.stopLoss}</td>
             <td class="price-display" data-label="حد سود">${trade.takeProfitStr || trade.takeProfit}</td>
@@ -1677,7 +1725,7 @@ async function showTradeDetails(tradeId) {
         
         const pnl = calculateTradePnL(trade);
         const pnlElement = document.getElementById('detail-net-pnl');
-        pnlElement.textContent = (pnl >= 0 ? '+' : '') + formatCurrency(Math.abs(pnl));
+        pnlElement.textContent = (pnl >= 0 ? '+' : '−') + formatCurrency(Math.abs(pnl));
         pnlElement.style.color = pnl >= 0 ? '#10b981' : '#ef4444';
         
         let priceDifference;
@@ -1953,6 +2001,11 @@ function updateAccountsList() {
                     <div class="account-balance">${formatCurrency(account.balance)}</div>
                     ${isActive ? '<div class="active-badge">فعال</div>' : ''}
                 </div>
+                <div class="account-vip">
+                    <select class="account-vip-select" onchange="setAccountVip(${account.id}, this.value)" title="سطح VIP این حساب">
+                        ${vipOptionsHTML(account.vipLevel)}
+                    </select>
+                </div>
                 <div class="account-actions">
                     <button class="account-action-btn" onclick="switchAccount(${account.id})" ${isActive ? 'disabled' : ''} title="انتخاب به عنوان حساب فعال">
                         <i class="fas fa-check-circle"></i>
@@ -1972,6 +2025,7 @@ function updateAccountsList() {
 async function addNewAccount() {
     const newAccountName = document.getElementById('newAccountName').value.trim();
     const newAccountBalance = parseFloat(document.getElementById('newAccountBalance').value);
+    const newAccountVip = normalizeVip(document.getElementById('newAccountVip').value);
     
     if (!newAccountName) {
         showNotification('لطفاً نام حساب را وارد کنید.', 'error');
@@ -1994,7 +2048,8 @@ async function addNewAccount() {
     const newAccount = {
         id: newAccountId,
         name: newAccountName,
-        balance: newAccountBalance
+        balance: newAccountBalance,
+        vipLevel: newAccountVip
     };
     
     accounts.push(newAccount);
@@ -2183,7 +2238,7 @@ function updateMonthlyDashboard() {
         
         if (trade.status === 'closed') {
             const pnl = calculateTradePnL(trade);
-            pnlText = (pnl >= 0 ? '+' : '') + formatCurrency(Math.abs(pnl));
+            pnlText = (pnl >= 0 ? '+' : '−') + formatCurrency(Math.abs(pnl));
             pnlClass = pnl > 0 ? 'profit' : (pnl < 0 ? 'loss' : 'neutral');
         }
         
@@ -2646,6 +2701,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const timezoneOffset = now.getTimezoneOffset() * 60000;
     const localISOTime = new Date(now - timezoneOffset).toISOString().slice(0, 16);
     document.getElementById('date').value = localISOTime;
+    
+    document.getElementById('newAccountVip').innerHTML = vipOptionsHTML('vip0');
+    // دکمه «پاک کردن» (type=reset) فیلدها را خالی می‌کند؛ کارمزد خودکار باید برگردد
+    document.getElementById('tradeForm').addEventListener('reset', () => setTimeout(syncAutoFee, 0));
     
     initialize();
     

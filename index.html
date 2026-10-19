@@ -10,6 +10,7 @@
     <meta name="apple-mobile-web-app-title" content="JournalMe">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css">
     <link rel="manifest" href="manifest.json">
 
     <!-- Apple Touch Icon -->
@@ -32,7 +33,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     
     <!-- استایل جدا -->
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=6">
 </head>
 <body>
     <!-- مودال نمایش تصویر بزرگ -->
@@ -525,6 +526,14 @@
                             </label>
                             <input type="number" id="newAccountBalance" class="modal-input" step="0.01" min="0">
                         </div>
+                        
+                        <div class="modal-input-group">
+                            <label class="modal-label">
+                                <i class="fas fa-crown"></i>
+                                سطح VIP (Bitunix)
+                            </label>
+                            <select id="newAccountVip" class="modal-input"></select>
+                        </div>
                     </div>
                     
                     <div class="modal-buttons">
@@ -607,11 +616,11 @@
                                 </div>
                                 
                                 <div class="form-group">
-                                    <label for="feePercent"><i class="fas fa-receipt"></i> کارمزد کل (%)</label>
-                                    <input type="text" id="feePercent" required class="price-display">
+                                    <label for="feePercent"><i class="fas fa-receipt"></i> کارمزد کل (%) <span class="auto-chip">خودکار</span></label>
+                                    <input type="text" id="feePercent" class="price-display" readonly tabindex="-1">
                                     <div class="fee-info">
                                         <i class="fas fa-info-circle"></i>
-                                        مجموع کارمزد ورود و خروج
+                                        <span id="feeAutoText">مجموع کارمزد ورود و خروج</span>
                                     </div>
                                 </div>
                                 
@@ -667,6 +676,14 @@
                                     <div class="fee-total">
                                         <span>کل کارمزد:</span>
                                         <span id="totalFeeAmount">$0.00</span>
+                                    </div>
+                                    <div class="fee-row">
+                                        <span>ضرر ناخالص در حد ضرر (بدون کارمزد):</span>
+                                        <span id="grossLossAmount">$0.00</span>
+                                    </div>
+                                    <div class="fee-row">
+                                        <span>ضرر کل در حد ضرر (با کارمزد = ریسک):</span>
+                                        <span id="totalLossAmount">$0.00</span>
                                     </div>
                                     <div class="fee-row">
                                         <span>سود خالص (پس از کارمزد):</span>
@@ -962,10 +979,11 @@
     </div>
 
     <!-- اسکریپت جدا -->
-    <script src="script.js"></script>
+    <script src="fees.js?v=6"></script>
+    <script src="script.js?v=6"></script>
     <script>
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+            window.addEventListener('load', () => navigator.serviceWorker.register('sw.js?v=6').catch(() => {}));
         }
     </script>
 </body>
