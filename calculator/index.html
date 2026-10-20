@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-title" content="JournalMe">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css">
+    <link rel="stylesheet" href="../fonts/fonts.css?v=8">
 
     <!-- Apple Touch Icon -->
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -23,10 +23,10 @@
     <meta name="theme-color" content="#0f172a">
 
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../vendor/fontawesome/css/fa.css?v=8">
 
     <!-- همان استایل ژورنال: نوار بالا، کارت‌ها، فرم‌ها و رنگ‌ها -->
-    <link rel="stylesheet" href="../style.css?v=7">
+    <link rel="stylesheet" href="../style.css?v=8">
 
     <style>
         /* فقط چیزهایی که مخصوص ماشین‌حساب است */
@@ -315,6 +315,14 @@
                                 <span>سود واقعی (با کارمزد)</span>
                                 <span class="val val-profit" id="profit-value">$0.00</span>
                             </div>
+                            <div class="fee-total">
+                                <span>ریسک به ریوارد</span>
+                                <span class="val" id="rr-gross">1:0.00</span>
+                            </div>
+                            <div class="fee-row">
+                                <span>ریسک به ریوارد خالص <span class="mini-badge">بعد از کارمزد</span></span>
+                                <span class="val val-gold" id="rr-net">1:0.00</span>
+                            </div>
                         </div>
 
                         <div class="calc-note">
@@ -327,7 +335,7 @@
         </div>
     </div>
 
-    <script src="../fees.js?v=7"></script>
+    <script src="../fees.js?v=8"></script>
     <script>
         const FIELDS = ['capital', 'riskPercent', 'stop', 'entry', 'rr', 'leverage', 'vipLevel', 'entryOrderType', 'exitOrderType'];
         const DEFAULTS = { capital: '2000', riskPercent: '0.5', stop: '0.25', entry: '1000', rr: '3', leverage: '5', vipLevel: 'vip0', entryOrderType: DEFAULT_ENTRY_ORDER, exitOrderType: DEFAULT_EXIT_ORDER };
@@ -392,6 +400,8 @@
                 ['position-value', 'margin-value', 'entry-fee', 'exit-fee', 'total-fee', 'gross-loss', 'loss-value', 'profit-value']
                     .forEach(id => setText(id, '$0.00'));
                 setText('quantity-value', '0.000000');
+                setText('rr-gross', '1:0.00');
+                setText('rr-net', '1:0.00');
                 return;
             }
 
@@ -414,6 +424,13 @@
             setText('gross-loss', '$' + grossLoss.toFixed(2));
             setText('loss-value', '$' + totalLoss.toFixed(2));
             setText('profit-value', '$' + netProfit.toFixed(2));
+
+            // ریسک به ریوارد: ناخالص = rr ورودی؛ خالص = (سود − کارمزد) ÷ ضرر کل (مثل ژورنال)
+            const netRR = totalLoss > 0 ? netProfit / totalLoss : 0;
+            setText('rr-gross', '1:' + rr.toFixed(2));
+            setText('rr-net', '1:' + netRR.toFixed(2));
+            $('rr-net').classList.toggle('val-loss', netRR <= 0);
+            $('rr-net').classList.toggle('val-gold', netRR > 0);
         }
 
         function resetAll() {
