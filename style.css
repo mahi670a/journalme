@@ -13,7 +13,6 @@ body {
     overflow-x: hidden;
 }
 
-/* ساختار اصلی با Toolbar */
 .app-wrapper {
     display: flex;
     flex-direction: column;
@@ -21,7 +20,6 @@ body {
     width: 100%;
 }
 
-/* ===== Toolbar بالا - با دکمه‌های هم اندازه ===== */
 .toolbar {
     width: 100%;
     height: 70px;
@@ -47,7 +45,6 @@ body {
     flex-shrink: 0;
 }
 
-/* ===== لوگوی Journal Me (بدون دور) ===== */
 .journalme-logo {
     display: flex;
     align-items: center;
@@ -166,7 +163,6 @@ body {
     box-shadow: 0 6px 12px rgba(16, 185, 129, 0.3);
 }
 
-/* محتوای اصلی */
 .main-wrapper {
     margin-top: 90px;
     padding: 20px;
@@ -184,7 +180,6 @@ body {
     border: 1px solid #334155;
 }
 
-/* واکنش‌گرایی برای موبایل */
 @media (max-width: 1024px) {
     .toolbar-btn {
         min-width: 100px;
@@ -225,7 +220,6 @@ body {
     }
 }
 
-/* بالانس */
 .balance-container {
     background: linear-gradient(145deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
     border-radius: 14px;
@@ -336,7 +330,6 @@ body {
     transform: translateY(-2px);
 }
 
-/* ===== معاملات باز ===== */
 .open-trades-container {
     background: rgba(15, 23, 42, 0.5);
     border-radius: 12px;
@@ -443,7 +436,6 @@ body {
     border-radius: 8px;
 }
 
-/* مودال‌ها */
 .modal-box {
     background: rgba(30, 41, 59, 0.95);
     border-radius: 12px;
@@ -734,7 +726,6 @@ body {
     gap: 30px;
 }
 
-/* بخش‌های اصلی */
 .section, .dashboard-section {
     background-color: rgba(15, 23, 42, 0.7);
     border-radius: 12px;
@@ -770,7 +761,6 @@ body {
     gap: 10px;
 }
 
-/* فرم ثبت معامله */
 .trade-form {
     display: flex;
     flex-direction: column;
@@ -1098,7 +1088,6 @@ button {
     box-shadow: 0 5px 15px rgba(245, 158, 11, 0.3);
 }
 
-/* جداول */
 .trades-table-container {
     overflow-x: auto;
     border-radius: 10px;
@@ -1227,7 +1216,6 @@ button {
     cursor: not-allowed;
 }
 
-/* آمار */
 .stats-container {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -1322,7 +1310,6 @@ button {
     border: 1px solid rgba(245, 158, 11, 0.2);
 }
 
-/* ===== باکس‌های رنگی برای آمار ===== */
 .percentage-box {
     display: inline-block;
     padding: 4px 12px;
@@ -1359,7 +1346,6 @@ button {
     border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
-/* ===== بخش آمار تفصیلی ===== */
 .detailed-stats-table {
     background: rgba(15, 23, 42, 0.5);
     border-radius: 12px;
@@ -1412,7 +1398,6 @@ button {
     font-family: 'Courier New', monospace;
 }
 
-/* ===== بخش نمودار رشد حساب ===== */
 .growth-chart-container,
 .monthly-chart-container {
     background: rgba(15, 23, 42, 0.5);
@@ -1458,7 +1443,6 @@ button {
     margin-left: auto;
 }
 
-/* پشتیبان‌گیری */
 .backup-container {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -1515,7 +1499,6 @@ button {
     font-size: 0.9rem;
 }
 
-/* داشبورد */
 .dashboard-header {
     display: flex;
     justify-content: space-between;
@@ -1657,9 +1640,6 @@ button {
     color: #94a3b8;
 }
 
-/* ===== مودال‌های تصویر و جزئیات ===== */
-
-/* مودال تصویر بزرگ - مخصوص نمایش تمام صفحه */
 .image-modal {
     position: fixed;
     top: 0;
@@ -1718,7 +1698,6 @@ button {
     transform: scale(1.1);
 }
 
-/* مودال جزئیات معامله */
 .details-modal {
     position: fixed;
     top: 0;
@@ -1762,7 +1741,6 @@ button {
     border-bottom: 1px solid #334155;
 }
 
-/* استایل اسکرین‌شات‌ها در مودال جزئیات */
 .screenshot-gallery {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -1803,7 +1781,6 @@ button {
     box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
 }
 
-/* مودال بستن معامله */
 .close-modal {
     position: fixed;
     top: 0;
@@ -1852,7 +1829,6 @@ button {
     margin: 15px auto 0;
 }
 
-/* انیمیشن */
 @keyframes modalSlideUp {
     from {
         transform: translateY(50px);
@@ -1864,7 +1840,6 @@ button {
     }
 }
 
-/* بقیه استایل‌های مودال */
 .details-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -1976,7 +1951,6 @@ button {
     background-color: rgba(59, 130, 246, 0.1);
 }
 
-/* پیشرفت پشتیبان */
 .backup-progress {
     margin-top: 20px;
     padding: 15px;
@@ -2044,7 +2018,6 @@ button {
     display: block;
 }
 
-/* واکنش‌گرایی برای بخش‌های جدید */
 @media (max-width: 768px) {
     .stats-row {
         grid-template-columns: 1fr;
@@ -2066,8 +2039,6 @@ button {
     }
 }
 
-
-/* ================= Responsive: همه‌ی اندازه‌ها ================= */
 :root { --safe-t: env(safe-area-inset-top, 0px); --safe-b: env(safe-area-inset-bottom, 0px); }
 html { -webkit-text-size-adjust: 100%; }
 body { -webkit-tap-highlight-color: transparent; }
@@ -2075,13 +2046,11 @@ button, .toolbar-btn, .btn-icon { touch-action: manipulation; }
 input, select, textarea { font-size: max(16px, 1em); max-width: 100%; }
 img, svg, canvas { max-width: 100%; }
 
-/* نوار بالا زیر status bar آیپد نرود */
 .toolbar { padding-top: var(--safe-t); height: calc(70px + var(--safe-t)); }
 .main-wrapper { margin-top: calc(90px + var(--safe-t)); }
 
 @media (min-width: 1800px) { .container { max-width: 1700px; } }
 
-/* تبلت عمودی و موبایل: نوار بالای فشرده + تب‌بار پایین */
 @media (max-width: 900px) {
     .toolbar {
         height: calc(56px + var(--safe-t));
@@ -2141,7 +2110,6 @@ img, svg, canvas { max-width: 100%; }
     .toolbar-btn, .calculator-btn, .btn-icon, .balance-btn, .preset-btn, .modal-btn { min-height: 44px; }
 }
 
-/* موبایل */
 @media (max-width: 600px) {
     .toolbar-calculator .calculator-btn span { display: none; }
     .toolbar-calculator .calculator-btn { width: 44px; padding: 0; }
@@ -2161,7 +2129,6 @@ img, svg, canvas { max-width: 100%; }
     .details-modal-content, .modal-box.active { padding: 16px; }
     .details-modal-content { width: 96%; margin: 12px auto; max-height: calc(100dvh - 24px); overflow-y: auto; }
 
-    /* جدول‌ها به کارت تبدیل می‌شوند */
     .trades-table-container, .monthly-trades-container { max-height: none; border: 0; overflow: visible; }
     .trades-table, .monthly-trades-table { min-width: 0; width: 100%; display: block; direction: rtl; }
     .trades-table thead, .monthly-trades-table thead { display: none; }
@@ -2184,7 +2151,6 @@ img, svg, canvas { max-width: 100%; }
     .monthly-trades-table td[colspan] { grid-column: 1 / -1; display: block; text-align: center; }
 }
 
-/* موبایل در حالت افقی: کم‌ارتفاع */
 @media (max-height: 480px) and (max-width: 900px) {
     .toolbar { height: calc(44px + var(--safe-t)); }
     .main-wrapper { margin-top: calc(44px + var(--safe-t)); }
@@ -2192,7 +2158,6 @@ img, svg, canvas { max-width: 100%; }
     .toolbar-btn span { display: none; }
 }
 
-/* ===== ژورنال، فیلتر تاریخچه، تحلیل پیشرفته ===== */
 textarea { width: 100%; padding: 12px; background: rgba(15, 23, 42, 0.8); border: 1px solid #475569; border-radius: 8px; color: #f1f5f9; font-family: inherit; resize: vertical; }
 .journal-fields { margin: 20px 0; }
 .hist-filters { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 12px 0; }
@@ -2219,10 +2184,6 @@ textarea { width: 100%; padding: 12px; background: rgba(15, 23, 42, 0.8); border
 .strategy-row select { flex: 1 1 0; width: 0; min-width: 0; }
 textarea { box-sizing: border-box; min-width: 0; }
 
-
-/* =====================================================
-   لایه‌ی ظاهر (Polish): سطوح آرام، فونت وزیرمتن، نوار نتیجه‌ی معامله
-   ===================================================== */
 :root {
     --ink: #0b1220; --panel: #111a2c; --raised: #17223a; --line: #243049;
     --text: #e8edf6; --muted: #8c9bb5;
@@ -2237,7 +2198,6 @@ body {
 ::selection { background: rgba(122, 162, 255, 0.35); }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-/* نوار ناوبری */
 .toolbar { background: rgba(11, 18, 32, 0.94); border-bottom: 1px solid var(--line); box-shadow: none; }
 .toolbar-btn { color: var(--muted); background: transparent; border: 0; border-radius: 12px; font-weight: 600; }
 .toolbar-btn:hover { color: var(--text); background: rgba(255, 255, 255, 0.05); transform: none; }
@@ -2246,7 +2206,6 @@ body {
     .toolbar-menu { background: rgba(11, 18, 32, 0.86); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); }
 }
 
-/* سطوح */
 .container { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 14px 34px rgba(0, 0, 0, 0.28); }
 .section-title { color: var(--text); font-weight: 800; font-size: 1.25rem; border-bottom: 1px solid var(--line); padding-bottom: 14px; }
 .section-title i { color: var(--muted); }
@@ -2256,7 +2215,6 @@ body {
 .stat-card:hover { transform: none; box-shadow: none; border-color: #33425f; }
 .risk-summary-section { background: var(--raised); border: 1px solid var(--line); border-radius: 14px; }
 
-/* فرم‌ها */
 .form-group label { color: var(--muted); font-weight: 600; font-size: 0.9rem; }
 input, select, textarea { background: var(--raised); border: 1px solid var(--line); border-radius: 12px; color: var(--text); }
 input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(122, 162, 255, 0.22); }
@@ -2268,7 +2226,6 @@ button:active { transform: scale(0.98); }
 .btn-secondary { background: var(--raised); color: var(--text); border: 1px solid var(--line); }
 .btn-secondary:hover { background: #1d2a47; transform: none; box-shadow: none; }
 
-/* مرور معاملات: جدول و کارت */
 .hist-filters input, .hist-filters select { background: var(--raised); border: 1px solid var(--line); }
 .trades-table-container { background: transparent; border: 1px solid var(--line); border-radius: 14px; }
 .trades-table th { background: #0f1830; color: var(--muted); font-weight: 700; font-size: 0.82rem; padding: 14px 12px; border-bottom: 1px solid var(--line); }
@@ -2290,7 +2247,6 @@ button:active { transform: scale(0.98); }
 .chip-closed { background: rgba(140, 155, 181, 0.14); color: var(--muted); }
 .btn-icon { min-width: 38px; width: 38px; height: 38px; padding: 0; border-radius: 10px; }
 
-/* کارت معامله روی گوشی: نماد و سود/ضرر در سرخط، بقیه‌ی جزئیات زیرش */
 @media (max-width: 600px) {
     .trades-table tr { border-inline-start: 4px solid var(--c, var(--line)); border-radius: 14px; background: var(--raised); }
     .trades-table tbody tr td:first-child { box-shadow: none; }
@@ -2305,16 +2261,13 @@ button:active { transform: scale(0.98); }
     .trades-table td.actions { order: 11; }
 }
 
-/* مودال‌ها */
 .details-modal, .close-modal, .image-modal { background-color: rgba(5, 9, 18, 0.72); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
 .details-modal-content, .close-modal-content { background: var(--panel); border: 1px solid var(--line); border-radius: 20px; box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55); }
 .close-modal-content h3 { color: var(--text); }
 
-/* اسکرول‌بار ظریف */
 * { scrollbar-width: thin; scrollbar-color: #2a3956 transparent; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 
-/* قاب تو در تو را تخت کن تا عرض هدر نرود */
 .container .container { background: transparent; border: 0; box-shadow: none; border-radius: 0; padding: 0; margin: 0; }
 @media (max-width: 600px) {
     .hist-filters { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -2327,11 +2280,11 @@ button:active { transform: scale(0.98); }
 }
 .section { background: transparent; border: 0; box-shadow: none; border-radius: 0; padding: 4px 0; }
 
-
-/* ===== کارمزد خودکار و VIP حساب‌ها ===== */
 .auto-chip { display: inline-block; margin-inline-start: 6px; padding: 1px 8px; border-radius: 999px; font-size: 0.7rem; font-weight: 700; background: rgba(122, 162, 255, 0.14); color: var(--accent); }
 #feePercent[readonly] { cursor: default; opacity: 0.9; }
 .account-item { flex-wrap: wrap; gap: 10px; }
 .account-vip { margin-inline-start: auto; }
 .account-vip-select { height: 36px; min-width: 92px; padding: 0 10px; font-size: 0.85rem; }
 .account-action-btn { min-width: 40px; width: 40px; height: 40px; padding: 5px; }
+
+.hidden-section { display: none !important; }

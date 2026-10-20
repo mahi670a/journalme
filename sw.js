@@ -1,5 +1,4 @@
-// نسخه را با هر انتشار تغییر بده تا کش قدیمی پاک شود
-const VERSION = 'journalme-v7';
+const VERSION = 'journalme-v10';
 const CORE = [
   './', 'index.html', 'style.css', 'script.js', 'fees.js', 'manifest.json',
   'calculator/', 'calculator/index.html',
@@ -8,14 +7,18 @@ const CORE = [
 const CDN_HOSTS = ['cdnjs.cloudflare.com', 'cdn.jsdelivr.net'];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(VERSION).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));
+  e.waitUntil((async () => {
+    const cache = await caches.open(VERSION);
+    await Promise.all(CORE.map(async (url) => {
+      try { await cache.add(url); } catch (err) { console.warn('[SW] skip:', url, err.message); }
+    }));
+    await self.skipWaiting();
+  })());
 });
 
 self.addEventListener('activate', e => {
   e.waitUntil(
-    caches.keys()
-      .then(keys => Promise.all(keys.filter(k => k !== VERSION).map(k => caches.delete(k))))
-      .then(() => self.clients.claim())
+    caches.keys().then(keys => Promise.all(keys.filter(k => k !== VERSION).map(k => caches.delete(k)))).then(() => self.clients.claim())
   );
 });
 
@@ -23,29 +26,16 @@ self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
-
-  // کتابخانه‌های CDN (Chart.js, JSZip, Font Awesome): کش‌اول؛ بعد از یک بار باز شدن آنلاین، آفلاین هم کار می‌کنند
   if (CDN_HOSTS.includes(url.hostname)) {
-    e.respondWith(
-      caches.match(req).then(hit => hit || fetch(req).then(res => {
-        const copy = res.clone();
-        caches.open(VERSION).then(c => c.put(req, copy));
-        return res;
-      }))
-    );
+    e.respondWith(caches.match(req).then(hit => hit || fetch(req).then(res => {
+      if (res && res.ok) { const copy = res.clone(); caches.open(VERSION).then(c => c.put(req, copy)).catch(() => {}); }
+      return res;
+    }).catch(() => caches.match(req, { ignoreSearch: true }))));
     return;
   }
-
   if (url.origin !== location.origin) return;
-
-  // فایل‌های خود برنامه: اول شبکه (تا آپدیت‌ها سریع برسند)، اگر آفلاین بود از کش
-  e.respondWith(
-    fetch(req, { cache: 'no-cache' }).then(res => {
-      if (res.ok) {
-        const copy = res.clone();
-        caches.open(VERSION).then(c => c.put(req, copy));
-      }
-      return res;
-    }).catch(() => caches.match(req, { ignoreSearch: true }).then(hit => hit || caches.match('index.html')))
-  );
+  e.respondWith(fetch(req, { cache: 'no-cache' }).then(res => {
+    if (res && res.ok) { const copy = res.clone(); caches.open(VERSION).then(c => c.put(req, copy)).catch(() => {}); }
+    return res;
+  }).catch(() => caches.match(req, { ignoreSearch: true }).then(hit => hit || caches.match('index.html'))));
 });
