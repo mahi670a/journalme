@@ -46,7 +46,6 @@ function formatPersianDate(date, withTime = true) {
     return toPersianDateWithEnglishNumbers(date, withTime);
 }
 
-// ✅ تبدیل امن رشته به عدد: ارقام فارسی، کاما، فاصله
 function toNumber(str) {
     if (typeof str === 'number') return str;
     if (!str) return 0;
@@ -60,7 +59,6 @@ function generateUID() {
     return 'trade_' + Date.now() + '_' + Math.random().toString(36).slice(2, 11);
 }
 
-// ✅ ID یکتا با فضای نمونه‌ی بزرگ (کاهش تصادم در import)
 function generateTradeId() {
     return Date.now() * 1000000 + Math.floor(Math.random() * 1000000);
 }
@@ -124,7 +122,6 @@ class TradingJournalDB {
         });
     }
 
-    // ✅ resolve بعد از tx.oncomplete (نه req.onsuccess)
     saveTrade(trade) {
         this.checkReady();
         return new Promise((resolve, reject) => {
@@ -246,7 +243,6 @@ class TradingJournalDB {
         });
     }
 
-    // ✅ deleteAccount که واقعاً پاک می‌کند
     deleteAccount(accountId) {
         this.checkReady();
         return new Promise((resolve, reject) => {
@@ -261,7 +257,6 @@ class TradingJournalDB {
         });
     }
 
-    // ✅ saveSetting بعد از tx.oncomplete
     saveSetting(key, value) {
         this.checkReady();
         return new Promise((resolve, reject) => {
@@ -300,7 +295,6 @@ class TradingJournalDB {
         if (!this.isReady || !this.db) throw new Error('دیتابیس آماده نیست');
     }
 
-    // ✅ backup شامل settings
     async backup() {
         const accounts = await this.getAccounts();
         const trades = await this.getAllTrades();
@@ -413,7 +407,6 @@ function updateGrowthChart() {
     });
 }
 
-// ✅ نمودار ماهانه از بالانس اول ماه شروع می‌شود
 function updateMonthlyGrowthChart() {
     const canvas = document.getElementById('monthlyGrowthChart');
     if (!canvas) return;
@@ -425,7 +418,6 @@ function updateMonthlyGrowthChart() {
     });
     const closed = [...monthly].filter(t => t.status === 'closed').sort((a, b) => new Date(a.date) - new Date(b.date));
 
-    // بالانس اول ماه = initialAccountBalance + ΣPnL(معاملات قبل از این ماه)
     const monthStartBalance = initialAccountBalance + trades
         .filter(t => t.accountId === activeAccountId && t.status === 'closed')
         .filter(t => {
@@ -496,8 +488,13 @@ async function initialize() {
         setTimeout(() => { updateGrowthChart(); updateMonthlyGrowthChart(); }, 500);
         try { customStrategies = JSON.parse((await db.getSetting('customStrategies')) || '[]'); } catch (e) { customStrategies = []; }
         refreshStrategyList();
-        if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
-        checkStorage();
+        // ✅ persist را await کن، بعد checkStorage
+        try {
+            if (navigator.storage && navigator.storage.persist) {
+                await navigator.storage.persist();
+            }
+        } catch (e) { /* ignore */ }
+        await checkStorage();
         if (trades.length > 0) {
             const last = parseInt(await db.getSetting('lastBackupAt')) || 0;
             const days = last ? Math.floor((Date.now() - last) / 86400000) : null;
@@ -774,7 +771,6 @@ async function setAccountVip(accountId, vipLevel) {
     showNotification(`سطح ${vipLabel(acc.vipLevel)} برای «${acc.name}» ثبت شد.`, 'success');
 }
 
-// ✅ استفاده از toNumber برای اعداد فارسی/کاما
 function calculateRisk() {
     syncAutoFee();
     const v = id => (document.getElementById(id) || {}).value || '';
@@ -1264,15 +1260,15 @@ async function addNewAccount() {
     showNotification('حساب اضافه شد.', 'success');
 }
 
-// ✅ deleteAccount که واقعاً از IndexedDB پاک می‌کند
+// ✅ ترتیب صحیح: اول trades، بعد account
 async function deleteAccount(accountId) {
     if (accountId === 1) { showNotification('حساب اصلی حذف نمی‌شود.', 'error'); return; }
     if (accounts.length <= 1) { showNotification('حداقل یک حساب لازم است.', 'error'); return; }
     if (!confirm('حذف این حساب و تمام معاملاتش؟')) return;
     try {
-        await db.deleteAccount(accountId);
         const accTrades = await db.getTradesByAccount(accountId);
         if (accTrades.length > 0) await db.deleteTrades(accTrades.map(t => t.id));
+        await db.deleteAccount(accountId);
         accounts = accounts.filter(a => a.id !== accountId);
         if (accountId === activeAccountId) {
             activeAccountId = 1;
@@ -1300,6 +1296,7 @@ async function deleteAccount(accountId) {
     }
 }
 
+// ✅ try/catch روی saveSetting
 async function switchAccount(accountId) {
     const newAcc = accounts.find(a => a.id === accountId);
     if (!newAcc) { showNotification('حساب یافت نشد.', 'error'); return; }
@@ -1307,7 +1304,8 @@ async function switchAccount(accountId) {
     activeAccount = newAcc;
     accountBalance = newAcc.balance;
     initialAccountBalance = accountBalance;
-    await db.saveSetting('activeAccountId', activeAccountId.toString());
+    try { await db.saveSetting('activeAccountId', activeAccountId.toString()); }
+    catch (e) { console.warn('خطا در ذخیره حساب فعال:', e); }
     trades = await db.getTradesByAccount(activeAccountId);
     updateBalanceDisplay();
     updateAccountsList();
@@ -1463,7 +1461,7 @@ async function importData() {
     isImportCancelled = false;
     importStartTime = Date.now();
     let snapshot = null, wiped = false;
-    let failedCount = 0;  // ✅ شمارش خطاها
+    let failedCount = 0;
     const restore = async () => {
         if (!wiped || !snapshot) return;
         try {
@@ -1554,7 +1552,6 @@ async function importData() {
             await db.saveAccounts(backupData.accounts);
             accounts = backupData.accounts;
         }
-        // ✅ بازگردانی settings (customStrategies و غیره)
         if (backupData.settings && Array.isArray(backupData.settings)) {
             for (const s of backupData.settings) {
                 try { await db.saveSetting(s.key, s.value); } catch (e) { console.warn('skip setting', s.key); }
