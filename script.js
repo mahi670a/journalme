@@ -488,7 +488,6 @@ async function initialize() {
         setTimeout(() => { updateGrowthChart(); updateMonthlyGrowthChart(); }, 500);
         try { customStrategies = JSON.parse((await db.getSetting('customStrategies')) || '[]'); } catch (e) { customStrategies = []; }
         refreshStrategyList();
-        // ✅ persist را await کن، بعد checkStorage
         try {
             if (navigator.storage && navigator.storage.persist) {
                 await navigator.storage.persist();
@@ -583,8 +582,11 @@ async function deleteTradeFromDB(tradeId) {
 }
 
 async function saveAccountsToDB() {
-    try { await db.saveAccounts(accounts); await db.saveSetting('activeAccountId', activeAccountId.toString()); return true; }
-    catch (e) { console.error(e); return false; }
+    try { await db.saveAccounts(accounts); }
+    catch (e) { console.error('خطا در ذخیره حساب‌ها:', e); return false; }
+    try { await db.saveSetting('activeAccountId', activeAccountId.toString()); }
+    catch (e) { console.warn('خطا در ذخیره حساب فعال:', e); }
+    return true;
 }
 
 function openImageModal(src) {
@@ -712,13 +714,13 @@ async function updateBalance() {
     if (nb <= 0) { showNotification('لطفاً یک عدد معتبر وارد کنید.', 'error'); return; }
     const rounded = Math.round(nb * 100) / 100;
     const idx = accounts.findIndex(a => a.id === activeAccountId);
-    if (idx !== -1) {
-        accounts[idx].balance = rounded;
-        activeAccount = accounts[idx];
-        accountBalance = rounded;
-        initialAccountBalance = rounded;
-        await saveAccountsToDB();
-    }
+    if (idx === -1) { showNotification('حساب فعال یافت نشد.', 'error'); return; }
+    accounts[idx].balance = rounded;
+    activeAccount = accounts[idx];
+    accountBalance = rounded;
+    initialAccountBalance = rounded;
+    const saved = await saveAccountsToDB();
+    if (!saved) { showNotification('خطا در ذخیره بالانس.', 'error'); return; }
     updateBalanceDisplay();
     updateTotalRisk();
     updateStats();
@@ -764,7 +766,8 @@ async function setAccountVip(accountId, vipLevel) {
     if (!acc) return;
     acc.vipLevel = normalizeVip(vipLevel);
     if (activeAccount && activeAccount.id === acc.id) activeAccount = acc;
-    await saveAccountsToDB();
+    const saved = await saveAccountsToDB();
+    if (!saved) { showNotification('خطا در ذخیره سطح VIP.', 'error'); return; }
     updateAccountsList();
     syncAutoFee();
     calculateRisk();
@@ -1120,7 +1123,8 @@ async function confirmCloseTrade() {
         trades[idx].exitScreenshotName = `exit_${t.uid}.png`;
     }
 
-    await saveTradeToDB(trades[idx]);
+    const ok = await saveTradeToDB(trades[idx]);
+    if (!ok) { showNotification('خطا در ذخیره‌ی بستن معامله.', 'error'); return; }
     loadTrades();
     updateStats();
     updateDetailedStats();
@@ -1208,7 +1212,8 @@ async function editTrade(id) {
 
 async function deleteTrade(id) {
     if (!confirm('از حذف این معامله اطمینان دارید؟')) return;
-    await deleteTradeFromDB(id);
+    const ok = await deleteTradeFromDB(id);
+    if (!ok) { showNotification('خطا در حذف معامله.', 'error'); return; }
     loadTrades();
     updateStats();
     updateDetailedStats();
@@ -1253,14 +1258,14 @@ async function addNewAccount() {
     if (accounts.find(a => a.name.toLowerCase() === name.toLowerCase())) { showNotification('این نام قبلاً وجود دارد.', 'error'); return; }
     const newId = accounts.length > 0 ? Math.max(...accounts.map(a => a.id)) + 1 : 1;
     accounts.push({ id: newId, name, balance: Math.round(balance * 100) / 100, vipLevel: vip });
-    await saveAccountsToDB();
+    const saved = await saveAccountsToDB();
+    if (!saved) { accounts = accounts.filter(a => a.id !== newId); showNotification('خطا در ذخیره حساب جدید.', 'error'); return; }
     document.getElementById('newAccountName').value = '';
     document.getElementById('newAccountBalance').value = '';
     updateAccountsList();
     showNotification('حساب اضافه شد.', 'success');
 }
 
-// ✅ ترتیب صحیح: اول trades، بعد account
 async function deleteAccount(accountId) {
     if (accountId === 1) { showNotification('حساب اصلی حذف نمی‌شود.', 'error'); return; }
     if (accounts.length <= 1) { showNotification('حداقل یک حساب لازم است.', 'error'); return; }
@@ -1296,7 +1301,6 @@ async function deleteAccount(accountId) {
     }
 }
 
-// ✅ try/catch روی saveSetting
 async function switchAccount(accountId) {
     const newAcc = accounts.find(a => a.id === accountId);
     if (!newAcc) { showNotification('حساب یافت نشد.', 'error'); return; }
