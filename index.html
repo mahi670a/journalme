@@ -36,7 +36,7 @@
         <div class="details-modal-content">
             <h3><i class="fas fa-chart-line"></i> جزئیات معامله</h3>
             <div class="details-grid">
-                <div class="detail-item"><span class="detail-label">ارز دیجیتال</span><div class="detail-value" id="detail-symbol">BTC</div></div>
+                <div class="detail-item"><span class="detail-label">ارز دیجیتال</span><div class="detail-value" id="detail-symbol"></div></div>
                 <div class="detail-item"><span class="detail-label">نوع معامله</span><div class="detail-value" id="detail-type">لانگ</div></div>
                 <div class="detail-item"><span class="detail-label">تاریخ معامله</span><div class="detail-value" id="detail-date">1402/10/15 - 14:30</div></div>
                 <div class="detail-item"><span class="detail-label">وضعیت</span><div class="detail-value" id="detail-status">باز</div></div>
@@ -271,17 +271,7 @@
                             <div class="form-grid">
                                 <div class="form-group">
                                     <label for="symbol"><i class="fas fa-coins"></i> ارز دیجیتال</label>
-                                    <input type="text" id="symbol" list="crypto-list" required>
-                                    <datalist id="crypto-list">
-                                        <option value="BTC"></option>
-                                        <option value="ETH"></option>
-                                        <option value="BNB"></option>
-                                        <option value="SOL"></option>
-                                        <option value="ARB"></option>
-                                        <option value="ENA"></option>
-                                        <option value="ADA"></option>
-                                        <option value="OP"></option>
-                                    </datalist>
+                                    <input type="text" id="symbol" required>
                                 </div>
                                 <div class="form-group">
                                     <label for="date"><i class="fas fa-calendar"></i> تاریخ معامله</label>
