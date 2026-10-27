@@ -1,4 +1,4 @@
-const VERSION = 'journalme-v10';
+const VERSION = 'journalme-v11';
 const CORE = [
   './', 'index.html', 'style.css', 'script.js', 'fees.js', 'manifest.json',
   'calculator/', 'calculator/index.html',

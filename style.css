@@ -24,7 +24,7 @@ body {
     width: 100%;
     height: 70px;
     background: rgba(15, 23, 42, 0.95);
-    backdrop-filter: blur(10px);
+    
     border-bottom: 1px solid #334155;
     display: flex;
     align-items: center;
@@ -50,7 +50,7 @@ body {
     align-items: center;
     gap: 5px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: background-color .25s, border-color .25s, box-shadow .25s, color .25s, opacity .25s;
 }
 
 .journalme-logo:hover {
@@ -96,7 +96,7 @@ body {
     font-size: 0.9rem;
     font-weight: 500;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: background-color .25s, border-color .25s, box-shadow .25s, color .25s, opacity .25s;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -109,7 +109,7 @@ body {
 .toolbar-btn i {
     font-size: 1.1rem;
     color: #64748b;
-    transition: all 0.2s;
+    transition: background-color .25s, border-color .25s, box-shadow .25s, color .25s, opacity .25s;
 }
 
 .toolbar-btn:hover {
@@ -147,7 +147,7 @@ body {
     font-size: 0.9rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: background-color .25s, border-color .25s, box-shadow .25s, color .25s, opacity .25s;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -319,7 +319,7 @@ body {
     cursor: pointer;
     font-size: 0.9rem;
     font-weight: 600;
-    transition: all 0.3s;
+    transition: background-color .25s, border-color .25s, box-shadow .25s, color .25s, opacity .25s;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -361,7 +361,7 @@ body {
     align-items: center;
     justify-content: space-between;
     border: 1px solid #334155;
-    transition: all 0.2s;
+    transition: background-color .25s, border-color .25s, box-shadow .25s, color .25s, opacity .25s;
 }
 
 .open-trade-item:hover {
@@ -419,7 +419,7 @@ body {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: background-color .25s, border-color .25s, box-shadow .25s, color .25s, opacity .25s;
 }
 
 .open-trade-actions .btn-icon:hover {
@@ -441,7 +441,7 @@ body {
     border-radius: 12px;
     border: 1px solid #475569;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    transition: all 0.3s ease;
+    transition: background-color .25s, border-color .25s, box-shadow .25s, color .25s, opacity .25s;
     max-height: 0;
     overflow: hidden;
     opacity: 0;
@@ -488,7 +488,7 @@ body {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: background-color .25s, border-color .25s, box-shadow .25s, color .25s, opacity .25s;
 }
 
 .modal-close:hover {
@@ -525,7 +525,7 @@ body {
     border-radius: 8px;
     color: #f1f5f9;
     font-size: 0.9rem;
-    transition: all 0.3s;
+    transition: background-color .25s, border-color .25s, box-shadow .25s, color .25s, opacity .25s;
 }
 
 .modal-input:focus {
@@ -548,7 +548,7 @@ body {
     font-size: 0.9rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: background-color .25s, border-color .25s, box-shadow .25s, color .25s, opacity .25s;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -604,7 +604,7 @@ body {
     cursor: pointer;
     font-size: 0.8rem;
     font-weight: 600;
-    transition: all 0.2s;
+    transition: background-color .25s, border-color .25s, box-shadow .25s, color .25s, opacity .25s;
     text-align: center;
 }
 
@@ -652,7 +652,7 @@ body {
     align-items: center;
     padding: 12px;
     border-bottom: 1px solid #475569;
-    transition: all 0.2s;
+    transition: background-color .25s, border-color .25s, box-shadow .25s, color .25s, opacity .25s;
 }
 
 .account-item:hover {
@@ -692,7 +692,7 @@ body {
     font-size: 0.9rem;
     padding: 5px;
     border-radius: 4px;
-    transition: all 0.2s;
+    transition: background-color .25s, border-color .25s, box-shadow .25s, color .25s, opacity .25s;
 }
 
 .account-action-btn:hover {
@@ -795,7 +795,7 @@ input, select {
     border-radius: 8px;
     font-size: 0.95rem;
     color: #f1f5f9;
-    transition: all 0.3s;
+    transition: background-color .25s, border-color .25s, box-shadow .25s, color .25s, opacity .25s;
     height: 44px;
 }
 
@@ -859,7 +859,7 @@ input:focus, select:focus {
     cursor: pointer;
     font-size: 0.85rem;
     font-weight: 600;
-    transition: all 0.2s;
+    transition: background-color .25s, border-color .25s, box-shadow .25s, color .25s, opacity .25s;
     flex: 1;
     min-height: 36px;
 }
@@ -877,7 +877,7 @@ input:focus, select:focus {
     border-radius: 8px;
     color: #f1f5f9;
     font-size: 0.9rem;
-    transition: all 0.3s;
+    transition: background-color .25s, border-color .25s, box-shadow .25s, color .25s, opacity .25s;
     height: 44px;
     display: flex;
     align-items: center;
@@ -1046,7 +1046,7 @@ button {
     font-size: 0.95rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: background-color .25s, border-color .25s, box-shadow .25s, color .25s, opacity .25s;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1191,7 +1191,7 @@ button {
     font-size: 0.9rem;
     cursor: pointer;
     border: none;
-    transition: all 0.2s;
+    transition: background-color .25s, border-color .25s, box-shadow .25s, color .25s, opacity .25s;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1233,7 +1233,7 @@ button {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    transition: all 0.3s ease;
+    transition: background-color .25s, border-color .25s, box-shadow .25s, color .25s, opacity .25s;
     position: relative;
     overflow: hidden;
 }
@@ -1535,7 +1535,7 @@ button {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: background-color .25s, border-color .25s, box-shadow .25s, color .25s, opacity .25s;
     min-width: 36px;
 }
 
@@ -1688,7 +1688,7 @@ button {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s;
+    transition: background-color .25s, border-color .25s, box-shadow .25s, color .25s, opacity .25s;
     z-index: 20001;
     border: 2px solid white;
 }
@@ -1710,7 +1710,7 @@ button {
     align-items: flex-start;
     z-index: 15000;
     display: none;
-    backdrop-filter: blur(5px);
+    
     overflow-y: auto;
     padding: 20px;
 }
@@ -1769,7 +1769,7 @@ button {
     height: auto;
     border-radius: 8px;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: background-color .25s, border-color .25s, box-shadow .25s, color .25s, opacity .25s;
     border: 2px solid transparent;
     display: block;
     margin: 0 auto;
@@ -1793,7 +1793,7 @@ button {
     align-items: center;
     z-index: 15000;
     display: none;
-    backdrop-filter: blur(5px);
+    
 }
 
 .close-modal-content {
@@ -1943,7 +1943,7 @@ button {
     justify-content: center;
     gap: 8px;
     margin: 15px 0;
-    transition: all 0.3s;
+    transition: background-color .25s, border-color .25s, box-shadow .25s, color .25s, opacity .25s;
 }
 
 .screenshot-upload:hover {
@@ -2063,7 +2063,7 @@ img, svg, canvas { max-width: 100%; }
     }
     .toolbar-header { flex: 1; min-width: 0; }
     .custom-logo { width: auto; }
-    .custom-logo svg { width: 112px; height: 44px; }
+    .custom-logo { display: flex; align-items: center; }
     .toolbar-calculator .calculator-btn { min-width: 0; height: 40px; padding: 0 14px; }
 
     .toolbar-menu {
@@ -2203,7 +2203,7 @@ body {
 .toolbar-btn:hover { color: var(--text); background: rgba(255, 255, 255, 0.05); transform: none; }
 .toolbar-btn.active { color: #fff; background: rgba(122, 162, 255, 0.14); box-shadow: inset 0 0 0 1px rgba(122, 162, 255, 0.35); border-bottom: 0; }
 @media (max-width: 900px) {
-    .toolbar-menu { background: rgba(11, 18, 32, 0.86); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); }
+    .toolbar-menu { background: rgba(11, 18, 32, 0.97);   }
 }
 
 .container { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 14px 34px rgba(0, 0, 0, 0.28); }
@@ -2261,7 +2261,7 @@ button:active { transform: scale(0.98); }
     .trades-table td.actions { order: 11; }
 }
 
-.details-modal, .close-modal, .image-modal { background-color: rgba(5, 9, 18, 0.72); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+.details-modal, .close-modal, .image-modal { background-color: rgba(5, 9, 18, 0.88);   }
 .details-modal-content, .close-modal-content { background: var(--panel); border: 1px solid var(--line); border-radius: 20px; box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55); }
 .close-modal-content h3 { color: var(--text); }
 
@@ -2288,3 +2288,10 @@ button:active { transform: scale(0.98); }
 .account-action-btn { min-width: 40px; width: 40px; height: 40px; padding: 5px; }
 
 .hidden-section { display: none !important; }
+
+
+/* ---- Simple static logo (no SVG filters / animations) ---- */
+.logo-text { display: inline-flex; align-items: baseline; gap: 2px; font-family: "Segoe UI", Helvetica, Arial, sans-serif; font-size: 1.5rem; font-weight: 700; letter-spacing: .5px; line-height: 1; white-space: nowrap; user-select: none; }
+.logo-j { color: #4ade80; }
+.logo-m { color: #f87171; }
+@media (max-width: 900px) { .logo-text { font-size: 1.15rem; } }
