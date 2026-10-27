@@ -26,7 +26,7 @@
     <link rel="stylesheet" href="../vendor/fontawesome/css/fa.css?v=8">
 
     <!-- همان استایل ژورنال: نوار بالا، کارت‌ها، فرم‌ها و رنگ‌ها -->
-    <link rel="stylesheet" href="../style.css?v=8">
+    <link rel="stylesheet" href="../style.css?v=11">
 
     <style>
         /* فقط چیزهایی که مخصوص ماشین‌حساب است */
@@ -83,110 +83,7 @@
             <div class="toolbar-header">
                 <a href="../index.html" aria-label="بازگشت به ژورنال" style="display:block; text-decoration:none;">
                     <div class="custom-logo" style="margin-left: 15px;">
-                    <svg width="240" height="70" viewBox="0 0 760 300" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMid meet">
-                        <defs>
-                            <linearGradient id="greenGrad" x1="0" y1="0" x2="0" y2="200">
-                                <stop offset="0%" stop-color="#66FF33">
-                                    <animate attributeName="stop-color"
-                                        values="#66FF33;#00FF99;#66FF33"
-                                        dur="4s" repeatCount="indefinite"/>
-                                </stop>
-                                <stop offset="100%" stop-color="#00FF99"/>
-                            </linearGradient>
-
-                            <linearGradient id="redGrad" x1="0" y1="0" x2="0" y2="200">
-                                <stop offset="0%" stop-color="#FF4D4D">
-                                    <animate attributeName="stop-color"
-                                        values="#FF4D4D;#FF0033;#FF4D4D"
-                                        dur="4s" repeatCount="indefinite"/>
-                                </stop>
-                                <stop offset="100%" stop-color="#FF0033"/>
-                            </linearGradient>
-
-                            <filter id="glow" x="-200%" y="-200%" width="400%" height="400%">
-                                <feGaussianBlur stdDeviation="10" result="blur"/>
-                                <feMerge>
-                                    <feMergeNode in="blur"/>
-                                    <feMergeNode in="SourceGraphic"/>
-                                </feMerge>
-                            </filter>
-                        </defs>
-
-                        <!-- بدون rect پس‌زمینه - کاملاً شفاف -->
-
-                        <path d="M90 190 
-                                 L150 130 
-                                 L200 160 
-                                 L260 100 
-                                 L320 150 
-                                 L380 110"
-                            stroke="url(#greenGrad)"
-                            stroke-width="5"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            filter="url(#glow)"
-                            stroke-dasharray="500"
-                            stroke-dashoffset="500">
-                            <animate attributeName="stroke-dashoffset"
-                                from="500" to="0"
-                                dur="3s"
-                                repeatCount="indefinite"/>
-                        </path>
-
-                        <!-- J -->
-                        <path d="M130 90 
-                                 V200 
-                                 Q130 230 170 230 
-                                 Q210 230 210 180"
-                            stroke="url(#greenGrad)"
-                            stroke-width="16"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            filter="url(#glow)">
-                            <animate attributeName="stroke-width"
-                                values="16;18;16"
-                                dur="2s"
-                                repeatCount="indefinite"/>
-                        </path>
-
-                        <!-- M -->
-                        <path d="M420 220 
-                                 L460 95 
-                                 L500 180 
-                                 L540 75 
-                                 L580 220"
-                            stroke="url(#redGrad)"
-                            stroke-width="16"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            filter="url(#glow)">
-                            <animate attributeName="stroke-width"
-                                values="16;18;16"
-                                dur="2s"
-                                repeatCount="indefinite"/>
-                        </path>
-
-                        <!-- Brand Text -->
-                        <text x="170" y="270"
-                            text-anchor="middle"
-                            font-family="Helvetica, Arial, sans-serif"
-                            font-size="40"
-                            letter-spacing="12"
-                            fill="url(#greenGrad)"
-                            filter="url(#glow)">
-                            JOURNAL
-                        </text>
-
-                        <text x="520" y="270"
-                            text-anchor="middle"
-                            font-family="Helvetica, Arial, sans-serif"
-                            font-size="40"
-                            letter-spacing="12"
-                            fill="url(#redGrad)"
-                            filter="url(#glow)">
-                            ME
-                        </text>
-                    </svg>
+                    <span class="logo-text" dir="ltr"><span class="logo-j">Journal</span><span class="logo-m">Me</span></span>
                 </div>
                 </a>
             </div>
